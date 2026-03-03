@@ -1,0 +1,26 @@
+{
+  "goals": ["test目标1", "test目标2", "test目标3"],
+  "routes": [
+    {
+      "name": "路线A",
+      "nodes": [
+        { "title": "test节点1", "tag": "学习", "completed": true },
+        { "title": "test节点2", "tag": "学习", "completed": true },
+        { "title": "test节点3", "tag": "项目", "completed": true },
+        { "title": "test节点4", "tag": "学习", "completed": false },
+        { "title": "test节点5", "tag": "项目", "completed": false }
+      ]
+    },
+    {
+      "name": "路线B",
+      "nodes": [
+        { "title": "test节点1", "tag": "学习", "completed": true },
+        { "title": "test节点2", "tag": "项目", "completed": false }
+      ]
+    },
+    {
+      "name": "路线C",
+      "nodes": []
+    }
+  ]
+}
