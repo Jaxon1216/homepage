@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FiGithub, FiMail } from "react-icons/fi";
+import { FiGithub, FiMail, FiExternalLink } from "react-icons/fi";
 import { siteConfig } from "@/lib/site-config";
 
 export function Footer() {
@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="font-semibold mb-3">{siteConfig.name}</h3>
+            <h3 className="font-semibold mb-3">{siteConfig.nameEn}</h3>
             <p className="text-sm text-[var(--muted)] leading-relaxed">
               热爱技术，持续学习，记录成长。
             </p>
@@ -32,27 +32,24 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Friend Links */}
+          {/* Social / External Links */}
           <div>
-            <h3 className="font-semibold mb-3">友链</h3>
-            {siteConfig.footer.friendLinks.length > 0 ? (
-              <ul className="space-y-2">
-                {siteConfig.footer.friendLinks.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-[var(--muted)]">暂无友链，欢迎交换</p>
-            )}
+            <h3 className="font-semibold mb-3">链接</h3>
+            <ul className="space-y-2">
+              {siteConfig.social.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+                  >
+                    <FiExternalLink size={12} />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Contact */}
@@ -74,7 +71,7 @@ export function Footer() {
                   className="flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
                 >
                   <FiMail size={16} />
-                  Email
+                  {siteConfig.email}
                 </a>
               )}
             </div>
@@ -82,7 +79,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-[var(--card-border)] text-center text-sm text-[var(--muted)]">
-          &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+          &copy; {new Date().getFullYear()} {siteConfig.nameEn}. All rights reserved.
         </div>
       </div>
     </footer>

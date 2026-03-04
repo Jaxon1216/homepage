@@ -11,7 +11,7 @@ const roles = ["Frontend Developer", "Lifelong Learner", "Open Source Enthusiast
 const stats = [
   { label: "项目", value: `${siteConfig.projects.length}+`, icon: FiCode },
   { label: "文章", value: "10+", icon: FiBookOpen },
-  { label: "GitHub", value: "Jaxon1216", icon: FiGithub },
+  { label: "GitHub", value: siteConfig.github, icon: FiGithub },
 ];
 
 const socials = [

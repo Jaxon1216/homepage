@@ -19,7 +19,7 @@ export default function HomePage() {
         <HeroSection />
         <GitHubContribution />
         <FeaturedProjects />
-        <MottoBlock text="知不足而奋进，望远山而前行" />
+        <MottoBlock text="Be so good they can't ignore you." />
       </div>
     </>
   );

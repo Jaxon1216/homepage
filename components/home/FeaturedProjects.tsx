@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FiExternalLink, FiGithub } from "react-icons/fi";
 import { siteConfig, type Project } from "@/lib/site-config";
 
+const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+  resume: {
+    bg: "bg-blue-50 dark:bg-blue-950/40",
+    text: "text-blue-600 dark:text-blue-400",
+    border: "border-blue-200 dark:border-blue-800",
+  },
+  vibecoding: {
+    bg: "bg-purple-50 dark:bg-purple-950/40",
+    text: "text-purple-600 dark:text-purple-400",
+    border: "border-purple-200 dark:border-purple-800",
+  },
+};
+
+function getCategoryLabel(key: string) {
+  return siteConfig.projectCategories.find((c) => c.key === key)?.label ?? key;
+}
+
 export function FeaturedProjects() {
-  const [activeTab, setActiveTab] = useState(siteConfig.projectCategories[0].key);
-
-  const filtered = siteConfig.projects.filter((p) => p.category === activeTab);
-
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
@@ -20,56 +32,32 @@ export function FeaturedProjects() {
     >
       <h2 className="text-2xl font-bold text-center mb-8">精选项目</h2>
 
-      {/* Tabs */}
-      <div className="flex justify-center gap-2 mb-8">
-        {siteConfig.projectCategories.map((cat) => (
-          <button
-            key={cat.key}
-            onClick={() => setActiveTab(cat.key)}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-              activeTab === cat.key
-                ? "bg-[var(--accent)] text-white"
-                : "bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)] border border-[var(--card-border)]"
-            }`}
-          >
-            {cat.label}
-          </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {siteConfig.projects.map((project) => (
+          <ProjectCard key={project.name} project={project} />
         ))}
       </div>
-
-      {/* Project cards */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          {filtered.length === 0 ? (
-            <p className="col-span-2 text-center text-[var(--muted)] py-8">
-              暂无项目，敬请期待
-            </p>
-          ) : (
-            filtered.map((project) => (
-              <ProjectCard key={project.name} project={project} />
-            ))
-          )}
-        </motion.div>
-      </AnimatePresence>
     </motion.section>
   );
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const colors = categoryColors[project.category] ?? categoryColors.resume;
+  const categoryLabel = getCategoryLabel(project.category);
+
   return (
-    <div className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group flex flex-col"
+    >
       <div className="flex items-start justify-between mb-2">
         <h3 className="font-semibold group-hover:text-[var(--accent)] transition-colors">
           {project.name}
         </h3>
-        <div className="flex gap-2">
+        <div className="flex gap-2 shrink-0 ml-2">
           {project.github && (
             <a
               href={project.github}
@@ -95,11 +83,16 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
 
-      <p className="text-sm text-[var(--muted)] mb-3 leading-relaxed">
+      <p className="text-sm text-[var(--muted)] mb-3 leading-relaxed flex-1">
         {project.description}
       </p>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <span
+          className={`px-2 py-0.5 text-xs rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}
+        >
+          {categoryLabel}
+        </span>
         {project.tags.map((tag) => (
           <span
             key={tag}
@@ -109,6 +102,6 @@ function ProjectCard({ project }: { project: Project }) {
           </span>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

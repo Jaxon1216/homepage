@@ -2,106 +2,195 @@
 
 import { motion } from "framer-motion";
 import {
-  SiTypescript,
-  SiReact,
-  SiNextdotjs,
-  SiTailwindcss,
-  SiNodedotjs,
-  SiGit,
-  SiPython,
-  SiDocker,
-} from "react-icons/si";
+  FiCode,
+  FiTool,
+  FiBook,
+  FiMail,
+  FiGithub,
+  FiGlobe,
+  FiBookOpen,
+} from "react-icons/fi";
+import { siteConfig } from "@/lib/site-config";
 import { MottoBlock } from "@/components/common/MottoBlock";
 
-const techStack = [
-  { icon: SiTypescript, name: "TypeScript", color: "#3178c6" },
-  { icon: SiReact, name: "React", color: "#61dafb" },
-  { icon: SiNextdotjs, name: "Next.js", color: "currentColor" },
-  { icon: SiTailwindcss, name: "Tailwind", color: "#06b6d4" },
-  { icon: SiNodedotjs, name: "Node.js", color: "#339933" },
-  { icon: SiPython, name: "Python", color: "#3776ab" },
-  { icon: SiGit, name: "Git", color: "#f05032" },
-  { icon: SiDocker, name: "Docker", color: "#2496ed" },
+const coreSkills = [
+  { label: "前端开发", items: ["HTML5/CSS3", "JavaScript(ES6+)", "Vue3", "React"] },
 ];
 
-const education = [
-  {
-    school: "填写你的学校",
-    degree: "填写你的专业",
-    period: "20xx - 20xx",
-  },
+const toolsAndPlatforms = [
+  { label: "开发工具", items: ["Cursor", "Git", "Chrome DevTools"] },
+  { label: "构建工具", items: ["Vite", "npm"] },
+  { label: "部署运维", items: ["Docker", "CI/CD(GitHub Actions)", "Vercel"] },
 ];
+
+const contacts = [
+  { icon: FiMail, label: "邮箱", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
+  { icon: FiGithub, label: "GitHub", value: `github.com/${siteConfig.github}`, href: `https://github.com/${siteConfig.github}` },
+  { icon: FiGlobe, label: "博客", value: "EastonJiang's blog", href: "https://www.jiangxu.net" },
+  { icon: FiBookOpen, label: "知识库", value: "EastonJiang's notes", href: "https://notes.jiangxu.net" },
+];
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
 
 const fadeUp = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5 },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 export function AboutContent() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-16">
-      <motion.h1 {...fadeUp} className="text-3xl font-bold mb-8">
-        关于我
-      </motion.h1>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-12"
+      >
+        <div className="border-b-2 border-[var(--accent)] pb-4">
+          <h1 className="text-3xl font-bold mb-1">
+            Hi, I&apos;m {siteConfig.nameEn}
+          </h1>
+          <p className="text-sm text-[var(--muted)]">Web 全栈开发者</p>
+        </div>
+      </motion.div>
 
-      {/* Bio */}
-      <motion.section {...fadeUp} className="mb-12">
-        <p className="text-[var(--muted)] leading-relaxed">
-          你好，我是江旭（Jaxon）。热爱技术，喜欢折腾，持续学习中。
-          这个网站是我的个人空间，记录技术心得、项目实践和成长足迹。
-        </p>
-      </motion.section>
-
-      {/* Tech stack */}
-      <motion.section {...fadeUp} className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">技术栈</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {techStack.map((tech) => (
-            <motion.div
-              key={tech.name}
-              whileHover={{ scale: 1.05 }}
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors"
-            >
-              <tech.icon size={28} style={{ color: tech.color }} />
-              <span className="text-sm text-[var(--muted)]">{tech.name}</span>
+      {/* 技术专长 */}
+      <Section icon={FiCode} title="核心技术栈">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="space-y-3"
+        >
+          {coreSkills.map((group) => (
+            <motion.div key={group.label} variants={fadeUp}>
+              <p className="text-sm font-medium mb-2">{group.label}</p>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <span
+                    key={item}
+                    className="px-3 py-1 rounded-full text-sm bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             </motion.div>
           ))}
-        </div>
-      </motion.section>
+        </motion.div>
+      </Section>
 
-      {/* Education */}
-      <motion.section {...fadeUp} className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">教育背景</h2>
-        {education.map((edu) => (
-          <div
-            key={edu.school}
-            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)]"
-          >
-            <h3 className="font-medium">{edu.school}</h3>
-            <p className="text-sm text-[var(--muted)]">{edu.degree}</p>
-            <p className="text-sm text-[var(--muted)]">{edu.period}</p>
-          </div>
-        ))}
-      </motion.section>
-
-      {/* Interests */}
-      <motion.section {...fadeUp} className="mb-12">
-        <h2 className="text-xl font-semibold mb-6">兴趣爱好</h2>
-        <div className="flex flex-wrap gap-2">
-          {["编程", "阅读", "开源", "旅行"].map((hobby) => (
-            <span
-              key={hobby}
-              className="px-3 py-1.5 rounded-full text-sm bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20"
-            >
-              {hobby}
-            </span>
+      {/* 工具与平台 */}
+      <Section icon={FiTool} title="工具与平台">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="space-y-3"
+        >
+          {toolsAndPlatforms.map((group) => (
+            <motion.div key={group.label} variants={fadeUp}>
+              <p className="text-sm font-medium mb-2">{group.label}</p>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <span
+                    key={item}
+                    className="px-3 py-1 rounded-full text-sm bg-[var(--card)] border border-[var(--card-border)]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
           ))}
-        </div>
-      </motion.section>
+        </motion.div>
+      </Section>
 
-      <MottoBlock text="Stay hungry, stay foolish." />
+      {/* 教育与竞赛经历 */}
+      <Section icon={FiBook} title="教育与竞赛经历">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)]"
+        >
+          <div className="flex justify-between items-start flex-wrap gap-2">
+            <div>
+              <span className="font-medium">中国地质大学（北京）</span>
+              <span className="text-[var(--muted)] mx-2">安全工程 本科在读</span>
+            </div>
+            <span className="text-sm text-[var(--muted)]">2024.09 - 至今</span>
+          </div>
+          <ul className="mt-3 text-sm text-[var(--muted)] space-y-1.5">
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
+              第17届全国大学生数学竞赛 - 北京赛区三等奖
+            </li>
+          </ul>
+        </motion.div>
+      </Section>
+
+      {/* 联系方式 */}
+      <Section icon={FiMail} title="联系方式">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+        >
+          {contacts.map((item) => (
+            <motion.a
+              key={item.label}
+              variants={fadeUp}
+              href={item.href}
+              target={item.href.startsWith("mailto:") ? undefined : "_blank"}
+              rel={item.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+              className="flex items-center gap-3 p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
+            >
+              <item.icon
+                size={16}
+                className="text-[var(--accent)] flex-shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--muted)]">{item.label}</p>
+                <p className="text-sm font-medium truncate group-hover:text-[var(--accent)] transition-colors">
+                  {item.value}
+                </p>
+              </div>
+            </motion.a>
+          ))}
+        </motion.div>
+      </Section>
+
+      <MottoBlock text="Obsessed is a word the lazy use to describe the dedicated." />
     </div>
+  );
+}
+
+function Section({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mb-10">
+      <h2 className="flex items-center gap-2 text-base font-semibold mb-4 pb-2 border-b border-[var(--card-border)]">
+        <Icon size={16} className="text-[var(--accent)]" />
+        {title}
+      </h2>
+      {children}
+    </section>
   );
 }
