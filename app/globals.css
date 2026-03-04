@@ -144,3 +144,17 @@ body {
 #particles-js canvas {
   pointer-events: auto;
 }
+
+.particles-passthrough {
+  pointer-events: none;
+}
+
+.particles-passthrough a,
+.particles-passthrough button,
+.particles-passthrough input,
+.particles-passthrough select,
+.particles-passthrough textarea,
+.particles-passthrough [role="button"],
+.particles-passthrough [tabindex] {
+  pointer-events: auto;
+}

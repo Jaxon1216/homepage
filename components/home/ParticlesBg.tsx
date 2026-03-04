@@ -11,18 +11,18 @@ declare global {
 const config = {
   particles: {
     number: {
-      value: 80,
+      value: 120,
       density: { enable: true, value_area: 800 },
     },
     color: { value: "#3b82f6" },
     shape: { type: "circle" },
     opacity: {
-      value: 0.2,
+      value: 0.25,
       random: true,
       anim: { enable: false },
     },
     size: {
-      value: 2,
+      value: 2.5,
       random: true,
       anim: { enable: false },
     },
@@ -41,6 +41,7 @@ const config = {
       straight: false,
       out_mode: "bounce",
       bounce: false,
+      attract: { enable: true, rotateX: 600, rotateY: 1200 },
     },
   },
   interactivity: {
@@ -64,7 +65,7 @@ const mobileConfig = {
   ...config,
   particles: {
     ...config.particles,
-    number: { value: 30, density: { enable: true, value_area: 800 } },
+    number: { value: 45, density: { enable: true, value_area: 800 } },
   },
 };
 

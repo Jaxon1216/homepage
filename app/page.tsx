@@ -15,7 +15,7 @@ export default function HomePage() {
   return (
     <>
       <ParticlesWrapper />
-      <div className="relative z-10 max-w-5xl mx-auto px-4">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 particles-passthrough">
         <HeroSection />
         <GitHubContribution />
         <FeaturedProjects />
