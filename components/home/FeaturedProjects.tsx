@@ -15,6 +15,16 @@ const categoryColors: Record<string, { bg: string; text: string; border: string 
     text: "text-purple-600 dark:text-purple-400",
     border: "border-purple-200 dark:border-purple-800",
   },
+  ForStudy: {
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+    text: "text-emerald-600 dark:text-emerald-400",
+    border: "border-emerald-200 dark:border-emerald-800",
+  },
+  Developing: {
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+    text: "text-amber-600 dark:text-amber-400",
+    border: "border-amber-200 dark:border-amber-800",
+  },
 };
 
 function getCategoryLabel(key: string) {
