@@ -66,7 +66,6 @@ const resumeVersions: ResumeVersion[] = [
           period: "2024.09 - 至今",
           details: [
             "第17届全国大学生数学竞赛 - 北京赛区三等奖",
-            "计划2026年5月申请转专业至计算机方向",
           ],
         },
       ],
@@ -113,7 +112,7 @@ const resumeVersions: ResumeVersion[] = [
   {
     key: "v1-2025",
     label: "2025 转专业版",
-    date: "2025-05",
+    date: "2025-11",
     header: {
       name: siteConfig.name,
       email: "jiangxu05@outlook.com",
@@ -122,7 +121,7 @@ const resumeVersions: ResumeVersion[] = [
     },
     sections: {
       summary:
-        "安全工程专业大一学生，申请转入软件工程专业。自学编程一年，具备扎实的 C++ 和数据结构基础，熟悉 Git 工作流和前端基础技术栈。",
+        "安全工程专业大一学生，申请转入软件工程专业。自学编程一年，具备扎实的 C++ 和数据结构基础，熟悉 Git 工作流和前端基础技术栈。因为学校政策这学期不能转要在大二下留一级转",
       education: [
         {
           school: "中国地质大学（北京）",

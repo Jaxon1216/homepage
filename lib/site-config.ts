@@ -45,7 +45,7 @@ export const siteConfig = {
       tags: ["Next.js", "TypeScript", "Tailwind CSS"],
       link: "https://jiangxu.net",
       github: "https://github.com/Jaxon1216/homepage",
-      category: "vibecoding" as const,
+      category: "Developing" as const,
     },
     {
       name: "TodoMVC 框架对比",
@@ -54,7 +54,7 @@ export const siteConfig = {
       tags: ["TypeScript", "Vue", "React"],
       link: "todo.jiangxu.net",
       github: "https://github.com/Jaxon1216/todomvc",
-      category: "resume" as const,
+      category: "ForStudy" as const,
     },
     {
       name: "学习笔记站",
@@ -62,7 +62,7 @@ export const siteConfig = {
       tags: ["JavaScript", "文档"],
       link: "https://notes.jiangxu.net",
       github: "https://github.com/Jaxon1216/notes",
-      category: "resume" as const,
+      category: "ForStudy" as const,
     },
     {
       name: "自习室 (Learning Duel)",
@@ -71,7 +71,7 @@ export const siteConfig = {
       tags: ["Next.js", "Supabase", "TypeScript"],
       link: "https://fc.jiangxu.net",
       github: "https://github.com/Jaxon1216/learning-duel",
-      category: "vibecoding" as const,
+      category: "ForStudy" as const,
     },
     {
       name: "悟空的朋友圈",
@@ -118,6 +118,8 @@ export const siteConfig = {
   projectCategories: [
     { key: "resume", label: "简历项目" },
     { key: "vibecoding", label: "Vibe Coding" },
+    { key: "ForStudy", label: "For Study" },
+    { key: "Developing", label: "Developing" },
   ],
 };
 
