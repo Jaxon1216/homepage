@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import {
   FiCode,
   FiTool,
@@ -50,11 +51,28 @@ export function AboutContent() {
         transition={{ duration: 0.5 }}
         className="mb-12"
       >
-        <div className="border-b-2 border-[var(--accent)] pb-4">
-          <h1 className="text-3xl font-bold mb-1">
-            Hi, I&apos;m {siteConfig.nameEn}
-          </h1>
-          <p className="text-sm text-[var(--muted)]">Web 全栈开发者</p>
+        <div className="border-b-2 border-[var(--accent)] pb-4 flex items-center gap-5">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex-shrink-0"
+          >
+            <Image
+              src={siteConfig.avatar}
+              alt={siteConfig.nameEn}
+              width={80}
+              height={80}
+              className="rounded-full object-cover ring-2 ring-[var(--accent)]/30"
+              priority
+            />
+          </motion.div>
+          <div>
+            <h1 className="text-3xl font-bold mb-1">
+              Hi, I&apos;m {siteConfig.nameEn}
+            </h1>
+            <p className="text-sm text-[var(--muted)]">Web 全栈开发者</p>
+          </div>
         </div>
       </motion.div>
 

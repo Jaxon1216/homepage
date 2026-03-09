@@ -1,6 +1,7 @@
 export const siteConfig = {
   name: "江旭",
   nameEn: "EastonJiang",
+  avatar: "/avatar1.jpg",
   title: "江旭 | 个人网站",
   description: "江旭的个人网站 - 技术博客、项目展示、在线简历",
   url: "https://jiangxu.net",
