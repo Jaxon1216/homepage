@@ -99,6 +99,14 @@ export const siteConfig = {
       category: "resume" as const,
     },
     {
+      name: "GenBI 智能数据分析平台",
+      description: "基于 AI 的智能数据分析与可视化平台，支持自然语言生成图表",
+      tags: ["React", "Spring Boot", "AI"],
+      link: "",
+      github: "https://github.com/Jaxon1216/genBI",
+      category: "resume" as const,
+    },
+    {
       name: "MathModelHub",
       description: "美赛/ICM 综合准备资源库，包含数学建模代码、模板和数据分析笔记",
       tags: ["Python", "Jupyter", "数学建模"],
