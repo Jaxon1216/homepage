@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { FiGithub } from "react-icons/fi";
 import { siteConfig } from "@/lib/site-config";
@@ -17,13 +16,13 @@ export function GitHubContribution() {
       <h2 className="text-2xl font-bold text-center mb-8">GitHub 贡献</h2>
 
       <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-xl p-6 overflow-x-auto">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={`https://ghchart.rshah.org/2563eb/${siteConfig.github}`}
           alt="GitHub Contribution Graph"
           width={896}
           height={112}
           className="w-full max-w-3xl mx-auto dark:brightness-90"
-          unoptimized
           loading="lazy"
         />
       </div>
