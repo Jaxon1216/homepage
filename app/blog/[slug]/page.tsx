@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
+import { mdxComponents } from "@/components/mdx";
 import { PostContent } from "./PostContent";
 
 interface Props {
@@ -36,6 +37,7 @@ export default async function BlogPostPage({ params }: Props) {
     <PostContent meta={post.meta}>
       <MDXRemote
         source={post.content}
+        components={mdxComponents}
         options={{
           mdxOptions: {
             remarkPlugins: [remarkGfm],
