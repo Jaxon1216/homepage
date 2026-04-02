@@ -4,6 +4,8 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
+import { rehypeMermaid } from "@/lib/rehype-mermaid";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
 import { mdxComponents } from "@/components/mdx";
 import { PostContent } from "./PostContent";
@@ -41,7 +43,18 @@ export default async function BlogPostPage({ params }: Props) {
         options={{
           mdxOptions: {
             remarkPlugins: [remarkGfm],
-            rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+            rehypePlugins: [
+              rehypeSlug,
+              rehypeAutolinkHeadings,
+              rehypeMermaid,
+              [
+                rehypePrettyCode,
+                {
+                  theme: { dark: "one-dark-pro", light: "github-light" },
+                  keepBackground: false,
+                },
+              ],
+            ],
           },
         }}
       />

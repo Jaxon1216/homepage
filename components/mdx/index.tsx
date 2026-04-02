@@ -1,22 +1,33 @@
-import type { ComponentPropsWithoutRef, ReactElement } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import { Mermaid } from "./Mermaid";
 
 function Pre(props: ComponentPropsWithoutRef<"pre">) {
-  const child = props.children as ReactElement<{
-    className?: string;
-    children?: string;
-  }>;
+  return <pre {...props} className={`${props.className ?? ""} not-prose`} />;
+}
 
-  if (
-    child?.props?.className === "language-mermaid" &&
-    typeof child.props.children === "string"
-  ) {
-    return <Mermaid chart={child.props.children} />;
+function Figure(
+  props: ComponentPropsWithoutRef<"figure"> & {
+    "data-rehype-pretty-code-figure"?: string;
   }
+) {
+  if ("data-rehype-pretty-code-figure" in props) {
+    return <figure {...props} className="not-prose my-4" />;
+  }
+  return <figure {...props} />;
+}
 
-  return <pre {...props} />;
+function Div(props: ComponentPropsWithoutRef<"div">) {
+  if (
+    props.className === "__mermaid__" &&
+    typeof props.children === "string"
+  ) {
+    return <Mermaid chart={props.children} />;
+  }
+  return <div {...props} />;
 }
 
 export const mdxComponents = {
   pre: Pre,
+  figure: Figure,
+  div: Div,
 };
