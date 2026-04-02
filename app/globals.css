@@ -168,6 +168,56 @@ body {
   padding: 0;
 }
 
+/* rehype-pretty-code */
+figure[data-rehype-pretty-code-figure] {
+  margin: 1rem 0;
+}
+
+figure[data-rehype-pretty-code-figure] pre {
+  background: var(--card) !important;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+figure[data-rehype-pretty-code-figure] pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  display: grid;
+}
+
+figure[data-rehype-pretty-code-figure] code [data-line] {
+  padding: 0 0.25rem;
+}
+
+figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background: var(--accent-light);
+  border-left: 2px solid var(--accent);
+}
+
+/* Dual-theme switching: light by default, dark when .dark class is present */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Inline code styled by pretty-code (single backtick with language) */
+code[data-theme] > span {
+  font-size: 0.875em;
+}
+
 /* Animations */
 @keyframes fade-in {
   from { opacity: 0; }
