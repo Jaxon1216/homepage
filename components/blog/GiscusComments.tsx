@@ -1,20 +1,52 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 
 export function GiscusComments() {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const { resolvedTheme } = useTheme();
 
-  useEffect(() => {
-    if (!ref.current) return;
+  const handleIntersection = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (entries[0].isIntersecting) {
+        setIsVisible(true);
+      }
+    },
+    []
+  );
 
-    const existing = ref.current.querySelector("iframe.giscus-frame");
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      rootMargin: "200px",
+    });
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [handleIntersection]);
+
+  useEffect(() => {
+    if (!isVisible || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const existing = container.querySelector("iframe.giscus-frame");
+
     if (existing) {
-      existing.remove();
+      const iframe = existing as HTMLIFrameElement;
+      const theme = resolvedTheme === "dark" ? "dark" : "light";
+      iframe.contentWindow?.postMessage(
+        { giscus: { setConfig: { theme } } },
+        "https://giscus.app"
+      );
+      return;
     }
-    ref.current.innerHTML = "";
+
+    container.innerHTML = "";
 
     const script = document.createElement("script");
     script.src = "https://giscus.app/client.js";
@@ -35,8 +67,13 @@ export function GiscusComments() {
     script.setAttribute("crossorigin", "anonymous");
     script.async = true;
 
-    ref.current.appendChild(script);
-  }, [resolvedTheme]);
+    container.appendChild(script);
+  }, [isVisible, resolvedTheme]);
 
-  return <div ref={ref} className="mt-12" />;
+  return (
+    <div className="mt-12">
+      <div ref={sentinelRef} />
+      <div ref={containerRef} />
+    </div>
+  );
 }
