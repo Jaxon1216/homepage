@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site-config";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--card-border)] bg-[var(--card)]">
+    <footer className="relative z-10 border-t border-[var(--card-border)] bg-[var(--card)]">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
