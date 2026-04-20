@@ -37,6 +37,7 @@ interface ResumeVersion {
   header: { name: string; email: string; github: string; blog: string };
   sections: {
     summary: string;
+    personalEvaluation?: string[];
     education: { school: string; degree: string; gpa: string; period: string; details: string[] }[];
     skills: string[];
     experience: Experience[];
@@ -57,58 +58,64 @@ const resumeVersions: ResumeVersion[] = [
     },
     sections: {
       summary:
-        "自学转码中的大二学生，专注前端开发，目标进大厂或外企。有 Vue 3 和 React 项目经验，熟悉前端工程化工具链。",
+        "中国地质大学（北京）在读，专注前端开发与工程化实践，有个人全栈 BI 项目与 Next.js 个人站点维护经验。",
+      personalEvaluation: [
+        "热爱开源技术，参与过 2k+ Star 项目贡献，个人 GitHub 拥有 10+ 完整实用项目，同时运营个人技术博客",
+        "具备较强的自学能力与问题排查能力，能够快速学习新技术并落地实践",
+        "具备良好的英文文档阅读能力，可无障碍查阅官方文档与前沿技术资料",
+      ],
       education: [
         {
           school: "中国地质大学（北京）",
-          degree: "安全工程 本科",
+          degree: "211本科",
           gpa: "",
-          period: "2024.09 - 至今",
-          details: [
-            "第17届全国大学生数学竞赛 - 北京赛区三等奖",
-          ],
+          period: "2024.9 - 2028.7",
+          details: ["第17届全国大学生数学竞赛三等奖"],
         },
       ],
       skills: [
-        "前端: 熟悉 HTML5 及 HTML5 元素、CSS3 基本语法与布局（Flex/Grid）",
-        "JavaScript: 熟悉 ES6+ 语法特性，理解 this 指向、作用域、闭包、原型链、Promise、模块化",
-        "Vue 3: 完成了黑马 Vue3 小兔鲜项目，熟悉组合式 API",
-        "React: 熟悉 JSX/TSX、useState、useEffect、React Router、useContext、useReducer 等",
-        "工具: Git、Docker、Cursor、Vercel、npm/pnpm",
-        "了解: HTTP 协议、TCP/IP、Node.js、webpack/vite",
-        "熟悉 React 框架开发，能够根据业务定制前端模板，比如封装全局异常处理逻辑",
-        "熟悉前端代码规范，并能够使用 ESLint + Prettier + TypeScript + Husky 等技术保证前端项目质量",
-        "熟悉 Ant Design、ECharts、Lodash 等组件库和工具的使用",
-        "能够使用 Ant Design Pro 框架、Umi OpenAPI 代码生成、VS Code、WebStorm IDE 等开发工具快速开发前端项目",
+        "深入理解事件循环、浏览器渲染等前端核心原理",
+        "熟练掌握 JavaScript/TypeScript，熟悉 React 及相关生态，了解 Vue3、Next.js 并有实际项目经验",
+        "熟悉前端工程化与代码规范，能够使用 ESLint + Prettier + TypeScript + Husky 保障项目代码质量",
+        "熟练使用 Ant Design、ECharts 等常用组件库与工具，具备快速查阅官方文档解决问题的能力",
+        "能够使用 ClaudeCode、Cursor、OpenSpec、Codex 等工具高效开发前端项目",
+        "熟悉 Git 协作与 PR 流程，掌握 CI/CD（GitHub Actions）、Docker 容器化部署",
       ],
       experience: [],
       projects: [
+        {
+          name: "AI驱动的数据分析平台",
+          tech: "React 18 + TypeScript + Umi Max + Ant Design + ECharts + Zod + react-window",
+          points: [
+            "GitHub：https://github.com/Jaxon1216/GenBI | 2026.02 – 维护至今",
+            "项目简介：基于 AI 大模型的智能 BI 平台，用户上传 Excel 数据后，AI 自动生成 ECharts 可视化图表与分析结论，支持同步/异步生成，可通过拖拽看板组合展示多图表",
+            "设计基于 Zod 的图表 Schema 校验层，对 AI 返回的 ECharts 配置进行运行时校验、JSON 容错提取与危险字段过滤，结合 Error Boundary 兜底，实现图表渲染崩溃率为 0",
+            "封装通用轮询 Hook，结合指数退避策略与 Page Visibility API 实现异步图表状态实时更新，减少约 60% 无效请求",
+            "使用 react-window 虚拟滚动，支持万行级数据展示，仅渲染可视区域 DOM，渲染耗时优化至 50ms 以内",
+          ],
+        },
+        {
+          name: "个人主页",
+          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + MDX + Framer Motion",
+          points: [
+            "站点：https://jiangxu.net | 2025.09 – 维护至今",
+            "项目简介：用于记录学习与成长历程，锻炼工程化与性能优化能力",
+            "基于 Next.js App Router 架构搭建，集成博客、简历、项目展示等模块",
+            "采用服务端组件与客户端组件混合渲染，博客页面使用 SSG 静态生成，优化首屏加载性能",
+            "实现 MDX 博客系统，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能",
+            "使用 Framer Motion 实现流畅的页面过渡与滚动驱动动画，通过动态导入按需加载重型组件",
+            "支持深色/浅色主题切换，全站响应式适配多端设备",
+          ],
+        },
         {
           name: "电商平台",
           tech: "Vue 3 + Vue-Router + Pinia + Axios + Element Plus",
           points: [
             "一个单页电商网站平台，支持商品展示、用户登录、购物车及订单管理等功能",
             "核心功能：独立开发了商品列表、详情展示、购物车及订单管理等一系列可复用组件",
-            "工程化开发：采用Pinia进行全局状态管理，并配合localStorage实现用户状态与购物车数据持久化",
-            "性能优化：通过Vue Router懒加载、图片懒加载、函数防抖等手段有效降低了初始加载时间与运行时的性能开销",
-            "可维护架构：对Axios进行二次封装，统一了API请求与错误处理逻辑，提升了代码复用性",
-          ],
-        },
-        {
-          name: "GenBI 智能数据分析平台",
-          tech: "React + Spring Boot + MySQL + Redis + RabbitMQ + AI",
-          points: [
-            "基于 React 和 Spring Boot 的智能 BI 平台，支持用户上传数据并通过自然语言生成可视化图表",
-            "后端采用 Spring Boot + MyBatis-Plus，集成 AI SDK 实现智能分析，使用 RabbitMQ 异步处理任务",
-            "前端使用 React + Ant Design Pro + ECharts，支持图表实时预览和交互",
-            "引入 Redis 缓存和限流机制，优化高并发场景下的系统性能",
-          ],
-        },
-        {
-          name: "高性能博客系统",
-          tech: "Next.js, TypeScript, Tailwind CSS",
-          points: [
-            "开发中 - 基于 Next.js 的高性能博客系统",
+            "工程化开发：采用 Pinia 进行全局状态管理，并配合 localStorage 实现用户状态与购物车数据持久化",
+            "性能优化：通过 Vue Router 懒加载、图片懒加载、函数防抖等手段有效降低了初始加载时间与运行时的性能开销",
+            "可维护架构：对 Axios 进行二次封装，统一了 API 请求与错误处理逻辑，提升了代码复用性",
           ],
         },
       ],
@@ -344,6 +351,19 @@ export function ResumeContent() {
                       </ul>
                     </div>
                   ))}
+                </ResumeSection>
+              )}
+
+              {v.personalEvaluation && v.personalEvaluation.length > 0 && (
+                <ResumeSection icon={FiUser} title="个人评价">
+                  <ul className="space-y-1.5 text-sm">
+                    {v.personalEvaluation.map((line, i) => (
+                      <li key={i} className="flex items-start gap-2 text-[var(--muted)]">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </ResumeSection>
               )}
             </motion.div>
