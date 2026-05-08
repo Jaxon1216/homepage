@@ -48,8 +48,8 @@ interface ResumeVersion {
 const resumeVersions: ResumeVersion[] = [
   {
     key: "v2-2026",
-    label: "2026 最新版",
-    date: "2026-03",
+    label: "2026 4月实习版",
+    date: "2026-04",
     header: {
       name: siteConfig.name,
       email: "jiangxu05@outlook.com",
@@ -107,17 +107,6 @@ const resumeVersions: ResumeVersion[] = [
             "支持深色/浅色主题切换，全站响应式适配多端设备",
           ],
         },
-        {
-          name: "电商平台",
-          tech: "Vue 3 + Vue-Router + Pinia + Axios + Element Plus",
-          points: [
-            "一个单页电商网站平台，支持商品展示、用户登录、购物车及订单管理等功能",
-            "核心功能：独立开发了商品列表、详情展示、购物车及订单管理等一系列可复用组件",
-            "工程化开发：采用 Pinia 进行全局状态管理，并配合 localStorage 实现用户状态与购物车数据持久化",
-            "性能优化：通过 Vue Router 懒加载、图片懒加载、函数防抖等手段有效降低了初始加载时间与运行时的性能开销",
-            "可维护架构：对 Axios 进行二次封装，统一了 API 请求与错误处理逻辑，提升了代码复用性",
-          ],
-        },
       ],
     },
   },
@@ -133,7 +122,7 @@ const resumeVersions: ResumeVersion[] = [
     },
     sections: {
       summary:
-        "安全工程专业大一学生，申请转入软件工程专业。自学编程一年，具备扎实的 C++ 和数据结构基础，熟悉 Git 工作流和前端基础技术栈。因为学校政策这学期不能转要在大二下留一级转",
+        "安全工程专业大一学生，申请转入软件工程专业。自学编程一年，具备扎实的 C++ 和数据结构基础，熟悉 Git 工作流和前端基础技术栈。因为学校政策这学期不能转要在大二下留一级转。26年04月找到实习后，决定不转了～。",
       education: [
         {
           school: "中国地质大学（北京）",

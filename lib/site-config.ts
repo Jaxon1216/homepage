@@ -18,7 +18,7 @@ export const siteConfig = {
   footer: {
     links: [
       { label: "GitHub", href: "https://github.com/Jaxon1216" },
-      { label: "TikTok", href: "https://www.tiktok.com/@jaxon1216" },
+      { label: "抖音Aweme", href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more" },
     ],
     friendLinks: [] as { label: string; href: string }[],
   },
@@ -35,7 +35,7 @@ export const siteConfig = {
     { label: "Email", href: "mailto:jiangxu05@outlook.com" },
     { label: "Blog", href: "https://www.jiangxu.net/" },
     { label: "Notes", href: "https://notes.jiangxu.net/" },
-    { label: "TikTok", href: "https://www.tiktok.com/@jaxon1216" },
+    { label: "Aweme", href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more" },
   ],
 
   projects: [
@@ -49,12 +49,19 @@ export const siteConfig = {
       category: "Resume" as const,
     },
     {
-      name: "TodoMVC 框架对比",
+      name: "GenBI 智能数据分析平台",
+      description: "基于 AI 的智能数据分析与可视化平台，支持自然语言生成图表",
+      tags: ["React", "Spring Boot", "AI"],
+      link: "",
+      github: "https://github.com/Jaxon1216/genBI",
+      category: "Resume" as const,
+    },
+    {
+      name: "项目分析-Skill",
       description:
-        "通过同一个 TodoMVC 项目，对比 Vanilla JS、Vue 和 React 的实现差异",
-      tags: ["TypeScript", "Vue", "React"],
-      link: "https://todo.jiangxu.net",
-      github: "https://github.com/Jaxon1216/todomvc",
+        "该skill通过系统分析项目结构与内容，会产出项目分析报告，包含项目的学习路线、项目的难点亮点等",
+      tags: ["python", "shell"],
+      github: "https://github.com/Jaxon1216/interview-analyzer-skill",
       category: "ForStudy" as const,
     },
     {
@@ -75,12 +82,13 @@ export const siteConfig = {
       category: "ForStudy" as const,
     },
     {
-      name: "悟空的朋友圈",
-      description: "基于 OpenClaw 框架的 AI 私人助手「悟空」的朋友圈展示页面",
-      tags: ["AI", "Telegram", "OpenClaw"],
-      link: "https://wk.jiangxu.net",
-      github: "https://github.com/Jaxon1216/wkmoments",
-      category: "vibecoding" as const,
+      name: "TodoMVC 框架对比",
+      description:
+        "通过同一个 TodoMVC 项目，对比 Vanilla JS、Vue 和 React 的实现差异",
+      tags: ["TypeScript", "Vue", "React"],
+      link: "https://todo.jiangxu.net",
+      github: "https://github.com/Jaxon1216/todomvc",
+      category: "ForStudy" as const,
     },
     {
       name: "烟花祝福",
@@ -89,22 +97,6 @@ export const siteConfig = {
       link: "",
       github: "https://github.com/Jaxon1216/fireworks-wishes",
       category: "vibecoding" as const,
-    },
-    {
-      name: "Vue3 Rabbit",
-      description: "基于 Vue 3 的电商实战项目",
-      tags: ["Vue 3", "JavaScript"],
-      link: "",
-      github: "https://github.com/Jaxon1216/vue3rabbit",
-      category: "resume" as const,
-    },
-    {
-      name: "GenBI 智能数据分析平台",
-      description: "基于 AI 的智能数据分析与可视化平台，支持自然语言生成图表",
-      tags: ["React", "Spring Boot", "AI"],
-      link: "",
-      github: "https://github.com/Jaxon1216/genBI",
-      category: "resume" as const,
     },
     {
       name: "MathModelHub",
@@ -116,7 +108,7 @@ export const siteConfig = {
     },
     {
       name: "SXMap",
-      description: "地图应用项目",
+      description: "地图WebApp,关于苏轼南贬之路与徐霞客西行的可视化展示",
       tags: ["JavaScript", "地图"],
       link: "https://map.jiangxu.net/",
       github: "https://github.com/Jaxon1216/sxmap",
