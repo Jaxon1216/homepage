@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { PostMeta } from "@/lib/mdx";
 import { formatDate } from "@/lib/utils";
 import { GiscusComments } from "@/components/blog/GiscusComments";
+import { ArticleToc } from "@/components/blog/ArticleToc";
 import { MottoBlock } from "@/components/common/MottoBlock";
 import type { ReactNode } from "react";
 
@@ -56,12 +57,16 @@ export function PostContent({ meta, children }: PostContentProps) {
           )}
         </header>
 
-        <div className="prose max-w-none">{children}</div>
+        <div id="post-content" className="prose max-w-none">
+          {children}
+        </div>
       </motion.article>
 
       <MottoBlock text="The only true wisdom is in knowing you know nothing." />
 
       <GiscusComments />
+
+      <ArticleToc />
     </div>
   );
 }
