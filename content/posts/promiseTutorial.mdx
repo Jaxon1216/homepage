@@ -1,0 +1,374 @@
+---
+title: "Promise手撕教程"
+date: "2026-05-14"
+description: "从状态机与回调队列出发，系统理解 Promise 的实现思路与链式调用。"
+tags: ["前端", "JavaScript"]
+---
+
+![Promise 手撕教程配图](/images/promiseTutorial.png)
+想了很久，也试了很多种讲法，最后我还是决定用这种方式来讲。
+
+我会先告诉你，哪些**前置知识**会更有助于理解（分成必须和可选）；然后你先*整体读一遍*，再*仔细读几遍*。
+
+这些方法都是我自己一路踩坑、一路总结出来的经验，所以不同经历的读者，理解速度可能会不一样。
+
+如果前置知识里有你不懂的，建议先复制去问 AI 搞懂，或者你也可以**边看代码边理解**。
+
+# 前置知识
+
+## 必须
+
+- **JavaScript 的 class 语法和结构**
+  - *constructor 会在 class 被 new 的时候执行*
+- **JavaScript 传参机制**
+  - *不像 C++ 那种固定传参（函数定义时写几个形参，调用时通常就传几个）；*
+  - JavaScript 函数传参不限制个数，少传的形参是 undefined，多传的可以用 arguments 接收；**只按位置匹配，不按变量名匹配**。
+- **队列特性**
+- **回调函数**
+- **形参和实参**
+
+## 可选
+
+- *JavaScript 的内存结构*
+  - *栈空间存基础数据类型，在 Promise 中，存函数的引用地址（可以理解成快递地址）*
+  - 堆里存**Promise 实例、回调函数、引用类型数据**，栈里存地址引用。
+- *this 指向弄懂，这里至少搞懂前两种*
+  - *普通函数的this*
+  - *箭头函数的this*
+  - *apply / bind / call / new 的this*
+
+## 背景
+
+假如我要睡觉
+
+```ts
+// ======================
+// 👇 回调地狱 正式开始
+// ======================
+sleep(1000, (res1) => {
+  console.log(res1); // 第1层：我睡一秒
+  
+  sleep(2000, (res2) => {
+    console.log(res2); // 第2层：睡晚了一秒之后，我再睡2秒
+    
+    sleep(3000, (res3) => {
+      console.log(res3); // 第3层：之后，再睡3秒
+      
+      sleep(4000, (res4) => {
+        console.log(res4); // 第4层：睡完继续睡，继续嵌套
+        // 想加逻辑只能继续往里缩进 → 金字塔灾难
+      });
+    });
+  });
+});
+```
+
+这就是**回调地狱**：
+
+- **最直观的地狱**：缩进层级深，难维护，逻辑容易乱
+- **业务上的地狱**：不能并行/等待/复用，错误难以捕获
+
+使用promise后，差不多长这样了：
+```ts
+// ======================
+// 👇 用了 Promise —— 链式调用，告别嵌套
+// ======================
+sleep(1000)
+  .then(res1 => { console.log(res1); return sleep(2000); })
+  .then(res2 => { console.log(res2); return sleep(3000); })
+  .then(res3 => { console.log(res3); return sleep(4000); })
+  .then(res4 => { console.log(res4); });
+```
+# 看完即可手撕
+
+## Promise 数据结构
+
+你需要记住，**Promise 的核心数据结构就是：状态机 + 回调队列**
+
+- **状态**有三种：等待中、已成功、已失败；状态只能**单向**地从等待中进入后两者。
+- *状态*说白了本质就是一个变量；既然要修改这个变量，那就需要函数来改。既然有两种落定结果，那通常就要有**对应**的两个**函数**。
+- **回调队列**，所谓回调，就是“回来再调用”，所以你可以猜到它不是在**初始化**的时候执行。队列一般可以用**数组**和**shift**方法模拟，但这里先不用急着纠结这一点，因为这跟回调真正执行的时机有关系，*先记住，后面就会串起来*。
+
+## 实现思路
+
+看完上面的阐述，你很容易就会想到：new Promise 的时候，到底要立即初始化哪些东西？答案其实就是：**两个状态常量，两个数组，两个函数**。
+
+```js
+class MyPromise {
+  constructor(executor) {
+    // 状态：pending / fulfilled / rejected
+    this.status = "pending";
+    // 成功结果 / 失败原因
+    this.result = undefined;
+    // 成功回调队列
+    this.onFulfilledcbs = [];
+    // 失败回调队列
+    this.onRejectedcbs = [];
+
+    // 成功函数
+    const resolve = (value) => {
+    ...
+    };
+
+    // 失败函数
+    const reject = (reason) => {
+    ...
+    };
+
+    // 执行器异常直接 reject
+    try {
+      executor(resolve, reject);
+    } catch (err) {
+      reject(err);
+    }
+  }
+}
+```
+
+这里你可能会问：**为什么要在 constructor 里面执行 executor？** executor 到底是什么？
+
+- 这里我们通过一个例子来理解。
+
+```ts
+function sleep(ms) {
+  return new Promise(【 (resolve) => {
+    setTimeout(() => {
+      resolve("2秒到了");
+    }, ms);
+  }) 】;
+}
+
+const promise1 = sleep(2000);
+
+promise1.then((res) => {
+  console.log(res);
+});
+```
+
+注意看，我【】起来的这部分就是 **executor**，中文一般叫“执行器”。它会在 `new Promise(...)` 的时候**立即执行**，因为本质上就是在 constructor 里同步执行的。
+
+也就是说，当 JavaScript 引擎执行到 `new Promise(...)` 这一行时，会立刻执行【】里的逻辑，比如这里的 `setTimeout(...)` 会立刻被注册出去。
+
+你会发现 executor 本身是一个回调函数，并且它接收两个参数：`resolve` 和 `reject`。对于外部来说，这两个是形式参数；但在 Promise 内部，它们其实是你自己定义出来的函数，再通过**闭包**传给 executor 使用。
+
+- 所以说，这个 Promise 被 new 的时候，外部传入的那个箭头函数就是**executor**，它会随着初始化**立即执行**。
+- 这件事的关键，本质上就是你能不能理解**形参和实参**。
+- 那么问题来了：外部写 executor 的时候，为什么能直接拿到 `resolve` 和 `reject`？答案是：这两个函数本来就是 Promise 内部定义好的，然后再通过**闭包**传给 executor。
+
+那回到业务代码，比如刚刚的 `sleep`。你会发现 `resolve` 也接受参数，那这个参数是做什么的？它最后会流向哪里？我们来看看 **resolve** 和 **reject** 的写法。
+
+```ts
+const resolve = (value) => {
+  if (this.status !== "pending") return;
+  this.status = "fulfilled";
+  this.result = value;
+  // 微任务执行所有成功回调
+  queueMicrotask(() => {
+	this.onFulfilledcbs.forEach(cb => cb(this.result));
+  });
+};
+```
+
+可以看到，`resolve` 一旦被调用，就会去修改前面定义好的 `status` 和 `result`。然后还有**关键的一步**：把当前 Promise 收集到的成功回调放进微任务里依次执行。为什么要这样做？你可以先思考下面几个问题：
+
+- 这个队列里的东西是从哪里来的？
+- 每个 Promise 的回调队列里都有值吗？
+- 回调队列的值大概几个？
+- 回调队列每次执行完都能干干净净吗，会不会继续把任务传到下一个 Promise？
+- 回调队列里的函数都要吃到当前 Promise 的 `result`，那如果 `result` 还没产生，也就是一直没 resolve，该怎么办？（透传）
+
+## 实现链式调用 功能
+
+我们知道，**链式调用是 Promise 的一大特性**。它的实现思路也不复杂：`then` 每次都返回一个新的 Promise，这样新的 Promise 还能继续调用 `then`，链子也就接起来了。
+
+`then` 方法，顾名思义就是处理“然后”的逻辑。既然是“然后”，它就一定要**依赖前一步的结果**。放到业务代码里也很好理解：前面拿到接口数据，后面再在 `then` 里做一层加工处理。那我们继续看前面的 `sleep` 函数：
+
+```ts
+promise1.then(【】);
+【(res) => {
+  console.log(res);
+}】
+```
+
+我把函数单独拎出来，是为了让你更明显地感知到：`then` 接收的其实就是一个**“结果处理函数”**（`onFulfilled / onRejected`）。
+
+那这个函数里的 `res` 又是哪里来的呢？
+
+这里就要把链式调用拆开来看了：前一个 Promise 先产出结果，后一个 Promise 再拿这个结果去加工。所以，`then` 接收的这个函数，本质上就是“处理前一个 Promise 结果的函数”，一般叫 `onFulfilled` 或 `onRejected`。
+
+如果你愿意带着语义去记，`onFulfilled` 可以理解成：**一旦 Promise1 成功，就执行这个函数**。
+
+那么这个加工函数加工的是谁？当然就是前一个 Promise 的结果。也就是说，如果当前 `then` 是挂在 **Promise1** 后面的，那么它内部大概率会有类似 `const res = onFulfilled(this.result);` 这样的逻辑，用来拿到 **Promise1** 的 `result`，再把处理后的结果交给 **Promise2**。
+
+那细心的你可能又发现了：我们这里只传了处理成功结果的函数，那失败的情况怎么办？这里就需要写一个**默认失败处理函数**，也就是你常说的“结果透传”兜底逻辑：
+
+```ts
+onRejected = typeof onRejected === "function" ? onRejected : err => { throw err };
+```
+
+当用户没有传 `onRejected` 时，Promise 就会使用这个默认函数。它的作用不是“吞掉错误”，而是**继续把错误往后抛**，让后面的 Promise 还能接到。
+
+同理，如果用户没传 `onFulfilled`，那默认就是 `val => val`，也就是把成功结果原样往后传。你可以把这种默认函数理解成一个*不额外加工、只负责继续传递*的中间层。
+
+调用 `then` 方法会返回一个新 Promise。因为 Promise 在初始化时就会把【状态、结果、队列、函数】这些结构准备好，所以你完全可以把 `Promise1.then(...)` 看成一个新的整体，也就是 **Promise2**；继续往后链，`Promise2.then(...)` 又会得到下一个新的 Promise。
+
+与直接 `new Promise(...)` 不同的是，调用 `then` 产生出来的 **Promise2**，必须感知前一个 **Promise1** 的状态。那它怎么感知？很简单，直接通过 **this**。因为 `then` 方法是由 **Promise1** 实例调用的，所以这里的 `this` 指向的就是 **Promise1**。
+
+书写 `then` 方法时，我的建议是：**先写分流逻辑**，先根据 **Promise1** 当前的状态来决定怎么走。
+
+```ts
+      // 状态还在等待 → 推入队列
+      if (this.status === "pending") {
+        this.onFulfilledcbs.push(handleSuccess);
+        this.onRejectedcbs.push(handleFail);
+      }
+      // 已成功 → 直接执行
+      else if (this.status === "fulfilled") {
+        queueMicrotask(handleSuccess);
+      }
+      // 已失败 → 直接执行
+      else {
+        queueMicrotask(handleFail);
+      }
+```
+
+- return new Promise 时，如果 **Promise1** 还没完成，也就是状态还是 `pending`，那 **Promise2** 对应的处理函数就暂时没法立刻执行。因为 **Promise2** 想加工的是 **Promise1** 的结果，可这时候 **Promise1.result** 还没出来。
+  - 所以最自然的做法就是：先把这些处理函数打包好，先存进 **Promise1** 的“回调队列”里，等 **Promise1** 以后有结果了，再**回**过来执行。
+  - 一旦 **Promise1** 之后 resolve / reject 了，就会把之前存起来的这些函数一个个取出来执行；而如果它一直没结束，那这些函数就只能继续留在队列里等。
+- 如果 **Promise1** 已经完成了，那就不用进队列了，直接把这个加工任务丢到**微任务队列**，等当前同步代码执行完后，再由 JavaScript 引擎统一执行。
+  - 为什么是丢给微任务队列，可以看一下：https://www.jiangxu.net/blog/eventLoop
+  - 简单来说，核心就一句：**这里必须异步执行**。
+- 失败分支也是同样的思路。
+
+分流结束后，我们进入具体流程。前面说过，如果 **Promise1** 已经成功，那就可以直接拿它的结果来加工，代码大概就是这样：
+
+```ts
+const res = onFulfilled(this.result);
+resolve(res);
+```
+
+但是，这里**不能直接同步执行 `onFulfilled`**。因为 Promise 规范要求：`then` 的回调必须**异步执行**。所以我们要先在外面包一层函数，再把这个函数丢进微任务队列。
+
+你要意识到，`handleSuccess` 本身并不是“现在立刻执行”，它只是一个函数地址；真正什么时候执行，要等后面被调度。
+
+```ts
+ const handleSuccess = () => {
+      ...
+	  };
+```
+
+等后一个 Promise 去“查询”前一个 Promise 的状态时，如果前一个还没完成，那后一个 Promise 对应的处理函数就会先被挂起来。这里做一个*极端假设*比较好理解：如果 **Promise1** 的任务就是 `sleep(一万年)`，那你不断地往后写 `then`，本质上就是不断把新的处理函数继续挂到前面的链路上。
+
+等到某个时刻，**Promise1** 终于拿到结果了，怎么触发后续加工？很简单：业务侧一旦调用了 `resolve(...)`，**Promise1** 就会拿着自己的 `result` 去触发前面收集好的回调，比如 `Promise1.then(on1)`，本质上就是执行 `on1(Promise1.result)`。
+
+以上就是我对 Promise 的理解。看到这里，如果你已经把前面的链路都想通了，那你**基本上就可以手撕出完整 Promise 了**。下面是完整代码，建议你自己再对着品一遍。
+
+## 前面几个问题的答案
+
+这些问题都是我在学习过程中自己逼自己想出来的。你如果能把下面这些问题都想明白，那你对 Promise 的理解就会**非常深入**。
+
+看完前文，你**应该能回答以下问题**：
+
+- **这个队列里的东西从哪里来？**【从后一个 Promise 推进来】
+- **每个 Promise 的回调队列里都有值吗？**【不一定，第一个 Promise 刚创建时可能还没有】
+- **回调队列里的值大概几个？**【可以有多个，这也是为什么一个 Promise 可以被多次 then】
+
+```ts
+promise1.then(fn1)
+promise1.then(fn2)
+promise1.then(fn3)
+```
+
+- **回调队列每次执行完都能彻底结束吗，会不会继续把任务传到下一个 Promise？**【会继续往后传，因为当前回调执行完，往往又会决定 Promise2 的结果】
+- **Promise2 想加工 Promise1 的结果，但 Promise1 还没完成咋整？**【先把处理函数存进 Promise1 的回调队列，等 Promise1 resolve 后再执行】
+
+
+## 完整代码
+
+```ts
+class MyPromise {
+  constructor(executor) {
+    // 状态：pending / fulfilled / rejected
+    this.status = "pending";
+    // 成功结果 / 失败原因
+    this.result = undefined;
+    // 成功回调队列
+    this.onFulfilledcbs = [];
+    // 失败回调队列
+    this.onRejectedcbs = [];
+
+    // 成功函数
+    const resolve = (value) => {
+      if (this.status !== "pending") return;
+      this.status = "fulfilled";
+      this.result = value;
+      // 微任务执行所有成功回调
+      queueMicrotask(() => {
+        this.onFulfilledcbs.forEach(cb => cb(this.result));
+      });
+    };
+
+    // 失败函数
+    const reject = (reason) => {
+      if (this.status !== "pending") return;
+      this.status = "rejected";
+      this.result = reason;
+      // 微任务执行所有失败回调
+      queueMicrotask(() => {
+        this.onRejectedcbs.forEach(cb => cb(this.result));
+      });
+    };
+
+    // 执行器异常直接 reject
+    try {
+      executor(resolve, reject);
+    } catch (err) {
+      reject(err);
+    }
+  }
+
+  // then 方法
+  then(onFulfilled, onRejected) {
+    // Promise A+ 规范：不传则使用默认透传函数
+    onFulfilled = typeof onFulfilled === "function" ? onFulfilled : val => val;
+    onRejected = typeof onRejected === "function" ? onRejected : err => { throw err };
+
+    // then 必须返回新 Promise
+    return new MyPromise((resolve, reject) => {
+      // 封装成功处理逻辑
+      const handleSuccess = () => {
+        try {
+          const res = onFulfilled(this.result);
+          resolve(res);
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      // 封装失败处理逻辑
+      const handleFail = () => {
+        try {
+          const res = onRejected(this.result);
+          resolve(res);
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      // 状态还在等待 → 推入队列
+      if (this.status === "pending") {
+        this.onFulfilledcbs.push(handleSuccess);
+        this.onRejectedcbs.push(handleFail);
+      }
+      // 已成功 → 直接执行
+      else if (this.status === "fulfilled") {
+        queueMicrotask(handleSuccess);
+      }
+      // 已失败 → 直接执行
+      else {
+        queueMicrotask(handleFail);
+      }
+    });
+  }
+}
+```
