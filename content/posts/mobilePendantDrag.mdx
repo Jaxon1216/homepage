@@ -1,0 +1,252 @@
+---
+title: "移动端挂件拖拽技术里的两个决策"
+date: "2026-05-15"
+description: "一次移动端悬浮挂件拖拽优化中，关于 document 级手势监听与 useCallback 使用边界的工程复盘。"
+tags: ["前端", "React"]
+---
+
+![移动端挂件拖拽技术里的两个决策](/images/mobilePendantDrag.png)
+
+页面有一个悬浮在右下角的挂件，需要支持拖拽移动和滚动收起。开发过程中踩到了两个关键技术点，特意记录下来，作为实打实的工作经验沉淀。
+
+1. 移动端拖拽，为什么最后一定要把监听挂到 `document`？
+2. `useCallback` 到底什么时候该用，什么时候该删？
+
+---
+
+# 一、移动端拖拽，为什么最后一定要监听 document
+
+我一开始的直觉特别简单：既然 `touchstart` 是触发在挂件上的，那把 `touchmove` 和 `touchend` 也直接绑在挂件自身的 DOM 上，岂不是最自然、最符合组件化思想？
+
+但实际开发直接踩坑了：用户拖拽时，手指会快速滑动、很容易移出挂件的边界。如果 `touchmove` 和 `touchend` 只绑定在组件自身，一旦手指滑出元素，事件就会直接丢失。这会导致组件永远收不到手势结束的信号，一直卡在“拖拽中”的状态，无法复位、直接卡死界面——这就是移动端拖拽**断触**的核心原因。
+
+所以这次优化改造，我确定了最可靠的方案：
+
+- `touchstart` 依旧从组件内部触发
+- 一旦进入拖拽手势阶段，`touchmove` 和 `touchend` 统一挂载到 `document`
+- 手势结束后，主动卸载 `document` 上的监听事件
+
+这背后有三个非常硬核的工程原因。
+
+## 第一，拖拽需要保证手势的完整性
+
+手指移出元素边界是常态，根本不是异常情况。`document` 是整个页面最稳定的事件接收载体，只有把监听挂在这里，才能保证整段拖拽手势被完整追踪。
+
+这里我联想到了 React 的事件机制：React 17+ 会把事件统一托管到 root 节点，那监听挂到 react-root 节点理论上可行吗？理论上可行，但因为事件会继续向上冒泡，**直接挂载在 `document` 上是最稳妥的选择**。
+
+## 第二，拖拽的元素本身一直在移动
+
+组件拖拽是通过 `transform` 实时位移的，JS 驱动状态、状态驱动动画（合成线程更新 `transform`）。
+
+```ts
+const wrapperStyle = useMemo(() => {
+  return { transform: `translate3d(0, ${offsetY}px, 0)` };
+}, [offsetY]);
+```
+
+这意味着事件目标元素本身在动，命中区域也在实时变化。如果执意把监听绑在这个移动的元素上，边界判断会变得极度复杂。把监听上提到 `document`，相当于把**手势采集层**和**视觉表现层**拆分开，这个模型更稳定。
+
+另外，为什么要用 `transform`，而不是直接改 `top`？核心原因是性能。`transform` 的变化主要发生在合成线程，影响的是渲染流程最后的合成阶段，通常不会重新触发布局计算。渲染主线程即使比较忙，也不会像频繁改布局属性那样直接拖慢这类位移动画。
+
+## 第三，这不是 React 事件问题，而是原生手势生命周期问题
+
+拖拽生效后，`touchmove` 阶段必须稳定做两件事：
+
+1. 持续追踪完整手势
+2. 阻止页面原生滚动
+
+前者决定了监听范围绝不能只局限在组件节点；后者决定了必须显式声明监听器配置 `{ passive: false }`。
+
+```ts
+document.addEventListener("touchmove", documentTouchMoveListenerRef.current!, {
+  passive: false,
+});
+document.addEventListener("touchend", documentTouchEndListenerRef.current!);
+```
+
+补充一个关键知识点：`passive: true / false` 到底在控制什么？
+
+- `passive: true`：告诉浏览器“我不会调用 `preventDefault()`”，浏览器无需等待 JS 执行，可以直接滚动。
+- `passive: false`：告诉浏览器“我可能会调用 `preventDefault()`”，浏览器必须等待 JS 执行完毕，再决定是否滚动。
+- 浏览器给 `touchmove` 的默认配置通常偏向滚动性能，所以需要阻止滚动时，必须手动写 `{ passive: false }`。
+
+---
+
+# 二、useCallback：不是“该不该加”，而是“有没有稳定引用的真实需求”
+
+## 业务场景
+
+最开始代码里大量函数都套了 `useCallback`，我看到第一反应也很诧异，仔细一想，这就是我**误以为**的性能优化。给大家看一段典型代码：
+
+```js
+const handleDocumentTouchEnd = useCallback(() => {
+  // 部分机型 touchend 后仍会补发 click，拖拽完成后短暂拦截避免误跳转。
+  const shouldBlockClick = dragMetaRef.current.hasDragged;
+  const endOffsetY = dragMetaRef.current.lastOffsetY ?? dragMetaRef.current.startOffsetY;
+  // ...
+
+  // 手势结束时立即卸载 document 级监听，避免下次触摸复用到旧闭包或旧位置信息。
+  document.removeEventListener("touchmove", handleDocumentTouchMove);
+  document.removeEventListener("touchend", handleDocumentTouchEnd);
+  document.removeEventListener("touchcancel", handleDocumentTouchEnd);
+  // ...
+}, [handleDocumentTouchMove, indexLog, isPendantExperiment, pendant, pendantItem, source]);
+```
+
+## 致命点 1：useCallback 依赖爆炸，函数引用频繁变化
+
+- 把大量易变状态塞进依赖数组。
+- 组件一渲染、依赖一改变，`useCallback` 就会返回全新的函数实例。
+- 这些依赖大部分时间不变，但只要一变，就会出大问题。
+
+直接导致的 BUG 是这样的：
+
+```text
+1. 首次渲染 → 生成 handleDocumentTouchEnd_v1
+2. 用户按下挂件 → document 绑定 v1 监听
+3. 拖拽中依赖更新 → 二次渲染 → 生成 v2
+4. useEffect 清理逻辑执行 → 卸载 v1 监听
+5. 新的 useEffect 不会重新绑定监听（绑定逻辑只在 touchStart 中）
+6. document 上的 touchend 监听直接清空
+7. 用户松手收不到事件 → 拖拽直接卡死
+```
+
+## 致命点 2：稳定引用和最新数据不可兼得
+
+- 想要监听函数引用稳定 → 必须清空依赖 → 闭包读不到最新业务数据。
+- 想要监听函数读最新数据 → 必须写全依赖 → 函数引用频繁变化，失去稳定性。
+
+这根本不是**调整依赖数组**能解决的问题，无论怎么改，要么引用不稳，要么数据过期。
+
+**唯一的解决方案是换模型**：把“稳定引用”和“读取最新数据”拆分成两个独立的层级。
+
+---
+
+# 三、最优解：四层架构解决问题
+
+## 第一层：稳定不变的“壳监听”（只创建一次）
+
+```ts
+const documentTouchMoveListenerRef = useRef<(event: TouchEvent) => void>();
+const documentTouchEndListenerRef = useRef<() => void>();
+
+// 只初始化一次，永不变化
+if (!documentTouchMoveListenerRef.current) {
+  documentTouchMoveListenerRef.current = (event) => {
+    handleDocumentTouchMoveRef.current(event);
+  };
+}
+
+if (!documentTouchEndListenerRef.current) {
+  documentTouchEndListenerRef.current = () => {
+    handleDocumentTouchEndRef.current();
+  };
+}
+```
+
+作用：
+
+- 壳函数永久不变。
+- 真正绑定到 `addEventListener` 的就是它。
+- 完美满足 DOM 监听必须稳定的核心要求。
+
+## 第二层：实时更新的“真实逻辑 ref”
+
+```ts
+const handleDocumentTouchMoveRef = useRef<(event: TouchEvent) => void>(() => {});
+const handleDocumentTouchEndRef = useRef<() => void>(() => {});
+
+// 每次渲染都更新为最新函数
+handleDocumentTouchMoveRef.current = (event: TouchEvent) => {
+  // 真实拖拽逻辑
+};
+
+handleDocumentTouchEndRef.current = () => {
+  // 真实结束逻辑
+};
+```
+
+作用：
+
+- 每次组件渲染，都存储最新的函数。
+- 永远持有最新逻辑、最新闭包、最新状态。
+
+## 第三层：最新业务上下文 ref（彻底解决依赖问题）
+
+```ts
+const latestTouchContextRef = useRef({
+  // ...
+});
+
+// 每次渲染自动同步
+latestTouchContextRef.current = {
+  // ...
+};
+```
+
+作用：
+
+- 所有易变业务数据统一装进一个 `ref`。
+- 监听函数执行时，直接从这里取最新值。
+- 彻底摆脱依赖数组的困扰。
+
+## 第四层：调用关系（稳定 → 转发 → 执行）
+
+```text
+稳定壳函数
+  ↓ 转发
+实时更新的 ref 函数
+  ↓ 执行
+从 latestContextRef 拿最新业务数据
+```
+
+---
+
+# 四、通用标准化公式
+
+这套模式不局限于拖拽场景，**所有“原生事件监听 + 需要最新业务数据”的场景都通用**。
+
+唯一区别是监听的绑定和销毁时机：
+
+- 常驻监听（`scroll`、`resize`）：`useEffect([])` 中绑定解绑，和组件生命周期对齐。
+- 按需监听（拖拽）：用户触发手势时手动绑定，结束时手动解绑，和手势生命周期对齐。
+
+两者共用同一套“稳定监听 + 最新 ref”结构：
+
+```ts
+// 1. 稳定壳函数（永久不变，用于挂载监听）
+const stableListener = useRef(() => realListenerRef.current());
+
+// 2. 实时业务逻辑（每次渲染更新）
+const realListenerRef = useRef(() => {});
+realListenerRef.current = () => {
+  // 业务逻辑
+};
+
+// 3. 最新上下文（存储所有易变状态）
+const latestData = useRef(...);
+latestData.current = 最新业务数据;
+
+// 4. 无依赖绑定与销毁
+useEffect(() => {
+  document.addEventListener("xxx", stableListener.current);
+  return () => document.removeEventListener("xxx", stableListener.current);
+}, []);
+```
+
+---
+
+# 五、useCallback 最终使用准则（精准避坑）
+
+经过这次优化，我彻底厘清了 `useCallback` 的使用边界，告别凭习惯编码。
+
+## 正确使用场景
+
+1. 传递给 `React.memo` 子组件，需要函数浅比较控制重渲染。
+2. 作为 `useEffect`、`useMemo` 依赖，需要避免无效重复执行。
+
+## 禁止使用场景
+
+1. 需要同时满足“稳定引用”和“读取最新数据”的全局监听场景，`useCallback` 模型不适用，应改用 `stable listener + latest ref`。
+2. 普通 JSX 内置事件（`onClick` 等），完全无需缓存。
+3. 依赖过多易变变量、会造成依赖爆炸的业务函数。
