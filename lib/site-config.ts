@@ -16,11 +16,31 @@ export const siteConfig = {
   ],
 
   footer: {
-    links: [
-      { label: "GitHub", href: "https://github.com/Jaxon1216" },
-      { label: "抖音Aweme", href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more" },
+    contactLinks: [
+      {
+        label: "GitHub",
+        href: "https://github.com/Jaxon1216",
+        type: "github" as const,
+      },
+      {
+        label: "jiangxu05@outlook.com",
+        href: "mailto:jiangxu05@outlook.com",
+        type: "email" as const,
+      },
+      {
+        label: "Aweme",
+        href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more",
+        type: "external" as const,
+      },
     ],
-    friendLinks: [] as { label: string; href: string }[],
+    friendLinks: [
+      { label: "🍔✌️woleigefou.xyz", href: "https://woleigefou.xyz" },
+      { label: "困醒 - 全栈神", href: "https://kunxing-blog.top" },
+      {
+        label: "acye - 全栈神",
+        href: "https://ye-guan-xing.github.io/",
+      },
+    ],
   },
 
   particles: {
@@ -29,15 +49,6 @@ export const siteConfig = {
     mobileParticleCount: 30,
     desktopParticleCount: 100,
   },
-
-  social: [
-    { label: "GitHub", href: "https://github.com/Jaxon1216" },
-    { label: "Email", href: "mailto:jiangxu05@outlook.com" },
-    { label: "Blog", href: "https://www.jiangxu.net/" },
-    { label: "Notes", href: "https://notes.jiangxu.net/" },
-    { label: "Aweme", href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more" },
-  ],
-
   projects: [
     {
       name: "个人博客网站",
