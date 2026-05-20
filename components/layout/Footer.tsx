@@ -2,6 +2,12 @@ import Link from "next/link";
 import { FiGithub, FiMail, FiExternalLink } from "react-icons/fi";
 import { siteConfig } from "@/lib/site-config";
 
+const contactIconMap = {
+  github: FiGithub,
+  email: FiMail,
+  external: FiExternalLink,
+} as const;
+
 export function Footer() {
   return (
     <footer className="relative z-10 border-t border-[var(--card-border)] bg-[var(--card)]">
@@ -32,11 +38,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Social / External Links */}
+          {/* Friend Links */}
           <div>
-            <h3 className="font-semibold mb-3">链接</h3>
+            <h3 className="font-semibold mb-3">友链</h3>
             <ul className="space-y-2">
-              {siteConfig.social.map((link) => (
+              {siteConfig.footer.friendLinks.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -56,24 +62,23 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-3">联系方式</h3>
             <div className="space-y-2">
-              <a
-                href={`https://github.com/${siteConfig.github}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-              >
-                <FiGithub size={16} />
-                GitHub
-              </a>
-              {siteConfig.email && (
-                <a
-                  href={`mailto:${siteConfig.email}`}
-                  className="flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-                >
-                  <FiMail size={16} />
-                  {siteConfig.email}
-                </a>
-              )}
+              {siteConfig.footer.contactLinks.map((link) => {
+                const Icon = contactIconMap[link.type];
+                const isExternal = !link.href.startsWith("mailto:");
+
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
+                  >
+                    <Icon size={16} />
+                    {link.label}
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
