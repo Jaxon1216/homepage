@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { FiGithub, FiMail, FiExternalLink } from "react-icons/fi";
+import { BiLogoTiktok } from "react-icons/bi";
 import { siteConfig } from "@/lib/site-config";
 
 const contactIconMap = {
   github: FiGithub,
   email: FiMail,
+  aweme: BiLogoTiktok,
   external: FiExternalLink,
 } as const;
 
