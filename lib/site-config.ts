@@ -34,7 +34,7 @@ export const siteConfig = {
       },
     ],
     friendLinks: [
-      { label: "🍔✌️woleigefou.xyz", href: "https://woleigefou.xyz" },
+      { label: "🍔✌️ - God", href: "https://woleigefou.xyz" },
       { label: "困醒 - 全栈神", href: "https://kunxing-blog.top" },
       {
         label: "acye - 全栈神",
