@@ -30,7 +30,7 @@ export const siteConfig = {
       {
         label: "Aweme",
         href: "https://v.douyin.com/WKSr3QRFYMQ/?utm_campaign=client_share&app=aweme&utm_medium=ios&tt_from=more&utm_source=more",
-        type: "external" as const,
+        type: "aweme" as const,
       },
     ],
     friendLinks: [
