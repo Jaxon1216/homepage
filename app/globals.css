@@ -18,6 +18,15 @@
   --muted: #64748b;
   --accent: #2563eb;
   --accent-light: #dbeafe;
+  --blog-thumb-w: 11rem;
+  --blog-thumb-h: 7rem;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --blog-thumb-w: 6.5rem;
+    --blog-thumb-h: 4.5rem;
+  }
 }
 
 .dark {

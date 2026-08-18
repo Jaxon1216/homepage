@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiClock, FiTag } from "react-icons/fi";
 import type { PostMeta } from "@/lib/mdx";
@@ -75,31 +76,51 @@ export function BlogList({ posts, tags }: BlogListProps) {
               >
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="block p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
+                  className="flex items-center gap-4 p-4 sm:p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
                 >
-                  <h2 className="font-semibold mb-1 group-hover:text-[var(--accent)] transition-colors">
-                    {post.title}
-                  </h2>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-semibold mb-1 group-hover:text-[var(--accent)] transition-colors">
+                      {post.title}
+                    </h2>
 
-                  {post.description && (
-                    <p className="text-sm text-[var(--muted)] mb-3 line-clamp-2">
-                      {post.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--muted)]">
-                    <span>{formatDate(post.date)}</span>
-                    <span className="flex items-center gap-1">
-                      <FiClock size={12} />
-                      {post.readingTime}
-                    </span>
-                    {post.tags.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        <FiTag size={12} />
-                        {post.tags.join(", ")}
-                      </span>
+                    {post.description && (
+                      <p className="text-sm text-[var(--muted)] mb-3 line-clamp-2">
+                        {post.description}
+                      </p>
                     )}
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--muted)]">
+                      <span>{formatDate(post.date)}</span>
+                      <span className="flex items-center gap-1">
+                        <FiClock size={12} />
+                        {post.readingTime}
+                      </span>
+                      {post.tags.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <FiTag size={12} />
+                          {post.tags.join(", ")}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  {post.cover && (
+                    <div
+                      className="relative shrink-0 overflow-hidden rounded-lg bg-[var(--card-border)]/50"
+                      style={{
+                        width: "var(--blog-thumb-w)",
+                        height: "var(--blog-thumb-h)",
+                      }}
+                    >
+                      <Image
+                        src={post.cover}
+                        alt={post.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        sizes="var(--blog-thumb-w)"
+                      />
+                    </div>
+                  )}
                 </Link>
               </motion.div>
             ))

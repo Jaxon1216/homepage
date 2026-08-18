@@ -38,3 +38,5 @@
 - `服务端`：后端、基础设施、接口与数据
 
 不要自造近义词（如 `前端`、`React`、`AI`、`工具`、`学校`）。`lib/mdx.ts` 会在读取文章时校验；非法 tag 会让 dev / build 直接报错，而不是被静默过滤。
+
+博客列表右侧封面默认取正文第一张图。也可在 frontmatter 写 `cover: /images/xxx.png` 指定，或 `cover: false` 不展示。

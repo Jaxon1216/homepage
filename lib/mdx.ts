@@ -32,7 +32,18 @@ export interface PostMeta {
   date: string;
   description: string;
   tags: string[];
+  cover?: string;
   readingTime: string;
+}
+
+const MARKDOWN_IMAGE_RE = /!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/;
+
+function resolveCover(data: Record<string, unknown>, content: string): string | undefined {
+  if (data.cover === false || data.cover === "") return undefined;
+  if (typeof data.cover === "string" && data.cover.trim()) {
+    return data.cover.trim();
+  }
+  return content.match(MARKDOWN_IMAGE_RE)?.[1];
 }
 
 export function getAllPosts(): PostMeta[] {
@@ -53,6 +64,7 @@ export function getAllPosts(): PostMeta[] {
       date: data.date || "",
       description: data.description || "",
       tags: assertAllowedTags(slug, data.tags || []),
+      cover: resolveCover(data, content),
       readingTime: stats.text.replace("min read", "分钟"),
     };
   });
@@ -77,6 +89,7 @@ export function getPostBySlug(slug: string) {
       date: data.date || "",
       description: data.description || "",
       tags: assertAllowedTags(slug, data.tags || []),
+      cover: resolveCover(data, content),
       readingTime: stats.text.replace("min read", "分钟"),
     },
     content,
