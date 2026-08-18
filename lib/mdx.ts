@@ -5,6 +5,27 @@ import readingTime from "reading-time";
 
 const postsDirectory = path.join(process.cwd(), "content/posts");
 
+export const POST_TAG_ALLOWLIST = [
+  "大前端",
+  "agent",
+  "学生思维",
+  "服务端",
+] as const;
+
+export type PostTag = (typeof POST_TAG_ALLOWLIST)[number];
+
+const POST_TAG_SET = new Set<string>(POST_TAG_ALLOWLIST);
+
+function assertAllowedTags(slug: string, tags: string[]): string[] {
+  const invalid = tags.filter((tag) => !POST_TAG_SET.has(tag));
+  if (invalid.length > 0) {
+    throw new Error(
+      `[${slug}] 非法 tag: ${invalid.join(", ")}。准出列表：${POST_TAG_ALLOWLIST.join(" / ")}`
+    );
+  }
+  return tags;
+}
+
 export interface PostMeta {
   slug: string;
   title: string;
@@ -31,7 +52,7 @@ export function getAllPosts(): PostMeta[] {
       title: data.title || slug,
       date: data.date || "",
       description: data.description || "",
-      tags: data.tags || [],
+      tags: assertAllowedTags(slug, data.tags || []),
       readingTime: stats.text.replace("min read", "分钟"),
     };
   });
@@ -55,7 +76,7 @@ export function getPostBySlug(slug: string) {
       title: data.title || slug,
       date: data.date || "",
       description: data.description || "",
-      tags: data.tags || [],
+      tags: assertAllowedTags(slug, data.tags || []),
       readingTime: stats.text.replace("min read", "分钟"),
     },
     content,
@@ -63,8 +84,6 @@ export function getPostBySlug(slug: string) {
 }
 
 export function getAllTags(): string[] {
-  const posts = getAllPosts();
-  const tagSet = new Set<string>();
-  posts.forEach((post) => post.tags.forEach((tag: string) => tagSet.add(tag)));
-  return Array.from(tagSet).sort();
+  const used = new Set(getAllPosts().flatMap((post) => post.tags));
+  return POST_TAG_ALLOWLIST.filter((tag) => used.has(tag));
 }

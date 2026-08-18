@@ -1,0 +1,286 @@
+---
+title: "Claude Code 使用技巧"
+date: "2026-08-18"
+description: "从上下文管理、MCP 扩展到 Subagent 并行，整理 Claude Code 日常开发中最值得掌握的进阶用法。"
+tags: ["agent"]
+---
+
+![Claude Code 使用技巧](/images/tips-for-using-claudecode.png)
+
+Claude Code 是 Anthropic 推出的终端 AI 编程助手。
+- 下载和 API 接入：配置 `ANTHROPIC_API_KEY`；也可在 GitHub / B 站搜索 `ccswitch` 看国内路由教程
+- 终端：Ghostty、Kitty、iTerm2 体验最好（通知、进度条、`Shift+Enter` 换行）；进会话后跑一次 `/terminal-setup`，补齐 Option 作 Meta、剪贴板等快捷键
+
+---
+
+# 一、项目初始化与上下文管理
+
+## `/init`：生成项目记忆
+
+扫描当前目录结构、依赖与配置文件，自动生成 `CLAUDE.md`。后续对话会加载该文件，帮助 AI 更快理解项目约定。
+
+- 可手动编辑 `CLAUDE.md`，补充框架选型、命名规范等
+- 设置 `CLAUDE_CODE_NEW_INIT=1` 可启用交互式初始化，顺带配置 Skills、Hooks 与个人记忆
+
+## `/compact` 与 `/clear`：控制上下文窗口
+
+| 命令 | 作用 | 适用场景 |
+| --- | --- | --- |
+| `/compact [指令]` | 压缩当前对话，保留关键决策 | 长会话中释放 token，不中断任务 |
+| `/clear [名称]` | 清空对话，保留 `CLAUDE.md` 等项目记忆 | 切换新任务，从零开始 |
+
+配合 `/context` 可查看当前上下文占用；窗口快满时优先 `/compact`，任务切换时用 `/clear`。
+
+## `/memory`：持久化记忆
+
+- **项目级**：写入项目根目录 `CLAUDE.md`，仅当前仓库生效
+- **用户级**：写入 `~/.claude/CLAUDE.md`，所有项目共享
+
+输入框以 `#` 开头可快速进入记忆编辑，选择写入项目或用户文件。也可用 `/memory` 管理 auto memory 条目。
+
+---
+
+# 二、深度推理与快捷输入
+
+## 推理强度（2026 更新）
+
+早期教程里的 `think` / `think hard` / `think harder` 分级**已不再生效**，只有 `ultrathink` 是官方识别的单次深度推理关键词：
+
+```
+ultrathink：分析这个竞态条件为何只在高并发下出现，并给出不加全局锁的修复方案
+```
+
+持久控制推理强度，用这些方式：
+
+- `/effort` 或 `/effort high`：调整当前会话推理深度（low / medium / high / max）
+- `/config`：切换全局 thinking 模式（`Option+T` / `Alt+T` 可临时切换）
+- `MAX_THINKING_TOKENS` 环境变量：精细控制 thinking token 上限
+
+## Shell 模式：`!` 前缀
+
+以 `!` 开头直接执行 shell 命令，跳过 AI 解读环节：
+
+```bash
+! npm install
+! git status
+```
+
+命令与输出会进入对话上下文，AI 可据此继续分析（如 `! npm test` 后直接让它修失败用例）。长任务可用 `Ctrl+B` 放到后台。
+
+## 记忆快捷键：`#` 前缀
+
+以 `#` 开头快速写入 `CLAUDE.md`，适合在对话中顺手记录项目约定，例如「本项目 Next.js 版本为 15.x」。
+
+---
+
+# 三、IDE 集成与非交互模式
+
+## `/ide`：打通 VS Code / JetBrains
+
+1. 在 IDE 安装 **Claude Code** 插件
+2. 终端运行 `/ide`，选择对应编辑器
+
+打通后：
+
+- IDE 中选中的代码会同步到 Claude Code 上下文
+- AI 改代码时，IDE 弹出 diff 预览，便于审查后接受或拒绝
+
+## 非交互模式：`claude -p`
+
+适合脚本、CI 或一次性问答：
+
+```bash
+claude -p "分析 src/utils 目录下的重复逻辑并给出重构建议"
+```
+
+执行完即退出，相当于把 Claude Code 当作命令行 AI 助手。配合 `--output-format json` 等参数可接入自动化流水线。
+
+---
+
+# 四、MCP 扩展外部能力
+
+MCP（Model Context Protocol）让 AI 调用文档检索、数据库、Issue 跟踪等外部工具。
+
+## 安装与管理
+
+```bash
+# 本地 stdio 服务（项目级，默认）
+claude mcp add context7 -- npx -y @upstash/context7-mcp
+
+# 用户级，所有项目可用
+claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp
+
+# 远程 HTTP 服务
+claude mcp add --transport http notion https://mcp.notion.com/mcp
+
+# 远程 SSE 服务
+claude mcp add --transport sse asana https://mcp.asana.com/sse
+
+# 删除
+claude mcp remove context7
+```
+
+会话内用 `/mcp` 查看已安装服务及连接状态。MCP 工具权限可用 `mcp__<server-name>` 格式在 `/permissions` 中预授权。
+
+## 典型场景
+
+**Context7**：拉取最新版库文档，适合 Tailwind v4 等新标准升级——先查文档再改代码，避免 AI 用过时 API。
+
+**数据库 MCP**（如 Neo4j）：
+
+```bash
+claude mcp add neo4j-db -- npx -y @neobarrientos/neo4j-mcpserver
+```
+
+安装后可直接问「数据库里有哪些表」，AI 通过 MCP 查询而非猜测 schema。
+
+---
+
+# 五、权限控制与自动化
+
+## `/permissions` 与 `settings.local.json`：提前授权
+
+交互里选「Yes, and don't ask again」时，Claude Code 会把规则写进仓库根目录的 `.claude/settings.local.json`。也可以自己改这个文件，让常用读写和包管理命令一路跑完、不再逐步确认：
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Bash(pnpm *)",
+      "Bash(node *)",
+      "Bash(npx *)"
+    ]
+  }
+}
+```
+
+几个要点：
+
+- **`settings.local.json`**：个人、本仓库、默认不入库。allow 规则立刻生效，不走 workspace trust 弹窗
+- **`.claude/settings.json`**：团队共享、可提交。其中的 allow 要先接受信任对话框才生效
+- **`~/.claude/settings.json`**：用户级，对所有项目生效
+- 规则按数组**合并**，不互相覆盖；任意一层的 **deny 优先于 allow**
+- 通配写法：`Bash(pnpm *)` 匹配以 `pnpm ` 开头的命令；`Bash(git commit:*)` 与 `Bash(git commit *)` 等价。空格加 `*` 带词边界，`Bash(ls *)` 不会误放行 `lsof`
+
+开发机上也可以用 `--dangerously-skip-permissions` 跳过全部确认，权限面比上面的 allow 列表大得多，**只适合可信环境**。
+
+## 自定义斜杠命令
+
+在 `.claude/commands/` 下创建 Markdown 文件，文件名即命令名：
+
+```
+.claude/commands/code-review.md
+```
+
+```markdown
+对比与 $ARGUMENTS 分支的差异，给出 Code Review 意见，重点关注安全与性能。
+```
+
+使用：`/code-review feature/login`，`$ARGUMENTS` 接收传入参数。项目级放 `.claude/commands/`，用户级放 `~/.claude/commands/`。
+
+## Hooks：在关键节点自动执行
+
+编辑 `.claude/settings.json`（个人覆盖用 `settings.local.json`，优先级更高）：
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --check ."
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+文件修改完成后自动跑 Prettier 检查；若报错，Claude 可据此自行修复。更多触发时机见官方 [Hooks 文档](https://code.claude.com/docs/en/hooks)。
+
+---
+
+# 六、Subagent 并行任务
+
+Subagent 类似子线程：主 Agent 拆任务，多个 Subagent 并行执行，各自持有精简上下文，完成后由主 Agent 汇总。
+
+创建方式：
+
+1. 运行 `/agents`（v2.1.198+ 建议直接让 Claude 创建，或编辑 `.claude/agents/`）
+2. 描述职责、分配工具集、选择模型与标识颜色
+3. 在对话中提出复合任务，AI 自动拆分并行派发
+
+适合「一边 Code Review 分支，一边查文档/跑调研」这类无依赖的多子任务。大型跨模块改造可配合 `/batch` 在独立 worktree 中并行推进。
+
+---
+
+# 七、GitHub 集成
+
+安装 [GitHub CLI](https://cli.github.com/)（`gh`）后，Claude Code 可直接操作仓库：
+
+```bash
+gh auth login
+```
+
+典型工作流：
+
+1. 用户提交 Issue 描述 bug
+2. 让 Claude「读取 Issue #1，修复后在 fix/issue-1 分支推送」
+3. AI 读 Issue → 本地改代码 → `git push` 回远程
+
+形成「Issue → 修复 → PR/分支」闭环，无需手动复制粘贴 Issue 内容。
+
+---
+
+# 八、会话管理与状态回退
+
+| 命令 / 操作 | 作用 |
+| --- | --- |
+| `/resume` | 恢复历史会话；会话内连按两次 `Esc` 可跳转到某条消息继续 |
+| `/export [文件名]` | 导出对话为纯文本，便于存档或交叉审查 |
+| `Esc` + `Esc` | 打开回退菜单，可选择仅回退代码或仅回退对话 |
+
+**注意：** 原生 Claude Code 的回退主要作用于对话；文件改动需依赖 [Checkpointing](https://code.claude.com/docs/en/checkpointing) 或社区工具 [ccundo](https://github.com/RonitSachdev/ccundo) 撤销代码变更。
+
+```bash
+npm install -g ccundo
+ccundo list      # 查看可回退操作
+ccundo preview   # 预览变更
+ccundo undo      # 执行回退
+```
+
+---
+
+# 九、可视化客户端
+
+## 官方：Claude Desktop（Code 标签页）
+
+Anthropic 已在 [Claude Desktop](https://code.claude.com/docs/en/desktop) 内置 Code 标签页，提供并行会话、可视化 diff、集成终端等能力，底层仍走 Claude Code CLI，适合不想纯靠终端的用户。
+
+## 社区：Opcode（原 Claudia）
+
+[Opcode](https://github.com/getAsterisk/opcode) 是早期较流行的第三方 GUI 封装，支持图形化管理 MCP、Hooks、Subagent 与时间线检查点（可同时回退文件与对话）。项目活跃度已不如官方 Desktop，但可作为参考实现。
+
+使用 API 或 CCR 路由时，需在客户端设置中配置 `ANTHROPIC_AUTH_TOKEN` 与 `ANTHROPIC_BASE_URL`（值可通过 `/status` 查看）。
+
+---
+
+# 速查：最值得日常使用的命令
+
+| 类别 | 命令 |
+| --- | --- |
+| 项目 | `/init`、`/memory`、`/doctor` |
+| 上下文 | `/compact`、`/clear`、`/context` |
+| 推理 | `/effort`、`ultrathink`（单次） |
+| 扩展 | `/mcp`、`/permissions` |
+| 协作 | `/agents`、`/batch`、`/fork` |
+| 会话 | `/resume`、`/export`、`/usage` |
+
+更多命令以终端内 `/help` 为准；官方文档提供[简体中文版](https://code.claude.com/docs/zh-CN/overview)。
