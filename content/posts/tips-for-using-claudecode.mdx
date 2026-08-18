@@ -138,6 +138,29 @@ claude mcp add neo4j-db -- npx -y @neobarrientos/neo4j-mcpserver
 
 # 五、权限控制与自动化
 
+## `Shift+Tab`：切换权限模式
+
+会话里按 `Shift+Tab` 循环切换权限模式（JetBrains 内置终端同样有效；VS Code / Desktop 点输入框旁的模式指示器）。**不能靠对话让 AI 改模式。** 当前模式看状态栏，例如 `⏸ manual mode on`、`⏵⏵ accept edits on`、`⏸ plan mode on`。
+
+默认循环是 **Manual → Accept Edits → Plan → 回到 Manual**。若账号可用 Auto，从 Auto 按一次会先回到 Manual，再进入上述循环；Auto / Bypass 作为可选模式插在 Plan 后面。
+
+| 模式 | 不询问就能做的事 | 适合 |
+| --- | --- | --- |
+| **Manual**（配置值 `default`） | 只读 | 敏感仓库、想逐步确认 |
+| **Accept Edits** | 读、改文件、常见文件系统命令（`mkdir` / `mv` / `cp` 等） | 本地迭代，命令仍会问 |
+| **Plan** | 只读；有 Auto 时，分类器放行的只读命令也可跑 | 先摸清代码再动手，批准计划后才开始改 |
+| **Auto** | 几乎全部操作，后台分类器拦高风险动作 | 长任务、少打断。Pro / Max / Team 新会话默认常是这个 |
+| **Bypass** | 全部跳过确认 | 仅限容器 / VM，等价于 `--dangerously-skip-permissions` |
+
+日常用法：
+
+- 大改动手前切 **Plan**，看完方案再批准（也可单次用 `/plan` 前缀，不必切整段会话）
+- 信任当前仓库、只想少点「改这个文件吗」时切 **Accept Edits**
+- 长重构、不想一直按确认，切 **Auto**（分类器会拦批量删文件、敏感外传等；仍不如 Bypass 危险）
+- 要逐步盯着每一步，切回 **Manual**
+
+启动时指定模式：`claude --permission-mode plan`。用户级默认可写在 `~/.claude/settings.json` 的 `permissions.defaultMode`。Deny 规则在所有模式下都生效，包括 Bypass。
+
 ## `/permissions` 与 `settings.local.json`：提前授权
 
 交互里选「Yes, and don't ask again」时，Claude Code 会把规则写进仓库根目录的 `.claude/settings.local.json`。也可以自己改这个文件，让常用读写和包管理命令一路跑完、不再逐步确认：
