@@ -2,14 +2,14 @@
 title: "编译构建：从 webpack 到 Vite 的原理与进化"
 date: "2026-08-31"
 description: "从无模块化、社区模块化到原生 ESM，梳理前端构建工具的演进；深入 webpack 的 compiler / compilation / module / loader / chunk 全流程与运行时；再讲透 Vite 的双引擎与依赖预构建，并延展到 2024–2026 的 Rust 原生化浪潮与选型建议。"
-tags: ["前端", "工程化", "构建工具"]
+tags: ["大前端"]
 ---
 
 每天 `npm run dev`、`npm run build`，我们都在和构建工具打交道，但很少有人停下来问一句：它到底做了什么？
 
 这篇文章想把这件事讲清楚。它有三条线：一条是**历史线**——从没有模块化的刀耕火种，到社区规范混战，再到浏览器原生 ESM；一条是**原理线**——以 webpack 为主角，把 `compiler`、`compilation`、`loader`、`chunk`、运行时逐个拆开，再讲透 Vite 的双引擎；还有一条是**趋势线**——2024 到 2026，整个 JS 工具链正在被 Rust 重写，这不是"又出了个新工具"，而是一次代际更替。
 
-读完你应该能回答：为什么需要构建工具、webpack 打包时到底发生了什么、Vite 为什么快、以及在 2026 年该怎么选。
+读完你应该能回答：为什么需要构建工具、一次打包时 `src` / `dist` / 入口依赖树各自是什么、webpack 打包时到底发生了什么、默认分包为什么只拆异步 chunk、Vite 为什么快、以及在 2026 年该怎么选。
 
 > 🧪 **建议边读边做**：文中 webpack / Vite 的运行时、异步 chunk、拆包这些结论，都可以自己动手验证。建议你新建一个最小实验：同一份 React + TS 源码（一个入口组件 + 一个普通模块 + 一个用 `import()` 动态加载的"重"模块），分别用 webpack 和 Vite 各跑一份，`npm install && npm run build` 后在 `dist/` 里对照本文的讲解。后面相关小节会标注"👉 动手验证"给出具体观察点。
 
@@ -17,7 +17,9 @@ tags: ["前端", "工程化", "构建工具"]
 
 先说结论：**构建工具的存在，是为了抹平"我们想怎么写代码"和"浏览器能跑什么"之间的鸿沟。**
 
-具体来说，它至少要解决这几件事：
+先补一句心态上的判断，免得后面把工程化讲成"凡是前端都必须上 webpack"。**简单项目可以不工程化。** 一个轮播图、一份只有几个 `<script>` 的静态页，硬套脚手架反而制造复杂度。工程化不是来给开发添麻烦的，而是复杂项目里那些问题——模块依赖、兼容、缓存、资源路径——已经存在了，工具只是把它们摊开并系统解决。判断标准很粗：页面还靠人肉维护得过来，就可以先不工程化；一旦变成多人协作、SPA、还要接一堆 npm 包，再上构建工具。
+
+具体来说，复杂项目里它至少要解决这几件事：
 
 - **模块化**：我们希望把代码拆成一个个模块、用 `import` 组织依赖，但早期浏览器并不认识这套语法，也没有依赖管理。
 - **请求数**：一个页面几百个模块，如果每个都单独发一个 HTTP 请求，首屏会被瀑布式请求拖垮。
@@ -61,6 +63,8 @@ tags: ["前端", "工程化", "构建工具"]
 - **全局变量污染**：所有脚本共享一个 `window`，变量名撞车是家常便饭。
 - **没有依赖管理**：文件之间的依赖关系全在开发者脑子里，项目一大就失控。
 
+这三条在今天的对策分别是：用模块系统声明依赖、用打包器按依赖图合并、用 `import $ from 'jquery'` 引入 npm 包而不是再往页面里塞全局 `<script>`——第三方库被打进 bundle，`$` 不再默认挂到 `window` 上。后面 webpack 章会落到具体工程上。
+
 那时候的"优化"也很原始——上线前用 YUI Compressor 或 Google Closure Compiler 手动压一下 JS，合并靠手工复制粘贴。
 
 ## 2.2 社区模块化时代：规范之争与任务运行器
@@ -88,6 +92,8 @@ define(['./math'], function (math) {
 - **CMD**（代表实现 SeaJS）：和 AMD 类似也是异步，但强调**依赖就近、按需加载**——用到某个依赖时才在代码里 `require`，而不是一开始就全声明。
 
 > 一句话对比：CommonJS 同步、面向 Node；AMD/CMD 异步、面向浏览器；区别主要在"什么时候声明依赖、什么时候加载"。后来 ES Module（第 2.3 节）作为语言级标准，才终结了这场规范之争。
+>
+> 补充一句后话：规范之争在工程上并没有要求你"只准用一种"。webpack 可以在同一个项目里同时吃 ESM 和 CommonJS——你写 `import`，某个老 npm 包仍是 `module.exports`，它都能收进依赖图。打包完成之后，这些模块语句会被消掉，产物是浏览器能执行的普通 JS。所以"混用两套语法"是开发期的自由，不是运行期还同时存在两套模块系统。
 
 规范有了，还需要工具把它们"跑起来"、把重复工作自动化。这就是**任务运行器（Task Runner）**的时代：
 
@@ -159,7 +165,7 @@ gulp.task('build', function () {
 
 webpack 官方的一句话定位是：把**有依赖关系的模块**（`.js`、`.css`、`.jade`、`.coffee`、图片……）当作输入，输出**浏览器能用的静态资源**（`.js`、`.css`、`.png`……）。
 
-它最核心的理念是**「万物皆模块」**——不只是 JS，CSS、图片、字体都能通过 loader 变成模块纳入依赖图。这一章我们把 webpack 从头到尾拆开：整体流程、依赖图、loader、资源处理、chunk 生成，最后看它打出来的运行时到底长什么样，以及工程上怎么优化。
+它最核心的理念是**「万物皆模块」**——不只是 JS，CSS、图片、字体都能通过 loader 变成模块纳入依赖图。这一章先用一次真实打包把 `src` / `dist` / 开发服务器讲清楚，再把 webpack 从头到尾拆开：整体流程、依赖图、loader、资源处理、chunk 生成，最后看它打出来的运行时到底长什么样，以及工程上怎么优化。
 
 ### 先建立一张全景图：一个 React 文件是怎么变成浏览器里的文件的
 
@@ -189,7 +195,7 @@ flowchart LR
 把这条主线拆成三个**时间节点**，概念就清楚了：
 
 1. **构建期（build time）**：在你的电脑或 CI 上跑 `webpack` 的阶段。`module`、`dependency`、`chunk` 全是**这个阶段的内部概念**，是 webpack 在内存里的数据结构，你在硬盘上看不到它们。
-2. **产物落地**：chunk 经过渲染变成 `asset`（真实文件）。这里有个关键区别——**开发模式（`npm run dev`）默认把产物放在内存里、不写磁盘**（所以 dev 时你在 `dist/` 里看不到文件）；**只有生产构建（`npm run build`）才真正把 asset 写到 `dist/` 目录**。
+2. **产物落地**：chunk 经过渲染变成 `asset`（真实文件）。开发模式默认把产物放在内存里、不写磁盘；只有生产构建才把 asset 写到 `dist/`。下一节把这套「dev 在内存 / 生产必须 build」展开。
 3. **运行期（runtime）**：`dist/` 里的 asset 被部署到服务器或 CDN，用户访问时浏览器把它们下载下来执行。**浏览器拿到的，就是 build 出来的 asset。**
 
 对应几个核心名词，记住这张对照表：
@@ -208,9 +214,86 @@ flowchart LR
 > - **"服务器部署、浏览器拿到的也是 build 产物吗？"** —— 是的，浏览器下载的正是 build 出来的 asset。纯前端项目就是把整个 `dist/` 部署到服务器/CDN，浏览器请求哪个下载哪个。
 > - **"为什么我的 Next.js 项目里也有 `chunks/` 目录？"** —— 因为 **chunk 是所有打包器的通用概念**，不是 webpack 独有。Next.js 底层也是打包器（现在默认用 Turbopack，见第五章），自然也有 chunk。但要注意区分：Next 里 `.next/static/` 下带 hash 的才是**发给浏览器的 asset**；而 `.next/server/`、`.next/build/` 下的是**构建期或跑在服务器上的产物**（如 SSR 代码、PostCSS 转换的辅助文件），并不会下发给浏览器。
 
+## 一次打包：从 src 到浏览器
+
+名词对照有了，先用一次完整打包把工程目录和开发体验钉死。后面 Compiler / loader / 运行时都是在解释这一趟里发生了什么。
+
+### 目录约定：`src`、`node_modules`、`dist`、`public`
+
+常见脚手架长这样：
+
+| 路径 | 谁在用 | 会不会被 webpack 当模块分析 |
+| --- | --- | --- |
+| `src/` | 你写的源码（JS / 样式 / 图片） | 会。从入口出发，被 `import` / `require` 到的才会进依赖图 |
+| `node_modules/` | npm 包装进来的第三方代码 | 会。`import 'jquery'` 和 `import './a.js'` 在依赖图里是同类边 |
+| `public/` | 不需要走模块分析的静态文件 | 不会。原样复制到产物根目录（favicon、`robots.txt`、不会被改写的静态资源） |
+| `dist/` | 生产构建的输出 | 这是结果，不是输入。开发阶段通常**看不到**这个目录 |
+
+开发时你改的是 `src/`；用户线上跑的是 `dist/` 里那份优化过的结果。两边不是同一套文件，只是后者由前者变出来。
+
+### 入口依赖树：一次打包具体在干什么
+
+默认入口往往是 `src/main.js` 或 `src/index.tsx`。webpack 从这一个文件出发，递归收集所有依赖：`main.js` → `a.js` → `b.js`，CSS、图片只要被入口直接或间接引用，也会长到这棵树上。没挂上的文件——即使躺在 `src/` 里——打包时等于不存在。
+
+```mermaid
+flowchart TB
+  E["入口 src/main.js"] --> A["a.js"]
+  E --> CSS["main.css"]
+  A --> B["b.js"]
+  A --> IMG["logo.png"]
+  E --> JQ["jquery（npm）"]
+  CSS --> BG["css 里 url 的背景图"]
+```
+
+跑 `npm run build` 之后，`dist/` 里通常会出现：
+
+- 合并压缩后的 JS（文件名带哈希，如 `app-13fa9.js`）
+- 抽离出的 CSS（如 `main-d74f1.css`）
+- 被复制或改名后的图片
+- 一份自动生成的 `index.html`，已经写好对这些资源的引用
+
+> 👉 **动手验证**：在最小 webpack 项目里从入口 `import` 一个 JS、一份 CSS、一张图，再故意在 `src/` 里放一个谁也不引用的 `orphan.js`。`npm run build` 后：`dist/` 里应有那三个资源，**不应**出现 `orphan.js`。
+
+### 打包之后，日常写法变了什么
+
+和第二章的蛮荒时代对比，变化最明显的是这三件：
+
+- **模块语法可以混用**：同一个项目里 ESM 的 `import` 和 CommonJS 的 `require` 都能进依赖图。打包完成后模块语句消失，浏览器拿到的是普通 JS——所以"兼容不像模块"这件事，很大一块是打包器替你扛的，而不只是 Babel 在转语法。
+- **前端可以直接用 npm，且不污染全局**：`import $ from 'jquery'` 会把 jQuery 打进 bundle，不再往 `window` 上挂 `$`。这和 2.1 节那种 `<script src="jquery.js">` 是两条路。
+- **天然适合 SPA**：单页应用往往只有一个 HTML 壳，内容由 JS 动态创建。webpack 用 `public/index.html` 当模板，打包后自动注入带哈希的 JS / CSS 引用；模板里的 `<script>` 通常带 `defer`，先下载、等 HTML 解析完再执行，不必再把脚本硬塞到 `body` 末尾。
+
+`public/` 和 `src/` 要分开记：
+
+- `src/` 里的文件必须被依赖图挂上才会出现在产物里，路径也会被改写成带哈希的最终地址。
+- `public/` 里除了当模板的 `index.html`，其余文件原样拷到 `dist/`，**不会**做模块解析，也不会改文件名。适合放 favicon、不会走 `import` 的静态资源。业务代码很少改这个目录。
+
+`HtmlWebpackPlugin` 干的就是"以模板生成最终 HTML，并注入本次打包出的资源引用"。3.3 节讲 plugin 时还会再碰到它。
+
+### 开发服务器：产物在内存里，改完即刷新
+
+如果每次改一行都 `build` 再打开 `dist/index.html`，开发会慢得没法做。所以开发阶段跑的是 `npm run dev` / `webpack serve`：启动一个本地 HTTP 服务（默认常是 `localhost:8080`），**打包结果放在内存里，不写 `dist/`**。
+
+```mermaid
+flowchart LR
+  SRC["改 src/ 并保存"] --> W["webpack 重新打包到内存"]
+  W --> S["dev server"]
+  B["浏览器"] -->|"请求 HTML / JS / CSS"| S
+  S -->|"从内存返回"| B
+  W -->|"通知刷新"| B
+```
+
+请求链很短：浏览器要 HTML → 再按页面里的引用要 JS / CSS → 全部由 dev server 从内存结果里返回。webpack 盯着 `src/`，文件一变就重新打包、刷新页面，形成「修改 → 打包 → 刷新」闭环。内存比落盘 IO 快，这是开发体验的一部分。
+
+两件必须分清：
+
+- **开发服务器只服务开发阶段。** 停掉进程（`Ctrl+C`）页面就没了，它也不会产出可上传的文件。
+- **上线必须 `npm run build`。** 部署到服务器 / CDN 的是 `dist/` 里的真实文件。dev 和 build 不是同一条命令换个名字，而是"内存里预览"和"落盘后的生产产物"。
+
+> 👉 **动手验证**：`npm run dev` 时看一眼项目根目录——通常没有新的 `dist/`，或里面不是这次热更新刚写出的文件。再跑一次 `npm run build`，`dist/` 才会出现带哈希的 JS / CSS 和注入好引用的 HTML。
+
 ## 3.1 整体流程与核心对象
 
-webpack 的一次完整构建，可以分成三个阶段：
+上一节从工程目录走完一趟打包，这里看 webpack 内部怎么把那一趟跑起来。一次完整构建可以分成三个阶段：
 
 1. **初始化**：读取配置 → 创建 `Compiler` 对象 → 注册所有插件。
 2. **构建（build）**：从 `entry`（入口文件，如 `src/index.tsx`）出发，递归解析每个模块的依赖，构建出完整的**依赖图**（谁引用了谁的一张关系网）。
@@ -235,9 +318,36 @@ class MyPlugin {
 }
 ```
 
+这里有个容易说反的点：**`apply` 不是事件处理函数，而是注册入口。** webpack 在初始化阶段创建好唯一的 `Compiler` 之后，立刻对每个插件调用一次 `apply(compiler)`——整个进程里通常只跑这一回。你在 `apply` 里做的事，是往 `compiler.hooks.xxx` 上**登记**回调；真正干活，要等后面某个钩子被触发。所以它更像 `window.addEventListener`，不像 `window.onload` 本身。
+
+登记的方式有三种，对应 [Tapable](https://webpack.js.org/api/plugins/) 的三类钩子：
+
+| 方法 | 回调形态 | 什么时候用 |
+| --- | --- | --- |
+| `tap` | 同步函数 | 钩子本身是 Sync，或异步钩子里你没有 I/O |
+| `tapAsync` | 最后多一个 Node 风格 `callback(err)` | 读文件、发请求，用回调收尾 |
+| `tapPromise` | 返回 Promise / `async` 函数 | 同上，只是更顺手 |
+
+同步钩子（如 `compile`）**只能** `tap`，乱写 `tapAsync` 会直接报错；异步钩子（如 `run`、`emit`）三种都能用。第一参是插件名，方便在统计和报错栈里认出是谁挂上去的。
+
+```mermaid
+sequenceDiagram
+  participant Init as 初始化
+  participant C as Compiler（全程一个）
+  participant P as plugin.apply
+  participant Comp as Compilation（每次构建一个）
+  Init->>C: 创建 Compiler
+  C->>P: 调用一次 apply，只负责 tap
+  C->>Comp: 开始一次构建
+  Comp->>P: 触发 emit 等钩子（可多次）
+  Note over C,Comp: watch / HMR：Compiler 不重建，Compilation 新建
+```
+
+> webpack 5 更推荐在 `compilation.hooks.processAssets` 上改产物，而不是 `compiler.hooks.emit`。`emit` 还能跑，官方已标成偏旧的时机（[Compilation Hooks](https://webpack.js.org/api/compilation-hooks/)）。上面这份最小插件继续用 `emit`，只因为它最好读；新插件优先 `processAssets`。
+
 ### Compilation
 
-`Compilation` 代表**一次具体的构建**。它持有本次构建的所有 `module`、`chunk`、`asset` 以及编译产生的信息。和 `Compiler` 的区别在于：`Compiler` 一个进程只有一个，而 `Compilation` 在 watch 模式下每次文件变更都会**重新创建一个**——每保存一次代码触发的重新编译，就是一个新的 `Compilation`。
+`Compilation` 代表**一次具体的构建**。它持有本次构建的所有 `module`、`chunk`、`asset` 以及编译产生的信息。和 `Compiler` 的区别在于：`Compiler` 一个进程只有一个，而 `Compilation` 在 watch 模式下每次文件变更都会**重新创建一个**——每保存一次代码触发的重新编译，就是一个新的 `Compilation`。所以上面那条序列里，`apply` 不会再跑，但 `emit` / `processAssets` 会跟着每次 Compilation 再触发一遍。
 
 整体的对象流转关系大致如下：
 
@@ -257,11 +367,11 @@ flowchart TB
 
 ## 3.2 从 entry 到依赖图：module 与 dependency
 
-构建阶段的核心，是**从 `entry` 递归建出依赖图**。这个过程可以用 webpack 内部的几个方法串起来（细节可参考作者 Tobias Koppers 的 [《How webpack works》](https://raw.githubusercontent.com/sokra/slides/master/data/how-webpack-works.pdf)）：
+构建阶段的核心，是**从 `entry` 递归建出依赖图**——前面「一次打包」那节从工程目录看到的那棵树，内部就是这样长出来的。这个过程可以用 webpack 内部的几个方法串起来（细节可参考作者 Tobias Koppers 的 [《How webpack works》](https://raw.githubusercontent.com/sokra/slides/master/data/how-webpack-works.pdf)）：
 
 1. `Compilation` 从 `entry` 调用 `addEntry`，进而 `addModuleChain`——依赖链的起点。
 2. `NormalModuleFactory` 用 `enhanced-resolve` 把请求路径（如 `./a.js`）解析成真实文件路径，并创建 `Module` 对象。
-3. `buildModule` 调用 `module.build`：跑 loader 转换源码，再用 AST 解析出这个模块里的 `import` / `require`，收集成一批 `dependency`。
+3. `buildModule` 调用 `module.build`：先读文件，再跑 loader 把内容转成 JS，**然后**才做 AST 解析，从树上收集 `import` / `require` 变成 `dependency`（下一节把这条时间线钉死）。
 4. `processModuleDependencies` 遍历这些 `dependency`，对每一个递归回到第 2 步。
 
 这里有一个关键优化：**相同的模块只会构建一次**。webpack 用模块的 identifier（可以理解为解析后的绝对路径）做去重——如果 `a.js` 和 `b.js` 都依赖了 `c.js`，`c.js` 只会被构建一次，第二次遇到时直接复用缓存里已存在的模块。这就是依赖图能收敛、不会无限膨胀的原因。
@@ -273,11 +383,28 @@ module 是"点"、dependency 是"边"，两者共同构成依赖图。而把各�
 
 ## 3.3 loader 与 AST：模块转换的核心
 
-webpack 本身只认识 JavaScript。想让它处理 `.css`、`.ts`、`.less`、图片，就得靠 **loader**——它本质是一个**文件转换器**：输入一种格式的内容，输出 webpack 能继续处理的内容。
+webpack 本身只认识 JavaScript。想让它处理 `.css`、`.ts`、`.less`、图片，就得靠 **loader**——它本质是一个**文件转换器**：输入一种格式的内容，输出 webpack 能继续处理的内容。webpack 内核只负责「建依赖图、打成 chunk」；读不懂的语法、要抽 HTML、要在编译开始打一行日志，都得靠 loader / plugin 往外接。
 
-loader 有两个容易记错的特性：
+先把 loader 插在流程的哪一格钉死，后面的「必须返回 JS」「Module parse failed」才说得通。
 
-**其一，loader 链是从右到左（数组里从后往前）执行的。** 比如处理 `.less`：
+```mermaid
+flowchart LR
+  R["① 读出文件原文"] --> L["② 跑匹配到的 loader 链"]
+  L --> A["③ 对结果做 AST 解析"]
+  A --> D["④ 记录 import / require"]
+  D --> S["⑤ 存下转换后的模块"]
+```
+
+loader 的执行窗口是 **②**：文件已经读到内存，但 webpack **还没**开始语法分析。它拿到的是字符串，吐回去的也必须是字符串——而且最终要让 ③ 的解析器认得出。所以：
+
+- 最左边、最后执行的那个 loader，**必须返回 JavaScript**。AST 这一步只吃 JS；你把 Less 转成 CSS 就停手，下一步会报 `Module parse failed`。
+- 反过来：源码里出现 webpack 不认识的写法（TSX，或某个自定义语法），也是在 ③ 炸，提示你缺 loader，而不是依赖图建错了。
+
+> 👉 **动手验证**：对一个 `.less` 文件只配 `less-loader`、不配后面能吐 JS 的 `css-loader` + `style-loader`（或 MiniCssExtract），`build` 时就会在解析阶段挂掉。补齐链之后，同样的文件就能进依赖图。
+
+执行顺序是下一件容易记错的事。
+
+**同一条 `use` 里，链是从右到左（数组里从后往前）执行的。** 比如处理 `.less`：
 
 ```js
 // webpack.config.js
@@ -309,33 +436,99 @@ flowchart RL
 2. **css-loader**：输入上一步的 CSS。它的职责是**解析 CSS 里写的 `@import "./other.css"` 和 `url(./logo.png)`**——因为 CSS 里也会引用其他文件，css-loader 把这些引用也变成 webpack 认识的依赖（也就是让图片、其他 css 也进入依赖图），而不是原样丢给浏览器。
 3. **style-loader**：输入处理好的 CSS，输出一段 **JS 代码**——这段 JS 在运行时会创建一个 `<style>` 标签把样式插进页面。为什么要变成 JS？因为 webpack 最终产物是 JS，样式得靠 JS 在运行时注入。
 
+回扣开头那张时间线：`css-loader` 并不是让 webpack 去「读懂 CSS」，而是先把 `@import` / `url()` **改写成 JS 里的 `require` / `import`**，再交给 ③ 的 AST 收集依赖。图片能进依赖图，是 loader 先翻译、解析器后记账，两步扣在一起。
+
 **记住两个端点：最后一个 loader（最右、最先执行）拿到的是原始文件内容；第一个 loader（最左、最后执行）必须返回 JavaScript。** 另外 loader 还有一个"从左到右"运行的 pitch 阶段，可以提前短路后续 loader，这里不展开（详见官方 [Writing a Loader](https://webpack.js.org/contribute/writing-a-loader/)）。
 
-**其二，loader 的核心工作往往是 AST 变换。** 以最常见的 `babel-loader` 为例，它把源码交给 `@babel/parser` 解析成 **AST（抽象语法树）**，在树上做转换（如把箭头函数、可选链降级），再 `generate` 回字符串。"理解代码结构再改写"，靠的就是 AST，而不是字符串替换。
+上面说的是**一条** `use` 数组。项目里通常有多条 `rules`，一个文件可能同时命中好几条——这时不是「哪条先写哪条先跑」这么简单，而是**先收集、再整条反向**：
 
-一个最简单的 loader 其实就是一个导出函数：
+1. 按 `rules` **从上到下**检查 `test`（匹配的是模块路径，如 `./src/index.js`）。
+2. 命中的每条 rule，把它的 `use` **按书写顺序追加**进一个总数组。
+3. 总数组形成后，**从后往前**执行——和单条 `use` 的右→左是同一条规则，只是数组更长。
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      { test: /\.js$/, use: ['loader1', 'loader2'] },
+      { test: /index\.js$/, use: ['loader3', 'loader4'] },
+    ],
+  },
+}
+```
+
+`index.js` 两条都中，总数组是 `[loader1, loader2, loader3, loader4]`，实际跑 **4 → 3 → 2 → 1**。`a.js` 只中第一条，总数组是 `[loader1, loader2]`，跑 **2 → 1**。入口和依赖模块走的链可以不一样——这是面试里很爱挖的坑。
+
+```mermaid
+flowchart TB
+  subgraph COLLECT["① 从上到下收集"]
+    R1["rule1 命中 → 追加 loader1, loader2"]
+    R2["rule2 命中 → 追加 loader3, loader4"]
+    R1 --> R2
+  end
+  subgraph RUN["② 整条链从后往前跑"]
+    L4["loader4 先吃原文"] --> L3["loader3"] --> L2["loader2"] --> L1["loader1 最后吐 JS"]
+  end
+  COLLECT --> RUN
+```
+
+进阶一句：`enforce: 'pre' | 'post'` 会再把某些 loader 抽到整条链的最前或最后，社区里 `eslint-loader` 当年就常标 `pre`。没碰到再记即可。
+
+**loader 函数内部的核心工作，往往还是 AST 变换。** 以最常见的 `babel-loader` 为例，它把源码交给 `@babel/parser` 解析成 **AST（抽象语法树）**，在树上做转换（如把箭头函数、可选链降级），再 `generate` 回字符串。"理解代码结构再改写"，靠的就是 AST，而不是字符串替换。注意这是 **loader 自己**在函数内部做的 AST，和前面流程图里 webpack 在 loader **之后**做的那次解析是两回事：webpack 那次是为了找依赖；Babel 这次是为了改语法。
+
+一个最简单的 loader 其实就是一个导出函数。它跑在 **Node 里、构建期**，处理完就扔掉，**不会**打进浏览器拿到的 bundle。所以函数体里没有 `window`，`source` 才是「正在被翻译的那份源码」。
 
 ```js
 // upper-loader.js：把源码里的注释标记替换掉（示意）
 module.exports = function (source) {
+  const { mark = '__MARK__' } = this.getOptions()
   // source 是上一个 loader 的输出（或原始文件内容）
-  return source.replace(/\/\/ __MARK__/g, '// processed by upper-loader')
+  return source.replace(`// ${mark}`, '// processed by upper-loader')
 }
 ```
 
+参数不从函数签名里来，而从 **`this`（loader context）** 来。配置里可以写对象，也可以走老的查询串：
+
+```js
+// 完整对象（现在的常规写法）
+{ loader: './upper-loader', options: { mark: '__MARK__' } }
+
+// 简写：use: ['style-loader', 'css-loader']
+// 更老：loader 路径后面拼 ?mark=__MARK__
+```
+
+这几条规则变过一轮，面试或翻旧文时很容易对不上。时间线比死记「现在的写法」有用：
+
+```mermaid
+flowchart LR
+  W2["webpack 2/3：query ?a=1"] --> W4["webpack 4：loader-utils"]
+  W4 --> W5["2020-10 webpack 5：this.getOptions"]
+  W5 --> W580["2023-04 5.80：ESM loader"]
+```
+
+- **query 字符串**（`loader: './x?a=1'`，以及 `!!xxx-loader?a=1!./file.js` 这种内联写法）是 2/3 时代的主流。对象 `options` 后来成了正统，query 还在，但只适合传几个标量。
+- **`loader-utils`**：webpack 4 官方推荐用它解析 `this.query`。它会把 `true` / `false` / `null` 收成字面量，还一度接受 JSON5（`?{arg:true}` 可以不写引号）。
+- **webpack 5.0（2020-10-10）** 把 `this.getOptions([schema])` 做成内置 API，用来取代 `loader-utils.getOptions`（[迁移指南](https://webpack.js.org/migrate/5/#getoptions-method-for-loaders)、[Loader Interface](https://webpack.js.org/api/loaders/)）。解析改走 Node 原生 querystring，JSON5 那种宽松写法算废弃。
+- **「loader 必须 CommonJS，不能写 `import`」**：在 webpack 4 和 5.0～5.79 基本成立——loader 由 Node `require` 加载。**2023-04-19 的 5.80.0** 才正式支持 ESM loader（[v5.80.0](https://github.com/webpack/webpack/releases/tag/v5.80.0)，PR [#15198](https://github.com/webpack/webpack/pull/15198)）：文件用 `.mjs` 或包上 `"type": "module"`。很多讲义还停在「必须 CJS」，说的是 5.80 之前的世界。
+- **别和源码混**：`src/` 里的 ESM / CJS 是**被打包的代码**；loader / plugin 是**打包过程自己在 Node 里跑的代码**。前者转完给浏览器，后者从不进 bundle。
+
+今天写新 loader：函数 + `this.getOptions()`，CJS 或 ESM 都行。翻到 `loader-utils` + `?a=1` 的旧 gist，按这条时间线对一下版本即可。
+
 ### loader 与 plugin 的区别
 
-初学时很容易混淆 loader 和 plugin：
+初学时很容易混淆，因为两者都是「扩展 webpack」。分界其实是能力边界：
 
-- **loader**：作用在**单个文件**上，负责"把 A 格式转成 B 格式"，是一个转换函数，在模块加载时执行。
-- **plugin**：基于 `Tapable` 的事件钩子，**贯穿整个构建生命周期**，能力更广（生成 HTML、提取 CSS、注入环境变量、分析产物……），它不直接转换文件，而是"在某个时机做某件事"。
+- **loader**：作用在**单个文件**上，窗口就卡在「读完原文、尚未 AST」那一下，负责把 A 格式转成 B 格式。
+- **plugin**：基于 `Tapable` 的事件钩子，**贯穿整个构建生命周期**。它不转换某个模块的源码，而是在某个时机做一件 loader 做不到的事。
+
+loader 做不到的，正好就是 plugin 出场的理由：编译启动时打一行日志、在写出磁盘前再生成一份清单、改已经成型的 asset 文件名、注入 HTML——这些都不是「把这份字符串变成另一份字符串」。硬塞进 loader 里，既没有全局的 `compilation.assets`，也没有「所有模块都建完了」这个时机。
 
 > webpack 构建过程里有很多"时机"（钩子），比如"开始编译前""每个模块构建完""所有资源即将写入磁盘时"。plugin 就是往这些时机上挂一段自己的逻辑。举几个具体例子：
-> - `HtmlWebpackPlugin`：在"资源生成后"这个时机，自动生成一个 `index.html` 并把打包出的 JS/CSS 引进去；
-> - `MiniCssExtractPlugin`：在合适的时机把 CSS 从 JS 里抽离成单独的 `.css` 文件；
-> - `DefinePlugin`：在"编译时"把代码里的 `process.env.NODE_ENV` 替换成真实值。
+> - `HtmlWebpackPlugin`：在资源生成后，以 `public/index.html` 为模板生成最终页面，并把本次打包出的、带哈希的 JS/CSS 自动引进去——也就是「一次打包」那节说的 SPA 壳；
+> - `MiniCssExtractPlugin`：在合适的时机把 CSS 从 JS 里抽离成单独的 `.css` 文件（所以生产态往往不再走 `style-loader` 运行时插标签）；
+> - `DefinePlugin`：在编译时把代码里的 `process.env.NODE_ENV` 替换成真实值。
 >
-> 回顾 3.1 的最小插件例子——它就是往 `compiler.hooks.emit`（资源即将输出的时机）挂了个回调，这正是 plugin 的工作方式。
+> 回顾 3.1：`apply` 只在初始化登记一次，`tap` / `tapAsync` / `tapPromise` 才是钩子被触发时真正跑的函数。那份最小插件往 `compiler.hooks.emit` 上挂回调，就是这个模型。
 
 一句话：**loader 管"翻译"（单个文件怎么转），plugin 管"编排"（整个流程的各个节点做什么）。**
 
@@ -399,15 +592,31 @@ flowchart TB
   EB -.用到.-> SHARED
 ```
 
-`entry a` 和 `entry b` 都依赖某段公共代码，于是它被抽成一个独立的 **common chunk**，输出为 `common.js` 这个 asset；两个入口页面各自再引用这个 `common.js`。这样公共代码只打包一份、只下载一次，还能被浏览器长期缓存。
+`entry a` 和 `entry b` 都依赖某段公共代码，于是它被抽成一个独立的 **common chunk**，输出为 `common.js` 这个 asset；两个入口页面各自再引用这个 `common.js`。这样公共代码只打包一份、只下载一次，还能被浏览器长期缓存。长期缓存靠的就是下一小节的 `contenthash`。至于 webpack 会不会默认抽出这张图，见下面「多 chunk 共享依赖」。
 
-> 关于长期缓存：webpack 会给 asset 名字加上 `contenthash`（如 `common.8f3a2c.js`）——内容不变，文件名就不变，浏览器缓存就能一直命中；内容一变，hash 变、文件名变，缓存自动失效。
+### contenthash：文件名变了，缓存才会让路
+
+浏览器会把 JS / CSS / 图片当成静态资源做**长期缓存**（具体多久看响应头，常见是一年量级）。如果文件名永远叫 `app.js`，服务器上的内容更新了，用户还是用本地那份旧的——这就是"发版了页面却没变"的经典原因。
+
+`contenthash` 的解法是把**内容指纹嵌进文件名**：
+
+1. 首次请求 `/js/app-9ea93.js`，浏览器按这个 URL 缓存。
+2. 源码改了，内容变，哈希变，产物变成 `/js/app-8b2c4.js`。
+3. HTML 由插件自动改成引用新文件名，浏览器发现 URL 没见过，只能重新下载。
+
+反过来说：内容没变，重新打包哈希也不变，旧缓存继续命中。开发者不用手改 HTML 里的引用——`HtmlWebpackPlugin` 每次都会注入当前这次的真实文件名。
+
+> 注意区分三种常见占位符：`hash` 是整次构建的哈希，任一文件变了，大家可能一起变名；`chunkhash` 跟单个 chunk 绑定；`contenthash` 跟**这个文件自己的内容**绑定。要做长期缓存，优先 `contenthash`（官方 [output.filename](https://webpack.js.org/configuration/output/#outputfilename)）。
+
+这和 3.7 把 runtime 拆成独立 chunk 是同一类问题：运行时一变，若它还和业务代码挤在同一个文件里，业务文件的 `contenthash` 也会跟着变，缓存就白做了。
 
 ### 多 chunk 共享依赖的问题
 
 这里藏着一个经典问题：**如果多个 chunk 都引用了相同的依赖，而不做处理，这个依赖会被重复打进每个 chunk 的产物里**——既让体积冗余，又让缓存失效（改一个业务 chunk，公共库跟着变名）。
 
-解法就是把公共依赖抽成独立 chunk，这正是 `SplitChunksPlugin` 干的事（见 3.7；官方文档：[SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/)、[Code Splitting 指南](https://webpack.js.org/guides/code-splitting/)）。
+解法就是把公共依赖抽成独立 chunk，这正是 `SplitChunksPlugin` 能干的事（见 3.7；官方文档：[SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/)、[Code Splitting 指南](https://webpack.js.org/guides/code-splitting/)）。
+
+> 注意：上面那张图是**目标形态**，不是 webpack 5 的默认结果。默认 `chunks: 'async'`，只处理动态 `import()` 切出来的块；两个**同步入口**共用的 jquery，并不会自动变成图里的 `common.js`。要抽同步公共库，得把 `chunks` 改成 `'all'`，或自己写 `cacheGroups`。3.7 会把这个默认钉死。
 
 ### chunk 的状态
 
@@ -578,11 +787,45 @@ sequenceDiagram
 
 ## 3.7 webpack 最佳实践
 
-理解了原理，工程上就有的放矢了。这一节讲几个高频优化手段。
+理解了原理，工程上就有的放矢了。这一节先讲为什么要拆、怎么看体积，再顺着手动分包（Dll）到自动分包（SplitChunks），最后到摇树和压缩。
+
+先说结论：**先测量，再优化。** 分包、摇树、压缩解决的是三件不同的事——分包决定「切成几个文件、什么时候下载」；摇树决定「模块之间哪些导出根本不该打进去」；压缩决定「打进去的那些字符怎么再变短」。source map 是压完之后怎么调试。
+
+### 为什么要分包
+
+3.5 已经说过：多入口共用的代码，正确做法是抽成独立 chunk，而不是让每个入口各打一份。这里把「为什么值得抽」钉死。
+
+假设 `pageA` 和 `pageB` 都 `import 'jquery'`：
+
+```mermaid
+flowchart LR
+  subgraph before ["不拆"]
+    A1["pageA.js 含 jquery"]
+    B1["pageB.js 含 jquery"]
+  end
+  subgraph after ["拆开"]
+    A2["pageA.js 业务"]
+    B2["pageB.js 业务"]
+    J["jquery.js 一份"]
+    A2 --> J
+    B2 --> J
+  end
+  before --> after
+```
+
+不拆的代价有三层：
+
+1. **体积重复**：两个页面各带一份同样的库，用户切页等于再下一遍。
+2. **缓存失效**：业务代码一改，整份含 jquery 的文件 `contenthash` 跟着变，半年不动的库也被重新下载。
+3. **构建浪费**：同一份库被编译进多个 chunk。
+
+所以分包的目的不是「文件越多越好」，而是：**去重、让不常变的代码吃长期缓存、业务源码不用改。** 小工具函数、天天改的业务代码，硬拆只会多请求、收益很小。
+
+旧讲义里常出现「webpack 默认不分包」。那是 webpack 3 及更早、还在用 `CommonsChunkPlugin` 且得自己开的世界。**webpack 4 起内置 `SplitChunksPlugin`，默认就会拆异步 chunk**——只是默认比较克制，所以「没写配置」不等于「完全没拆」。
 
 ### 构建产物分析：webpack-bundle-analyzer
 
-优化的第一步是"看清楚体积都花在哪"。[webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer) 能把每个 chunk / 模块的体积占比可视化成矩形树图：
+优化的第一步是看清楚体积花在哪。[webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer) 把每个 chunk / 模块画成矩形树图：面积越大，这块越该先动手。
 
 ```js
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
@@ -592,11 +835,96 @@ module.exports = {
 }
 ```
 
-> 👉 **动手验证 + 待补图**：在你的 webpack 项目里装上 `webpack-bundle-analyzer` 插件，`npm run build` 后会弹出体积可视化。（📌 一张可视化截图待后续补到这里。）
+怎么读图，比怎么挂插件重要：
+
+| 开关 | 看的是什么 |
+| --- | --- |
+| **stat** | webpack 统计里、压缩前的体积 |
+| **parsed** | 产物文件被解析后的实际体积（更接近磁盘上的 JS） |
+| **gzipped** | 再做 gzip 之后的近似传输体积 |
+
+默认 `server` 模式会起一个本地页；也可以 `analyzerMode: 'static'` 落一份 HTML。矩形是**相对大小**，别只看色块比例、不看旁边的 KB 数字——gzip 之后 50KB 和 500KB 观感差很多，图上可能都「挺大」。
+
+先点最大的那几块：常见是整包 lodash / moment、没拆开的第三方库、某个路由把重图表库同步引进来了。然后才决定拆包、换 `lodash-es` / 按路径引入，还是改成 `import()`。analyzer 自己不优化，只提供决策依据。
+
+图上的 gzip 数字和分包也是两件事：分包改变「下几个文件」；gzip / Brotli 改变「每个文件在网上有多胖」。传输层压缩通常由 CDN / Nginx 做，不一定要 webpack 再吐 `.gz`。
+
+> 👉 **动手验证 + 待补图**：装上插件后 `npm run build`，对照 `stat` / `parsed` / `gzipped` 三档看最大矩形是谁。（📌 一张可视化截图待后续补到这里。）
+
+### 手动分包：Dll（科普）
+
+在 SplitChunks 成为默认之前，社区用 **DLL（Dynamic Link Library）** 这套「先打一份公共库、业务构建再引用」的办法。面试还可能问到，新项目不必再配。
+
+三步：
+
+1. 单独一份配置（如 `webpack.dll.config.js`），`entry` 写成 jquery / lodash，`output.library` 暴露全局变量。
+2. `DllPlugin` 打出 `dll/jquery.js`，并生成 **manifest**（模块路径 → 全局变量名）。
+3. 业务构建用 `DllReferencePlugin` 读 manifest：遇到这些模块就**不再打进 bundle**，改成读已经挂上的全局变量。HTML 还得自己先写 `<script src="./dll/jquery.js">`。
+
+```mermaid
+sequenceDiagram
+  participant Dll as DLL 构建
+  participant M as manifest.json
+  participant App as 业务构建
+  participant H as 页面
+  Dll->>M: DllPlugin 记下模块和全局名
+  Dll->>H: 产出 dll/jquery.js
+  App->>M: DllReferencePlugin 对照清单
+  App->>App: 业务包里不再含 jquery 源码
+  H->>H: 必须先加载 dll，再加载业务包
+```
+
+版本线：
+
+```mermaid
+flowchart LR
+  W3["webpack 1–3：CommonsChunkPlugin + 流行 Dll"] --> W4["2018-02 webpack 4：SplitChunksPlugin"]
+  W4 --> W5["2020-10 webpack 5：filesystem cache"]
+```
+
+- **webpack 3 前后**：Dll 解决两件事——大库只编一次（加速二次构建）、产物拆开利于缓存。`CommonsChunkPlugin` 负责从多个入口抽公共代码，配置绕、和异步 chunk 容易打架。
+- **webpack 4（2018-02）**：用内置的 `SplitChunksPlugin` 取代 `CommonsChunkPlugin`（[文档](https://webpack.js.org/plugins/split-chunks-plugin/)）。按体积和引用次数自动拆，不必再点名「把 jquery 抽出去」——但**默认只拆异步 chunk**，同步入口里的大库要把 `chunks` 改成 `'all'`，下一节把这个默认钉死。
+- **webpack 5（2020-10）**：`cache: { type: 'filesystem' }` 把「大库别每次重编」这件事做掉了大半。Dll 还在（[DllPlugin](https://webpack.js.org/plugins/dll-plugin/)），但新项目用自动分包 + `contenthash` 即可。
+
+局限也是它退出舞台的原因：要维护第二份配置、HTML 手动引脚本、更新库要重打 DLL 和 manifest、复杂依赖链很难点名。**今天把它当历史，不当作业。**
 
 ### 拆包优化：SplitChunksPlugin
 
-webpack 主要用 `optimization.splitChunks`（底层是 `SplitChunksPlugin`）按体积、引用次数等规则做分包（官方 [SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/)）。下面这份配置是**为了讲解逐字段列出的，`minSize`/请求数上限的数值刻意缩小到不合理的程度**（只为触发拆分方便演示），**请勿照抄到生产**：
+现在的正统是 `optimization.splitChunks`（底层就是 `SplitChunksPlugin`）。先记住默认，再看下面那份「为了演示才写得很激进」的配置，才不会以为官方默认就是 `chunks: 'all'`。
+
+webpack 5 的默认大致是（官方 [SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/)）：
+
+```js
+{
+  chunks: 'async', // 只处理动态 import() 切出来的块
+  minSize: 20000, // 约 20KB 以下不独立成文件
+  minChunks: 1, // 顶层默认：被 1 个 chunk 用到就可能拆
+  maxAsyncRequests: 30,
+  maxInitialRequests: 30,
+  cacheGroups: {
+    defaultVendors: {
+      test: /[\\/]node_modules[\\/]/,
+      priority: -10,
+      reuseExistingChunk: true,
+    },
+    default: {
+      minChunks: 2, // 业务公共代码：至少被 2 个 chunk 引用
+      priority: -20,
+      reuseExistingChunk: true,
+    },
+  },
+}
+```
+
+几条容易对不上号的：
+
+- **`chunks` 默认 `'async'`。** 只有同步入口、没有 `import()` 时，你会觉得「没拆」。示例里写 `'all'`，是为了让同步的 jquery 也能抽出来。三个取值：`async` 只拆异步块；`initial` 只拆首屏同步加载的那些 chunk（不含 `import()`）；`all` 两边都拆。生产里多入口 / 要抽 vendor，才常改成 `all`。
+- **`minSize`**：webpack 4 默认约 **30KB**（旧讲义那个数字），webpack 5 改成 **20KB**。小于阈值的公共模块宁可重复，也不换一次 HTTP。
+- **`minChunks` 有两层。** 顶层默认是 1；真正管「业务公共代码」的是默认组 `default` 的 `minChunks: 2`。所以「两个入口都引用的小工具函数没被拆」——先看体积够不够 `minSize`，再看是不是落进了 `default` 组。
+- **`maxSize`**：超过就尝试再切，但**切割单位是模块**，单个 200KB 的 jquery 切不开。拆多了不减传输量，只加请求，实际意义有限。
+- **默认缓存组**：`defaultVendors` 吃 `node_modules`（priority -10），`default` 吃被 2 个 chunk 引用的其余模块（-20）。webpack 4 里前者叫 `vendors`，**5 改名为 `defaultVendors`**，避免和用户自己写的 `vendors` 撞名。缓存组继承顶层选项，也可以覆盖；设成 `false` 就关掉该默认组。
+
+下面这份配置是**为了讲解逐字段列出的，`minSize` / 请求数上限刻意缩小到不合理的程度**（只为触发拆分方便演示），**请勿照抄到生产**：
 
 ```js
 // ⚠️ 演示用配置：数值为方便演示而刻意缩小，非推荐默认值
@@ -618,16 +946,15 @@ module.exports = {
 > - `minChunks: 2` 的准确含义是**"这个模块至少被 2 个 chunk 引用才拆分"**，不是"被引用超过 2 次"。
 > - `minSize: 100` / 请求数上限设成 2 这类值只是为了演示时容易触发拆分，**照抄到生产会拆出一堆过小的碎文件、适得其反**。
 
-实际项目里，更推荐直接用 webpack 5 的默认值，只按需覆盖，一份保守的实践配置类似：
+实际项目里，更推荐直接用 webpack 5 的默认值，只按需覆盖。多入口或要抽同步 vendor 时，常只改这一处：
 
 ```js
 // 生产可参考：多数值用 webpack 默认，只做必要覆盖
 module.exports = {
   optimization: {
     splitChunks: {
-      chunks: 'all',
-      minSize: 20000, // 20KB 以上才独立成 chunk（webpack 默认量级）
-      // maxInitialRequests / maxAsyncRequests / minChunks 一般用默认即可
+      chunks: 'all', // 覆盖默认的 async，让同步入口里的公共库也能抽
+      // minSize 默认 20KB；maxInitialRequests / maxAsyncRequests / minChunks 一般不用改
     },
   },
 }
@@ -635,10 +962,10 @@ module.exports = {
 
 ### 常见分包策略
 
-先补两个名词，不然下面看不懂：
+上一节默认组里已经出现过这两件事，这里把社区叫法钉死：
 
 - **vendor**：指第三方依赖（`node_modules` 里的 React、lodash 等），因为它们不常变，适合单独打成一个包长期缓存。"vendor" 是社区约定俗成的叫法，意为"供应商代码"。
-- **`cacheGroups`**：`splitChunks` 里用来**定义"分组规则"**的字段。你在这里写若干条规则，告诉 webpack"符合条件的模块归到哪个 chunk、叫什么名字"。比如"凡是来自 `node_modules` 的都归到 vendor 组"。
+- **`cacheGroups`**：`splitChunks` 里用来**定义"分组规则"**的字段。默认的 `defaultVendors` / `default` 就是两组；你也可以再写自己的规则，告诉 webpack"符合条件的模块归到哪个 chunk、叫什么名字"。
 
 一个典型配置长这样：
 
@@ -666,10 +993,12 @@ module.exports = {
 }
 ```
 
+这是在**覆盖默认组**，不是从零发明：`priority` 比默认的 -10 / -20 高，会抢走本该进 `defaultVendors` / `default` 的模块。`name: 'vendors'` 会把命中的第三方收成**一个**文件；默认组不写死 `name` 时，文件名往往带上关联的入口，粒度更碎、缓存更细，也更容易请求变多。
+
 对应到实践中通常这样设置：
 
-- **针对 `node_modules`**：用 `cacheGroups` 把第三方依赖单独打成 vendor 文件，避免业务代码变更影响 npm 包的缓存（业务代码天天改，但 React 版本很久才动一次，分开打包，React 那个文件的 hash 就能长期不变）；同时建议用 `maxSize` 设阈值，防止 vendor 包过大。
-- **针对业务代码**：设一个 common 分组，通过 `minChunks` 把使用率较高的资源合并为 common；首屏用不上的代码尽量用异步 `import()` 引入。
+- **针对 `node_modules`**：用 `cacheGroups` 把第三方依赖单独打成 vendor 文件，避免业务代码变更影响 npm 包的缓存（业务代码天天改，但 React 版本很久才动一次，分开打包，React 那个文件的 hash 就能长期不变）。`maxSize` 可以设阈值防止 vendor 过大，但切不开单个大模块。
+- **针对业务代码**：设一个 common 分组，通过 `minChunks` 把使用率较高的资源合并为 common；首屏用不上的代码尽量用异步 `import()` 引入（见后面「懒加载」）。
 - **runtime chunk**：把 `optimization.runtimeChunk` 设为 `true`（或 `{ name: 'runtime' }`），将 webpack 运行时代码拆成独立资源。这样运行时变动就不会牵连其他 chunk 的 `contenthash`，缓存更稳定。
 
 ### 两种分包思路：split-by-module vs split-by-experience
@@ -681,9 +1010,125 @@ module.exports = {
 
 实践中两者常结合：用 split-by-module 处理第三方库，用 split-by-experience 规划业务代码的加载节奏。
 
+### 懒加载：和分包怎么配合
+
+运行时怎么把异步 chunk 拉回来，3.6 已经用 JSONP / `webpackChunk` 讲过。这里只补工程侧：`import()` 就是 split-by-experience 的落点。
+
+```js
+button.addEventListener('click', async () => {
+  const { chart } = await import(/* webpackChunkName: "chart" */ './chart')
+  chart.render()
+})
+```
+
+- webpack 看到动态 `import()`，会切出 **async chunk**；浏览器先跑主包，用户点了再下载。这和「编译期把公共库抽到 vendor」是两件事：一个决定**何时加载**，一个决定**别重复打包**。
+- 默认 `chunks: 'async'` 吃的就是这些异步块——所以你即使不写 `splitChunks`，懒加载切出来的大依赖，仍然可能被再抽一层。
+- `/* webpackChunkName: "chart" */` 是 webpack 的魔法注释，产物文件名带上可读前缀，analyzer 里也好认。它不是语言标准。
+- `import()` 早年是提案，**2020 年进了 ES2020**，现在就是标准动态导入，返回 Promise。旧讲义写「草案」是当时的世界。
+
+和 Tree Shaking 打架的典型坑：`await import('lodash')` 会把整个 lodash 打进那个异步块，静态分析看不到你只用了其中一个函数。做法是**自己写一个只具名导出用到的函数的中间模块**，再动态导入这个中间模块；或者继续用 `import debounce from 'lodash/debounce'` 这种路径级按需，而不是动态导入整个库。
+
+> 👉 **动手验证**：给入口加一个点击后才 `import('./heavy')` 的按钮，`npm run build` 后 `dist/` 里应多出一个独立 chunk；DevTools 的 Network 里，这个文件要等点击之后才出现请求。
+
+### Tree Shaking：模块之间的无用导出
+
+先说和压缩的分工：**压缩处理一个模块内部**（空白、短变量名、确定走不到的分支）；**Tree Shaking 处理模块之间**（`myMath` 导出了 `add` / `sub`，入口只 `import` 了 `add`，`sub` 不该出现在产物里）。生产构建里两者接在一起：webpack 先标记，压缩器再删。
+
+```mermaid
+flowchart LR
+  ESM["ESM 静态 import / export"] --> Mark["usedExports 标成 unused"]
+  Mark --> Terser["压缩器做 DCE，真正删掉"]
+```
+
+依赖 ESM 的静态结构：`import` / `export` 必须在模块顶层、路径必须是字符串字面量、绑定不能重新赋值。CommonJS 的 `require(可变路径)`、条件 `require`，构建期没法确定导出表，一般摇不掉。这就是「同样一个 lodash，CJS 版整包进来，`lodash-es` 才能按函数摇」的原因。
+
+生产模式默认会打开 `optimization.usedExports`（以及 `sideEffects` 分析）。打开之后，产物里常能搜到 `/* unused harmony export sub */` 这类注释——**标记还不是删除**。真正拿掉字符，要等 Terser（或现在的 SWC minify）做 Dead Code Elimination。所以开发模式关掉压缩时，你会觉得「摇树没生效」。
+
+写法上的差别很大：
+
+```js
+// 好摇：具名导出，用哪个拿哪个
+export function add() {}
+export function sub() {}
+import { add } from './myMath'
+
+// 难摇：默认导出一个对象，运行时还可能 obj[name]()
+export default { add, sub }
+```
+
+`package.json` 的 `sideEffects` 是另一道闸：即使没人用这个模块的导出，只要它**进模块就有副作用**（改全局、导入 CSS、打 polyfill），就不能整文件删掉。`"sideEffects": false` 是在对打包器说「这些文件除了导出都没副作用」；更稳的是数组列出例外，如 `["*.css", "./src/polyfill.js"]`。标错了会静默丢样式或 polyfill。
+
+webpack 4 时代有个 `webpack-deep-scope-plugin`，用来补「函数内部其实没用到的依赖还被留下」——作者后来直接写：**别用了，会弄坏代码，请上 webpack 5。** webpack 5 的内部图分析已经覆盖它想做的事。CSS 也不能当无副作用 JS 来摇；旧讲义里的 PurgeCSS 是另一套「对照 HTML / JS 字符串删选择器」，和 ESM 摇树不是同一条路，CSS Modules 的哈希类名会让它误伤，这里不展开。
+
+> 👉 **动手验证**：一个文件 `export` `add` / `sub`，入口只 `import { add }`，`mode: 'production'` 构建后搜 `sub` 的函数体，不应再出现。把导出改成 `export default { add, sub }` 再打一次，往往就删不干净。
+
+### 代码压缩：模块内部变短
+
+生产环境 `mode: 'production'` 会打开 `optimization.minimize`，开发默认不压——否则你在 DevTools 里看到的全是一行。压缩同时干两件：减小体积、把标识符搅短（提高阅读成本，不是加密）。
+
+工具史：
+
+```mermaid
+flowchart LR
+  U["UglifyJS：不认 ES6"] --> UE["uglify-es：harmony 分支"]
+  UE --> T["Terser 接手"]
+  T --> W426["2018-11 webpack 4.26 默认换成 Terser"]
+```
+
+UglifyJS 老版本吃不了 ES6，官方建议先 Babel 再压。社区 fork 出 uglify-es，维护跟不上，**Terser** 从那条线接着做。webpack **4.26.0（2018-11-19）** 把默认压缩器换成 Terser（[v4.26.0](https://github.com/webpack/webpack/releases/tag/v4.26.0)）；webpack 5 继续内置，一般不用自己再装一遍。
+
+Terser 里两个开关别混：
+
+- **compress**：删空白、合并语句、常量折叠、**DCE**（`return` 后面的代码、`if (false)` 分支、标记为纯的未使用调用）。
+- **mangle**：把 `userName` 收成 `a`。可以 `reserved` 保住几个全局名。
+
+「纯函数」才会被当成可删 / 可折叠：相同输入相同输出、不改外部。`fetch`、写 `localStorage`、改传入对象，都有副作用，默认不敢动。源码里可用 `/*#__PURE__*/` 提示某次调用没副作用。
+
+CSS 要另接压缩器。webpack 4 常用 `optimize-css-assets-webpack-plugin`；**webpack 5 请换官方的 [css-minimizer-webpack-plugin](https://webpack.js.org/plugins/css-minimizer-webpack-plugin/)**，旧插件依赖的钩子已经废弃。
+
+```js
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+
+module.exports = {
+  optimization: {
+    minimize: true,
+    minimizer: [
+      '...', // webpack 5：保留默认的 Terser，不要把 JS 压缩弄丢
+      new CssMinimizerPlugin(),
+    ],
+  },
+}
+```
+
+注意：一旦自己写 `minimizer` 数组，就等于接管整份压缩名单。漏掉 `'...'` 或不显式放回 `TerserPlugin`，JS 可能不再压缩。
+
+摇完再压：Tree Shaking 标出来的 unused export，要靠这一步从文件里消失。压完之后怎么调试，就是下一节的 source map。
+
+### source map：压缩代码怎么映回源码
+
+3.5 提过：一个 chunk 除了 JS asset，**配置打开时**常常还多出一个 `.map` 文件。压缩、混淆之后，变量变成 `e`、`n`，多行折成一行，报错栈若只指向 `app-36067.js:1:38421`，人眼没法看。
+
+**source map（源码地图）** 就是这份对照表。打包时 webpack 生成同名的 `.map`（如 `app-36067.js.map`），里面用 VLQ 编码记录"产物第几列 ↔ 源码哪一行"，浏览器还能从 `sourcesContent` 读到原始源码。运行的仍是压缩后的文件；DevTools 发现有 map，就把红字映射回 `src/main.js` 第 26 行。
+
+```mermaid
+flowchart LR
+  RUN["浏览器执行 app.hash.js"] --> ERR["抛错"]
+  ERR --> MAP["读取 app.hash.js.map"]
+  MAP --> SRC["DevTools 显示 src/main.js:26"]
+```
+
+开发模式默认会开某种 source map（webpack 常是 `eval`，代码嵌在产物里，**不一定**落成 `.map` 文件），不然打包后的报错几乎没法对回你写的那一行。生产环境要单独做决定：
+
+- **打开**：线上报错能还原到源码，排障快；代价是多一份体积，且 map 若可公开访问等于把源码交出去。
+- **关掉或单独上传到监控平台**：更常见。`devtool: false` 或不把 `.map` 部署到 CDN，只交给 Sentry 这类服务。
+
+配置入口是 `devtool`（官方 [Devtool](https://webpack.js.org/configuration/devtool/)）。开发用 `eval-cheap-module-source-map` 一类够快的；生产若要生成 map，用 `source-map` 并确保它不会被随便下载。
+
+> 👉 **动手验证**：生产模式默认 `devtool: false`，光 `npm run build` **不会**出现 `.map`。加上 `devtool: 'source-map'` 再构建，`dist/` 里才会成对出现 `.js` 和 `.js.map`。用压缩后的文件制造一个运行时错误，打开 DevTools 的 Sources / 调用栈——有 map 时应跳到你的源码行，删掉 `.map` 再刷新，栈会停在产物文件上。
+
 ### 构建性能优化：缓存与并行
 
-除了产物优化，构建速度本身也能优化（官方 [Build Performance](https://webpack.js.org/guides/build-performance/)）。
+除了产物优化，构建速度本身也能优化（官方 [Build Performance](https://webpack.js.org/guides/build-performance/)）。前面 Dll 想加速的「大库别每次重编」，今天优先靠持久化缓存，而不是再维护一份 dll 配置。
 
 **持久化缓存**：webpack 5 内置了文件系统缓存，把模块和 chunk 的编译结果落盘，二次构建直接复用：
 
@@ -720,14 +1165,14 @@ module.exports = {
 
 ### 面试高频优化清单
 
-上面讲的拆包、缓存、并行是重点，这里再补一份**面试常被追问**的优化手段速查，分两类记忆：
+上面讲的拆包、摇树、压缩、缓存是重点，这里再收成一份**面试速查**，分两类记忆：
 
 **一、减小产物体积（优化加载）**
 
-- **Tree Shaking**：删除未被使用的导出代码。依赖 ESM 的静态结构，生产模式默认开启（`optimization.usedExports`）；注意用 `package.json` 的 `sideEffects` 标记哪些文件有副作用（如 CSS）不能被删。
-- **代码分割 + 路由懒加载**：用动态 `import()` 按路由/组件拆分，首屏只加载核心 chunk——这是**最常被问、收益最大**的一条。
-- **按需引入**：像 lodash、组件库不要整包 `import`，只引用到的部分（`import debounce from 'lodash/debounce'`），配合 tree-shaking。
-- **压缩**：JS 用 `terser`、CSS 用 `css-minimizer`；配合服务端开 **Gzip/Brotli**（`compression-webpack-plugin` 生成 `.gz`），文本资源体积可再降一半以上。
+- **Tree Shaking**：见上文「Tree Shaking」。抓 ESM 静态结构、`usedExports` 只是标记、真正删除靠压缩器、`sideEffects` 别标错。
+- **代码分割 + 路由懒加载**：见上文「懒加载」。动态 `import()` 按路由 / 组件拆，首屏只加载核心 chunk——最常被问、收益最大。
+- **按需引入**：像 lodash、组件库不要整包 `import`，只引用到的部分（`import debounce from 'lodash/debounce'`），这是路径级少打进去；摇树是导出级再删。
+- **压缩**：见上文「代码压缩」。JS 默认 Terser，CSS 用 `css-minimizer`；传输层再开 **Gzip/Brotli**（CDN / Nginx，或 `compression-webpack-plugin` 预生成 `.gz`）。
 - **`contenthash` 长期缓存**：产物名带内容 hash，内容不变文件名不变，浏览器缓存长期命中。
 
 **二、加快构建速度（优化构建）**
@@ -735,7 +1180,7 @@ module.exports = {
 - **缩小 loader 处理范围**：用 `include` / `exclude` 精确命中（如 `exclude: /node_modules/`），别让 babel 去转译第三方库。
 - **持久化缓存**：`cache: { type: 'filesystem' }`（前面讲过）+ `babel-loader` 的 `cacheDirectory`。
 - **多进程**：`thread-loader` 并行跑 loader，`TerserPlugin` 的 `parallel` 并行压缩。
-- **`DllPlugin`（了解即可）**：把不常变的第三方库预先单独打包，后续构建直接引用、不再重新编译。webpack 5 有了持久化缓存后，它的必要性已下降，但面试仍可能提到。
+- **`DllPlugin`（了解即可）**：见「手动分包」科普。webpack 5 有了持久化缓存后必要性已下降，别当现行方案。
 - **`resolve` 优化**：合理配置 `extensions`（少写后缀）、`alias`（直接指向库的产物），减少模块查找耗时。
 
 > 一个高频追问：**"这么多手段，先做哪个？"** 通常先用 `webpack-bundle-analyzer` 定位体积大头，再针对性地拆包 / 按需引入 / 懒加载——**先测量，再优化**，别上来就堆配置。
@@ -745,8 +1190,10 @@ module.exports = {
 最后统一一下前面出现的三个 chunk 概念：
 
 - **initial chunk**：入口同步加载的 chunk（`entry` 直接产出）。
-- **async chunk**：动态 `import()` 产生的、运行时按需加载的 chunk。
+- **async chunk**：动态 `import()` 产生的、运行时按需加载的 chunk。默认 `splitChunks.chunks: 'async'` 处理的就是这类。
 - **runtime chunk**：webpack 运行时代码单独拆出的 chunk（`runtimeChunk`）。
+
+`SplitChunksPlugin` 抽出来的 vendor / common 也是 chunk，只是来源是「公共依赖」而不是入口或 `import()`；它可能挂在 initial 上，也可能挂在 async 上。
 
 理解了 webpack 这套"依赖图 → chunk → 运行时"的完整机制，再看 Vite 会轻松很多——因为它选了一条几乎相反的路。
 
@@ -1025,10 +1472,19 @@ VoidZero 还推出了 [Vite+](https://viteplus.dev/)（`vp` 命令），把 runt
 
 - [Plugin API / Tapable](https://webpack.js.org/api/plugins/)
 - [Writing a Loader（pitch、右到左执行）](https://webpack.js.org/contribute/writing-a-loader/)
+- [Loader Interface（`this.getOptions`）](https://webpack.js.org/api/loaders/)
+- [webpack 5 迁移：getOptions 取代 loader-utils](https://webpack.js.org/migrate/5/#getoptions-method-for-loaders)
+- [webpack 5.80.0：支持 ESM loader](https://github.com/webpack/webpack/releases/tag/v5.80.0)
 - [Compilation Hooks（seal / optimize / chunk 生命周期）](https://webpack.kr/api/compilation-hooks/)
 - [SplitChunksPlugin](https://webpack.js.org/plugins/split-chunks-plugin/)
+- [DllPlugin](https://webpack.js.org/plugins/dll-plugin/)
+- [Tree Shaking](https://webpack.js.org/guides/tree-shaking/)
+- [webpack 4.26.0：默认压缩器换成 Terser](https://github.com/webpack/webpack/releases/tag/v4.26.0)
+- [css-minimizer-webpack-plugin](https://webpack.js.org/plugins/css-minimizer-webpack-plugin/)
 - [Asset Modules](https://webpack.js.org/guides/asset-modules/)
 - [optimization.runtimeChunk](https://webpack.js.org/configuration/optimization/#optimizationruntimechunk)
+- [output.filename / contenthash](https://webpack.js.org/configuration/output/#outputfilename)
+- [Devtool（source map）](https://webpack.js.org/configuration/devtool/)
 - [Build Performance（filesystem cache / 并行）](https://webpack.js.org/guides/build-performance/)
 - [thread-loader](https://webpack.js.org/loaders/thread-loader/)
 - [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer)
