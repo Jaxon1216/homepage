@@ -65,6 +65,8 @@ export function AboutContent() {
               height={80}
               className="rounded-full object-cover ring-2 ring-[var(--accent)]/30"
               priority
+              quality={100}
+              unoptimized
             />
           </motion.div>
           <div>

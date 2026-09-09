@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +16,20 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[var(--background)]/80 border-b border-[var(--card-border)]">
       <nav className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="text-lg font-bold text-[var(--accent)] hover:opacity-80 transition-opacity">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-bold text-[var(--accent)] hover:opacity-80 transition-opacity"
+        >
+          <Image
+            src={siteConfig.avatar}
+            alt={siteConfig.nameEn}
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-full object-cover ring-1 ring-[var(--accent)]/30"
+            priority
+            quality={100}
+            unoptimized
+          />
           {siteConfig.nameEn}
         </Link>
 
