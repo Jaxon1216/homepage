@@ -3,32 +3,87 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
-  FiCode,
-  FiTool,
   FiBook,
-  FiMail,
+  FiBookOpen,
+  FiCode,
+  FiCpu,
   FiGithub,
   FiGlobe,
-  FiBookOpen,
+  FiLayers,
+  FiMail,
+  FiTool,
+  FiTrendingUp,
 } from "react-icons/fi";
 import { siteConfig } from "@/lib/site-config";
 import { MottoBlock } from "@/components/common/MottoBlock";
 
-const coreSkills = [
-  { label: "前端开发", items: ["HTML5/CSS3", "JavaScript(ES6+)", "Vue3", "React"] },
+interface Skill {
+  name: string;
+  level: string;
+  fill: number;
+}
+
+const skillLegend = [
+  "1 · concept only",
+  "2 · demo with help",
+  "3 · independent",
+  "4 · principles & tradeoffs",
+  "5 · production-ready",
+];
+
+const skillGroups: { title: string; icon: typeof FiCode; skills: Skill[] }[] = [
+  {
+    title: "Frontend",
+    icon: FiCode,
+    skills: [
+      { name: "JavaScript / Browser", level: "L4", fill: 4 },
+      { name: "React", level: "L3", fill: 3 },
+      { name: "Frontend Engineering", level: "L3~4", fill: 3 },
+    ],
+  },
+  {
+    title: "Foundations",
+    icon: FiLayers,
+    skills: [
+      { name: "C++", level: "L2~3", fill: 2 },
+      { name: "Data Structures", level: "L3", fill: 3 },
+      { name: "Algorithms", level: "L3", fill: 3 },
+    ],
+  },
+  {
+    title: "Backend",
+    icon: FiTrendingUp,
+    skills: [
+      { name: "Node.js / Express", level: "L2", fill: 2 },
+      { name: "HTTP / API", level: "L2", fill: 2 },
+      { name: "Go", level: "L1~2", fill: 1 },
+      { name: "MySQL", level: "L1", fill: 1 },
+      { name: "Backend Engineering", level: "L1~2", fill: 1 },
+    ],
+  },
+  {
+    title: "AI & Infra",
+    icon: FiCpu,
+    skills: [
+      { name: "AI Application", level: "L3", fill: 3 },
+      { name: "Agent / RAG / MCP", level: "L3", fill: 3 },
+      { name: "Docker", level: "L1", fill: 1 },
+      { name: "Linux / Deployment", level: "L1", fill: 1 },
+    ],
+  },
 ];
 
 const toolsAndPlatforms = [
-  { label: "开发工具", items: ["Cursor", "Git", "Chrome DevTools"] },
-  { label: "构建工具", items: ["Vite", "npm"] },
-  { label: "部署运维", items: ["Docker", "CI/CD(GitHub Actions)", "Vercel"] },
+  { label: "Editors", items: ["Cursor", "VS Code", "Trae", "Claude Code", "Codex"] },
+  { label: "Build", items: ["Webpack", "Rspack"] },
+  { label: "DevOps", items: ["Docker", "CI"] },
 ];
 
 const contacts = [
-  { icon: FiMail, label: "邮箱", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
+  { icon: FiMail, label: "Email", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
   { icon: FiGithub, label: "GitHub", value: `github.com/${siteConfig.github}`, href: `https://github.com/${siteConfig.github}` },
-  { icon: FiGlobe, label: "博客", value: "EastonJiang's blog", href: "https://www.jiangxu.net" },
-  { icon: FiBookOpen, label: "知识库", value: "EastonJiang's notes", href: "https://notes.jiangxu.net" },
+  { icon: FiGlobe, label: "Blog", value: "EastonJiang's blog", href: "https://www.jiangxu.net" },
+  { icon: FiBookOpen, label: "Notes", value: "EastonJiang's notes", href: "https://notes.jiangxu.net" },
 ];
 
 const stagger = {
@@ -70,43 +125,46 @@ export function AboutContent() {
             />
           </motion.div>
           <div>
-            <h1 className="text-3xl font-bold mb-1">
-              Hi, I&apos;m {siteConfig.nameEn}
-            </h1>
-            <p className="text-sm text-[var(--muted)]">Web 全栈开发者</p>
+            <h1 className="text-3xl font-bold mb-1">Hi, I&apos;m {siteConfig.nameEn}</h1>
+            <p className="text-sm text-[var(--muted)]">Frontend-focused · leveling up toward full-stack</p>
           </div>
         </div>
       </motion.div>
 
-      {/* 技术专长 */}
-      <Section icon={FiCode} title="核心技术栈">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="space-y-3"
-        >
-          {coreSkills.map((group) => (
-            <motion.div key={group.label} variants={fadeUp}>
-              <p className="text-sm font-medium mb-2">{group.label}</p>
-              <div className="flex flex-wrap gap-2">
-                {group.items.map((item) => (
-                  <span
-                    key={item}
-                    className="px-3 py-1 rounded-full text-sm bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20"
-                  >
-                    {item}
-                  </span>
+      {/* Skills */}
+      <Section icon={FiCode} title="Skills">
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[var(--muted)] mb-5">
+          {skillLegend.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {skillGroups.map((group, index) => (
+            <motion.div
+              key={group.title}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+              className="p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)]"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <group.icon size={16} className="text-[var(--accent)] flex-shrink-0" />
+                <h3 className="text-sm font-semibold">{group.title}</h3>
+              </div>
+              <div className="space-y-3">
+                {group.skills.map((skill) => (
+                  <SkillRow key={skill.name} skill={skill} />
                 ))}
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </Section>
 
-      {/* 工具与平台 */}
-      <Section icon={FiTool} title="工具与平台">
+      {/* Tools & Platforms */}
+      <Section icon={FiTool} title="Tools & Platforms">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -132,8 +190,8 @@ export function AboutContent() {
         </motion.div>
       </Section>
 
-      {/* 教育与竞赛经历 */}
-      <Section icon={FiBook} title="教育与竞赛经历">
+      {/* Education & Awards */}
+      <Section icon={FiBook} title="Education & Awards">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -143,22 +201,17 @@ export function AboutContent() {
         >
           <div className="flex justify-between items-start flex-wrap gap-2">
             <div>
-              <span className="font-medium">中国地质大学（北京）</span>
-              <span className="text-[var(--muted)] mx-2">安全工程 本科在读</span>
+              <span className="font-medium">China University of Geosciences (Beijing)</span>
+              <span className="text-[var(--muted)] mx-2">B.Eng. in Safety Engineering, in progress</span>
             </div>
-            <span className="text-sm text-[var(--muted)]">2024.09 - 至今</span>
+            <span className="text-sm text-[var(--muted)]">Sep 2024 – Present</span>
           </div>
-          <ul className="mt-3 text-sm text-[var(--muted)] space-y-1.5">
-            <li className="flex items-start gap-2">
-              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
-              第17届全国大学生数学竞赛 - 北京赛区三等奖
-            </li>
-          </ul>
+          <p className="mt-3 text-sm text-[var(--muted)]">17th China Undergraduate Mathematics Competition · Third Prize (Beijing Division)</p>
         </motion.div>
       </Section>
 
-      {/* 联系方式 */}
-      <Section icon={FiMail} title="联系方式">
+      {/* Contact */}
+      <Section icon={FiMail} title="Contact">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -175,10 +228,7 @@ export function AboutContent() {
               rel={item.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
               className="flex items-center gap-3 p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
             >
-              <item.icon
-                size={16}
-                className="text-[var(--accent)] flex-shrink-0"
-              />
+              <item.icon size={16} className="text-[var(--accent)] flex-shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs text-[var(--muted)]">{item.label}</p>
                 <p className="text-sm font-medium truncate group-hover:text-[var(--accent)] transition-colors">
@@ -191,6 +241,27 @@ export function AboutContent() {
       </Section>
 
       <MottoBlock text="Obsessed is a word the lazy use to describe the dedicated." />
+    </div>
+  );
+}
+
+function SkillRow({ skill }: { skill: Skill }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-3 text-xs mb-1">
+        <span>{skill.name}</span>
+        <span className="text-[var(--accent)] font-medium">{skill.level}</span>
+      </div>
+      <div className="flex gap-1" aria-label={`${skill.name} ${skill.level}`}>
+        {[1, 2, 3, 4, 5].map((point) => (
+          <span
+            key={point}
+            className={`h-1.5 flex-1 rounded-full ${
+              point <= skill.fill ? "bg-[var(--accent)]" : "bg-[var(--card-border)]"
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

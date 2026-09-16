@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { AboutContent } from "./AboutContent";
 
 export const metadata: Metadata = {
-  title: "关于我",
-  description: "了解更多关于江旭的信息",
+  title: "About",
+  description: "More about EastonJiang",
 };
 
 export default function AboutPage() {
