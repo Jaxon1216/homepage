@@ -12,12 +12,14 @@ import {
   FiGithub,
   FiGlobe,
 } from "react-icons/fi";
+import { SiBytedance } from "react-icons/si";
 import { MottoBlock } from "@/components/common/MottoBlock";
 import { siteConfig } from "@/lib/site-config";
 
 interface Experience {
   title: string;
   company: string;
+  companyIcon?: React.ComponentType<{ size?: number; className?: string }>;
   period: string;
   summary?: string;
   points: string[];
@@ -25,6 +27,7 @@ interface Experience {
 
 interface ResumeProject {
   name: string;
+  role?: string;
   tech: string;
   summary?: string;
   points: string[];
@@ -87,6 +90,7 @@ const resumeVersions: ResumeVersion[] = [
       experience: [
         {
           company: "字节跳动",
+          companyIcon: SiBytedance,
           title: "前端开发实习生",
           period: "2026.04 - 2026.09",
           summary:
@@ -103,6 +107,7 @@ const resumeVersions: ResumeVersion[] = [
       projects: [
         {
           name: "DeerFlow 全栈 AI Agent 系统",
+          role: "Contributor",
           tech: "React + Next.js + LangGraph + SSE + MCP",
           summary:
             "项目简介：DeerFlow 是基于 React、Next.js 与 LangGraph 的全栈 AI Agent 系统，支持长时流式对话、多 Agent 协作、Skill/MCP 工具扩展、持久记忆和沙箱文件产物；参与将非确定性的 Agent 执行过程收敛为可恢复、可观察、可编辑的前端状态，并联调流协议、上下文治理和运行时边界。",
@@ -132,8 +137,11 @@ const resumeVersions: ResumeVersion[] = [
           name: "MathModelAgent",
           tech: "Python + LLM Agent + Prompt Engineering",
           points: [
-            "向 5.7k Star 的开源数学建模 Agent 项目提交并合入 2 个 PR，累计覆盖 25 个文件、增加 996 行 / 删除 345 行。",
-            "重构 Prompt 架构并补充建模、可视化与写作规范；修复绘图中文字体、进度自动跟踪和异常配置日志问题。",
+            "向 **5.7k Star** 的开源数学建模 Agent 项目提交并合入 **2 个 PR**，累计覆盖 25 个文件、增加 996 行 / 删除 345 行。",
+            "**Prompt 架构重构（PR #54）**：将单文件 prompts.py 拆分为模块化 prompts/ 包（coordinator / modeler / coder / writer / shared），通过 __init__.py 保持向后兼容；注入竞赛级建模策略、O 奖级可视化标准与 MCM 论文写作规范，并支持按 Agent 独立配置 max_tokens。",
+            "**鲁棒性与产物修复**：修复 writer 只输出“如图 X 所示”文字却未插入 Markdown 图片标签导致 docx 无图的问题；为 modeler 增加 JSON 解析失败自动 repair 重试，flows 取值改用 .get() 防 KeyError。",
+            "**绘图字体与运行稳定性（PR #102）**：新增 matplotlib_setup.py 统一字体注册、以绝对路径解决 Docker 内 chdir 后中文字体注册失败；用 LLMConfigError 隔离配置错误与 JSON 重试、为 coordinator / modeler 加 MAX_JSON_RETRIES=3 上限，修复未验证配置直接启动任务时无限重试刷爆日志。",
+            "**前端体验优化**：新增 useStickyScroll composable，为 ChatArea 与 NotebookArea 实现进度时间线与代码执行区的粘底自动跟踪，运行中自动滚动到最新消息。",
           ],
         },
         {
@@ -409,9 +417,12 @@ export function ResumeContent() {
                   {v.experience.map((exp) => (
                     <div key={exp.title} className="mb-4 last:mb-0">
                       <div className="flex justify-between items-start flex-wrap gap-1">
-                        <div>
+                        <div className="flex items-center gap-1.5">
+                          {exp.companyIcon && (
+                            <exp.companyIcon size={15} className="text-[var(--accent)]" />
+                          )}
                           <span className="font-medium">{exp.company}</span>
-                          <span className="text-[var(--muted)] mx-2">{exp.title}</span>
+                          <span className="text-[var(--muted)] mx-1">{exp.title}</span>
                         </div>
                         <span className="text-sm text-[var(--muted)]">{exp.period}</span>
                       </div>
@@ -437,6 +448,11 @@ export function ResumeContent() {
                     <div key={proj.name} className="mb-4 last:mb-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
                         <h4 className="font-medium">{proj.name}</h4>
+                        {proj.role && (
+                          <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-[var(--accent)]/10 text-[var(--accent)]">
+                            {proj.role}
+                          </span>
+                        )}
                         <span className="text-xs text-[var(--accent)]">{proj.tech}</span>
                       </div>
                       {proj.summary && (
