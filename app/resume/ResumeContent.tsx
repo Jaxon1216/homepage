@@ -91,7 +91,7 @@ const resumeVersions: ResumeVersion[] = [
         {
           company: "字节跳动",
           companyIcon: SiBytedance,
-          title: "前端开发实习生",
+          title: "大前端研发",
           period: "2026.04 - 2026.09",
           summary:
             "实习简介：参与抖音月付 Hybrid 大前端开发，贡献 7 个仓库、累计约 1.8 万行代码改造，完成 20+ 个需求的开发、联调、自测与上线。",
@@ -107,7 +107,7 @@ const resumeVersions: ResumeVersion[] = [
       projects: [
         {
           name: "DeerFlow 全栈 AI Agent 系统",
-          role: "Contributor",
+          role: "Contributor先欠着",
           tech: "React + Next.js + LangGraph + SSE + MCP",
           summary:
             "项目简介：DeerFlow 是基于 React、Next.js 与 LangGraph 的全栈 AI Agent 系统，支持长时流式对话、多 Agent 协作、Skill/MCP 工具扩展、持久记忆和沙箱文件产物；参与将非确定性的 Agent 执行过程收敛为可恢复、可观察、可编辑的前端状态，并联调流协议、上下文治理和运行时边界。",
