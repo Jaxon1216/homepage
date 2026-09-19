@@ -8,12 +8,10 @@ import {
   FiTool,
   FiBriefcase,
   FiFolder,
-  FiPhone,
   FiMail,
   FiGithub,
   FiGlobe,
 } from "react-icons/fi";
-import { GitHubContribution } from "@/components/home/GitHubContribution";
 import { MottoBlock } from "@/components/common/MottoBlock";
 import { siteConfig } from "@/lib/site-config";
 
@@ -21,12 +19,14 @@ interface Experience {
   title: string;
   company: string;
   period: string;
+  summary?: string;
   points: string[];
 }
 
 interface ResumeProject {
   name: string;
   tech: string;
+  summary?: string;
   points: string[];
 }
 
@@ -42,10 +42,111 @@ interface ResumeVersion {
     skills: string[];
     experience: Experience[];
     projects: ResumeProject[];
+    openSource?: ResumeProject[];
   };
 }
 
 const resumeVersions: ResumeVersion[] = [
+  {
+    key: "v3-2026-internship",
+    label: "2026 9月实习版",
+    date: "2026-09",
+    header: {
+      name: siteConfig.name,
+      email: "jiangxu05@outlook.com",
+      github: siteConfig.github,
+      blog: "jiangxu.net",
+    },
+    sections: {
+      summary:
+        "中国地质大学（北京）在读，前端开发方向；在字节跳动完成消费金融移动端 H5 实习，聚焦高流量交互、数据质量、复杂流程与多版本页面演进。",
+      personalEvaluation: [
+        "持续维护个人技术博客与开源项目，关注 AI 编程工具、前端工程化与可复用的开发体验",
+        "具备较强的自学能力与问题排查能力，能够快速学习新技术并落地实践",
+        "具备良好的英文文档阅读能力，可无障碍查阅官方文档与前沿技术资料",
+      ],
+      education: [
+        {
+          school: "中国地质大学（北京）",
+          degree: "211本科",
+          gpa: "",
+          period: "2024.9 - 2028.7",
+          details: ["第17届全国大学生数学竞赛三等奖"],
+        },
+      ],
+      skills: [
+        "深入理解事件循环、浏览器渲染等前端核心原理",
+        "熟练掌握 JavaScript/TypeScript，熟悉 React、Next.js、Zustand 并有实际项目经验",
+        "熟悉前端工程化与代码规范，能够使用 ESLint + Prettier + TypeScript + Husky 保障项目代码质量",
+        "熟练使用 Ant Design、ECharts、ReactBits、Umami等常用组件库与工具，具备快速查阅官方文档解决问题的能力",
+        "能够使用 ClaudeCode、Cursor、OpenSpec、Codex 等工具高效开发AI全栈项目",
+        "了解 Go 语言基础及 Gin、GORM 生态，能够完成 RESTful API、数据持久化等基础服务端开发",
+        "了解 Agent 的规划、工具调用、记忆与多 Agent 协作等设计模式，具备流式交互、上下文管理与可观测性相关实践",
+        "熟悉 Git 协作与 PR 流程，掌握 CI（GitHub Actions）、Docker 容器化部署",
+      ],
+      experience: [
+        {
+          company: "字节跳动",
+          title: "前端开发实习生",
+          period: "2026.04 - 2026.09",
+          summary:
+            "实习简介：参与抖音月付 Hybrid 大前端开发，贡献 7 个仓库、累计约 1.8 万行代码改造，完成 20+ 个需求的开发、联调、自测与上线。",
+          points: [
+            "**挂件交互**：独立开发月付频道首页固定挂件，基于原生 Touch 实现拖拽、滚动收起、边界限制、拖拽/点击判定及 WebView 误触与滚动穿透治理；**10% 流量实验**覆盖 1,461 万+曝光、产生 2.99 万次拖拽，实验组交互率较对照提升 0.168pp，核心指标无明显负向后全量上线。",
+            "**曝光治理**：针对日均 1,873 万 PV 营销卡片的首屏曝光误报，封装基于 IntersectionObserver 的通用曝光 Hook，以 1px 可见触发曝光、1/3 视口可见为阈值，并在**动态布局场景**增加稳定时长复核；统一资源位口径，支持横向轮播与节点动态重挂。",
+            "**弹窗全链路**：负责高访问活动页退出挽留弹窗的全链路设计与开发，接入动态资源位请求，校验关键素材并按内容子类型分流渲染；将**真实展示后的曝光、点击、关闭上报与频控**收敛至组件内部，基于 forwardRef / useImperativeHandle 编排“关闭当前弹窗 → 命中挽留条件 → 退出页面”的返回优先级，区分外跳返回与普通切后台并支持无效配置降级。",
+            "**设置页改版**：参与多版本设置页跨模块重构，使用 Figma MCP 与 D2C MCP 辅助还原设计稿；复用**Prefetch → Store → Hook → UI 数据链路**聚合首屏数据，避免为单一展示字段新增请求；协同完成 30+ 文件、约 2,000 行改动，并通过线上会话回放定位版本切换中的接口异常。",
+            "**Agent 上下文工程**：开展 Coding Agent 仓库级上下文工程改造，沉淀 AGENTS.md 与架构、术语、开发指南等按需文档；参考行业公开评测方法，结合真实需求任务结果与 Trae Hooks Trace 验证效果。小样本对照中，长任务耗时约从 1.5h 降至 1h、**工具调用约减半**，任务与验证过程评分均提升。",
+          ],
+        },
+      ],
+      projects: [
+        {
+          name: "DeerFlow 全栈 AI Agent 系统",
+          tech: "React + Next.js + LangGraph + SSE + MCP",
+          summary:
+            "项目简介：DeerFlow 是基于 React、Next.js 与 LangGraph 的全栈 AI Agent 系统，支持长时流式对话、多 Agent 协作、Skill/MCP 工具扩展、持久记忆和沙箱文件产物；参与将非确定性的 Agent 执行过程收敛为可恢复、可观察、可编辑的前端状态，并联调流协议、上下文治理和运行时边界。",
+          points: [
+            "**增量流恢复**：参与将主聊天链路收敛为 messages-tuple、updates、custom 增量流，并基于 **SSE Last-Event-ID** 实现“缺口识别 → 持久态重载 → 原运行续接”；最多 5 次恢复重接，避免异常循环，使刷新或弱网恢复不重复执行 Agent。",
+            "**状态归并**：参与前后端一致的交互状态模型，前端镜像 **LangGraph Reducer** 语义，由 SDK 单独组装消息分片、类型化归并器处理非消息更新，并为结构化人工输入保留文本降级；使实时流、检查点和历史回填可在同一渲染模型下对账。",
+            "**多 Agent 调度**：参与打通子 Agent 生命周期事件、步骤持久化和前端分页回填；采用进程并发 3、单次运行总量 6、默认超时 1,800 秒及深度任务最多 150 轮的**多维预算**，使实时步骤与刷新后的历史共享同一任务时间线。",
+            "**上下文治理**：参与长上下文与增量检查点治理，通过中间件生成持久摘要和近期窗口，分层注入可信系统指令与不可信外部数据；以 **Delta Channel 增量写入**、默认每 10 次更新生成快照，兼顾会话连续性与存储成本。",
+            "**按需发现**：参与 Skill/MCP 渐进式能力发现，设计“名称索引 → **最多 5 个候选** → 描述或正文按需读取”的 Skill 流程，MCP 工具经检索后才提升至本轮允许集合，使能力发现受运行时授权与策略过滤约束。",
+            "**沙箱安全**：参与沙箱到产物面板的安全闭环，按用户与线程隔离工作区，限制输出目录并惰性获取沙箱租约；前端采用 1 MiB Range 预览、2 MiB UTF-8 编辑上限与 **SHA-256 乐观并发**，在版本变化时保留草稿并阻止静默覆盖。",
+          ],
+        },
+        {
+          name: "个人主页",
+          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + MDX + Framer Motion",
+          points: [
+            "**站点地址**：**https://jiangxu.net** | 2025.09 – 维护至今",
+            "**应用架构**：基于 **Next.js App Router** 架构搭建，集成博客、简历、项目展示等模块。",
+            "**首屏性能**：采用服务端组件与客户端组件混合渲染，博客页面使用 **SSG 静态生成**。",
+            "**内容系统**：实现 **MDX 博客系统**，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能。",
+            "**博客产出**：持续发布 **11 篇技术博客**，覆盖浏览器原理、React 工程实践、移动端 WebView 与 AI 编程工具等主题，并通过 MDX 统一管理内容与展示。",
+          ],
+        },
+      ],
+      openSource: [
+        {
+          name: "MathModelAgent",
+          tech: "Python + LLM Agent + Prompt Engineering",
+          points: [
+            "向 5.7k Star 的开源数学建模 Agent 项目提交并合入 2 个 PR，累计覆盖 25 个文件、增加 996 行 / 删除 345 行。",
+            "重构 Prompt 架构并补充建模、可视化与写作规范；修复绘图中文字体、进度自动跟踪和异常配置日志问题。",
+          ],
+        },
+        {
+          name: "ASu-skills",
+          tech: "Python + Codex Skill + Developer Experience",
+          points: [
+            "向 4.8k Star 的开源 Skill 仓库提交并合入“项目导学”能力，覆盖 18 个文件、增加 1,003 行 / 删除 81 行。",
+            "将项目结构分析、学习路径与 STAR 面试口播串联为可复用工作流，降低新项目理解与面试准备的启动成本。",
+          ],
+        },
+      ],
+    },
+  },
   {
     key: "v2-2026",
     label: "2026 4月实习版",
@@ -280,7 +381,7 @@ export function ResumeContent() {
                       <span className="text-sm text-[var(--muted)]">{edu.period}</span>
                     </div>
                     {edu.details.length > 0 && (
-                      <ul className="mt-1 text-sm text-[var(--muted)] list-disc list-inside">
+                      <ul className="mt-1 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)]">
                         {edu.details.map((d, i) => (
                           <li key={i}>{d}</li>
                         ))}
@@ -314,9 +415,14 @@ export function ResumeContent() {
                         </div>
                         <span className="text-sm text-[var(--muted)]">{exp.period}</span>
                       </div>
-                      <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside space-y-1">
+                      {exp.summary && (
+                        <p className="mt-1 text-sm text-[var(--muted)] leading-relaxed">
+                          {exp.summary}
+                        </p>
+                      )}
+                      <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)] space-y-1">
                         {exp.points.map((p, i) => (
-                          <li key={i}>{p}</li>
+                          <li key={i}>{formatResumeText(p)}</li>
                         ))}
                       </ul>
                     </div>
@@ -333,9 +439,32 @@ export function ResumeContent() {
                         <h4 className="font-medium">{proj.name}</h4>
                         <span className="text-xs text-[var(--accent)]">{proj.tech}</span>
                       </div>
-                      <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside space-y-1">
+                      {proj.summary && (
+                        <p className="mt-1 text-sm text-[var(--muted)] leading-relaxed">
+                          {formatResumeText(proj.summary)}
+                        </p>
+                      )}
+                      <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)] space-y-1">
                         {proj.points.map((p, i) => (
-                          <li key={i}>{p}</li>
+                          <li key={i}>{formatResumeText(p)}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </ResumeSection>
+              )}
+
+              {v.openSource && v.openSource.length > 0 && (
+                <ResumeSection icon={FiGithub} title="开源贡献">
+                  {v.openSource.map((project) => (
+                    <div key={project.name} className="mb-4 last:mb-0">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <h4 className="font-medium">{project.name}</h4>
+                        <span className="text-xs text-[var(--accent)]">{project.tech}</span>
+                      </div>
+                      <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)] space-y-1">
+                        {project.points.map((point, i) => (
+                          <li key={i}>{formatResumeText(point)}</li>
                         ))}
                       </ul>
                     </div>
@@ -360,12 +489,26 @@ export function ResumeContent() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <GitHubContribution />
-      </div>
-
       <MottoBlock text="Stay hungry. Stay foolish." />
     </div>
+  );
+}
+
+function formatResumeText(content: string) {
+  return (
+    <>
+      {content.split(/(\*\*.+?\*\*)/).map((part, index) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={index} className="font-semibold text-[var(--foreground)]">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+
+        return part;
+      })}
+    </>
   );
 }
 
