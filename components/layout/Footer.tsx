@@ -19,13 +19,13 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-3">{siteConfig.nameEn}</h3>
             <p className="text-sm text-[var(--muted)] leading-relaxed">
-              热爱技术，持续学习，记录成长。
+              Building, learning, and writing it down.
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h3 className="font-semibold mb-3">导航</h3>
+            <h3 className="font-semibold mb-3">Navigate</h3>
             <ul className="space-y-2">
               {siteConfig.nav.map((item) => (
                 <li key={item.href}>
@@ -42,7 +42,7 @@ export function Footer() {
 
           {/* Friend Links */}
           <div>
-            <h3 className="font-semibold mb-3">友链</h3>
+            <h3 className="font-semibold mb-3">Friends</h3>
             <ul className="space-y-2">
               {siteConfig.footer.friendLinks.map((link) => (
                 <li key={link.href}>
@@ -62,7 +62,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-3">联系方式</h3>
+            <h3 className="font-semibold mb-3">Contact</h3>
             <div className="space-y-2">
               {siteConfig.footer.contactLinks.map((link) => {
                 const Icon = contactIconMap[link.type];

@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     default: siteConfig.title,
-    template: `%s | ${siteConfig.name}`,
+    template: `%s | ${siteConfig.nameEn}`,
   },
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     url: siteConfig.url,
-    siteName: siteConfig.name,
-    locale: "zh_CN",
+    siteName: siteConfig.nameEn,
+    locale: "en_US",
     type: "website",
   },
 };
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://ghchart.rshah.org" />
         <link rel="dns-prefetch" href="https://ghchart.rshah.org" />

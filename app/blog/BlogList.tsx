@@ -33,7 +33,7 @@ export function BlogList({ posts, tags }: BlogListProps) {
                 : "bg-[var(--card)] text-[var(--muted)] border border-[var(--card-border)] hover:text-[var(--foreground)]"
             }`}
           >
-            全部
+            All
           </button>
           {tags.map((tag) => (
             <button
@@ -63,8 +63,8 @@ export function BlogList({ posts, tags }: BlogListProps) {
           {filtered.length === 0 ? (
             <p className="text-center text-[var(--muted)] py-12">
               {posts.length === 0
-                ? "暂无文章，在 content/posts/ 下添加 .mdx 文件开始写作"
-                : "该标签下暂无文章"}
+                ? "No posts yet. Add an .mdx file under content/posts/."
+                : "No posts under this tag."}
             </p>
           ) : (
             filtered.map((post, i) => (

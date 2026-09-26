@@ -9,8 +9,8 @@ const nameChars = siteConfig.name.split("");
 const roles = ["Frontend Developer", "Lifelong Learner", "Open Source Enthusiast"];
 
 const stats = [
-  { label: "项目", value: `${siteConfig.projects.length}+`, icon: FiCode },
-  { label: "文章", value: "10+", icon: FiBookOpen },
+  { label: "Projects", value: `${siteConfig.projects.length}+`, icon: FiCode },
+  { label: "Posts", value: "10+", icon: FiBookOpen },
   { label: "GitHub", value: siteConfig.github, icon: FiGithub },
 ];
 
@@ -23,7 +23,7 @@ const socials = [
   ...(siteConfig.email
     ? [{ icon: FiMail, href: `mailto:${siteConfig.email}`, label: "Email" }]
     : []),
-  { icon: FiFileText, href: "/resume", label: "简历" },
+  { icon: FiFileText, href: "/resume", label: "Resume" },
 ];
 
 export function HeroSection() {

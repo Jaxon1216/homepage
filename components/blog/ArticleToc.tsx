@@ -168,7 +168,7 @@ export function ArticleToc() {
           </p>
         </div>
 
-        <nav aria-label="文章目录" className="no-scrollbar max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
+        <nav aria-label="Table of contents" className="no-scrollbar max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
           <ul className="space-y-2">
             {headings.map((heading) => {
               const isActive = heading.id === activeId;

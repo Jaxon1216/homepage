@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
 import { DocumentLang } from "@/components/common/DocumentLang";
-import { ResumeContent } from "./ResumeContent";
 
 export const metadata: Metadata = {
-  title: "在线简历",
-  description: "江旭的在线简历",
   openGraph: {
     locale: "zh_CN",
   },
 };
 
-export default function ResumePage() {
+export default function BlogLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <DocumentLang lang="zh-CN" />
-      <ResumeContent />
+      {children}
     </>
   );
 }

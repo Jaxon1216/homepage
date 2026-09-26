@@ -18,11 +18,11 @@ export default function GlobalError({
       <p className="text-6xl font-bold text-red-500 animate-fade-up">Oops</p>
 
       <h1 className="mt-6 text-2xl font-bold animate-fade-up [animation-delay:0.1s]">
-        出了点问题
+        Something went wrong
       </h1>
 
       <p className="mt-3 text-[var(--muted)] animate-fade-up [animation-delay:0.2s]">
-        页面遇到了意外错误，请稍后再试。
+        An unexpected error occurred. Please try again.
       </p>
 
       <div className="mt-8 flex items-center justify-center gap-4 animate-fade-up [animation-delay:0.3s]">
@@ -30,13 +30,13 @@ export default function GlobalError({
           onClick={reset}
           className="px-5 py-2.5 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity"
         >
-          重试
+          Retry
         </button>
         <a
           href="/"
           className="px-5 py-2.5 rounded-lg border border-[var(--card-border)] text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors"
         >
-          返回首页
+          Back home
         </a>
       </div>
     </div>

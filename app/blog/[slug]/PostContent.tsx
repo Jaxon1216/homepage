@@ -23,7 +23,7 @@ export function PostContent({ meta, children }: PostContentProps) {
         className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-8"
       >
         <FiArrowLeft size={14} />
-        返回文章列表
+        Back to posts
       </Link>
 
       <motion.article

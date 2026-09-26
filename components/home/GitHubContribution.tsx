@@ -13,7 +13,7 @@ export function GitHubContribution() {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <h2 className="text-2xl font-bold text-center mb-8">GitHub 贡献</h2>
+      <h2 className="text-2xl font-bold text-center mb-8">GitHub</h2>
 
       <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-xl p-6 overflow-x-auto">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -35,7 +35,7 @@ export function GitHubContribution() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--card-border)] text-sm text-[var(--muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
         >
           <FiGithub size={16} />
-          查看 GitHub 主页
+          View GitHub
         </a>
       </div>
     </motion.section>

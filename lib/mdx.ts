@@ -65,7 +65,7 @@ export function getAllPosts(): PostMeta[] {
       description: data.description || "",
       tags: assertAllowedTags(slug, data.tags || []),
       cover: resolveCover(data, content),
-      readingTime: stats.text.replace("min read", "分钟"),
+      readingTime: stats.text,
     };
   });
 
@@ -90,7 +90,7 @@ export function getPostBySlug(slug: string) {
       description: data.description || "",
       tags: assertAllowedTags(slug, data.tags || []),
       cover: resolveCover(data, content),
-      readingTime: stats.text.replace("min read", "分钟"),
+      readingTime: stats.text,
     },
     content,
   };
