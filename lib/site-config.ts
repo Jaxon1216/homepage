@@ -12,6 +12,7 @@ export const siteConfig = {
     { label: "Home", href: "/" },
     { label: "Blog", href: "/blog" },
     { label: "Resume", href: "/resume" },
+    { label: "Inner World", href: "/inner-world" },
     { label: "About", href: "/about" },
   ],
 
