@@ -21,26 +21,14 @@ function spineMetrics(title: string) {
 
 function toneOf(book: Book, clusters: ReadingCluster[]) {
   const index = clusters.findIndex((cluster) => cluster.key === book.clusters[0]);
-  const slot = (index >= 0 ? index : 0) % 4 + 1;
-  const hash = hashTitle(book.title);
-  const mix = 12 + (hash % 14);
-  const toward = hash % 2 === 0 ? "#f3ece3" : "#1c1612";
-  return `color-mix(in srgb, var(--spine-${slot}) ${100 - mix}%, ${toward})`;
+  const slot = index >= 0 ? (index % 4) + 1 : (hashTitle(book.title) % 4) + 1;
+  return {
+    background: `var(--spine-${slot})`,
+    ink: `var(--spine-${slot}-ink)`,
+  };
 }
 
 const spring = { type: "spring" as const, stiffness: 380, damping: 32 };
-
-function shelfGroups(books: Book[]) {
-  const partial = books.filter((book) => book.progress === "partial");
-  const finished = books.filter((book) => book.progress !== "partial");
-  if (partial.length === 0 || finished.length === 0) {
-    return [{ label: null as string | null, books }];
-  }
-  return [
-    { label: "完整读完", books: finished },
-    { label: "读过一部分", books: partial },
-  ];
-}
 
 export function Bookshelf({
   stageKey,
@@ -136,48 +124,41 @@ export function Bookshelf({
         </div>
       )}
 
-      <div className="space-y-8">
-        {shelfGroups(books).map((group) => (
-          <div key={group.label ?? "all"}>
-            {group.label && <p className="mb-2 text-xs text-[var(--muted)]">{group.label}</p>}
-            <div className="overflow-x-auto no-scrollbar pt-4 pb-5 md:overflow-visible">
-              <div className="w-max">
-                <div className="bookshelf-row flex items-end gap-2 px-1">
-                  {group.books.map((book) => {
-                    const { height, width } = spineMetrics(book.title);
-                    const tone = toneOf(book, clusters);
-                    const dimmed = activeCluster !== null && !book.clusters.includes(activeCluster);
-                    const open = selected?.title === book.title;
-                    const partial = book.progress === "partial";
+      <div className="overflow-x-auto no-scrollbar pt-4 pb-5 md:overflow-visible">
+        <div className="w-max">
+          <div className="bookshelf-row flex items-end gap-2 px-1">
+            {books.map((book) => {
+              const { height, width } = spineMetrics(book.title);
+              const tone = toneOf(book, clusters);
+              const dimmed = activeCluster !== null && !book.clusters.includes(activeCluster);
+              const open = selected?.title === book.title;
+              const partial = book.progress === "partial";
 
-                    return (
-                      <div
-                        key={book.title}
-                        className={`book-slot ${dimmed ? "is-dimmed" : ""}`}
-                        style={{ height, width }}
-                      >
-                        <motion.button
-                          type="button"
-                          onClick={() => onSelect(open ? null : book.title)}
-                          animate={reduce ? undefined : { y: open ? -12 : 0 }}
-                          whileHover={reduce || open ? undefined : { y: -10, rotateX: 8 }}
-                          transition={spring}
-                          className={`book-spine h-full w-full ${open ? "is-open" : ""}`}
-                          style={{ backgroundColor: tone, borderRadius: 8 }}
-                          aria-pressed={open}
-                          aria-label={`《${book.title}》${book.author ? `，${book.author}` : ""}${partial ? "，部分阅读" : ""}`}
-                        >
-                          <span className="book-spine-title">《{book.title}》</span>
-                        </motion.button>
-                      </div>
-                    );
-                  })}
+              return (
+                <div
+                  key={book.title}
+                  className={`book-slot ${dimmed ? "is-dimmed" : ""}`}
+                  style={{ height, width }}
+                >
+                  <motion.button
+                    type="button"
+                    onClick={() => onSelect(open ? null : book.title)}
+                    animate={reduce ? undefined : { y: open ? -12 : 0 }}
+                    whileHover={reduce || open ? undefined : { y: -10, rotateX: 8 }}
+                    transition={spring}
+                    className={`book-spine h-full w-full ${open ? "is-open" : ""}`}
+                          style={{ backgroundColor: tone.background, color: tone.ink, borderRadius: 8 }}
+                    aria-pressed={open}
+                    aria-label={`《${book.title}》${book.author ? `，${book.author}` : ""}${partial ? "，部分阅读" : ""}`}
+                  >
+                    <span className="book-spine-title">《{book.title}》</span>
+                  </motion.button>
                 </div>
-                <div className="shelf-board" aria-hidden />
-              </div>
-            </div>
+              );
+            })}
           </div>
-        ))}
+          <div className="shelf-board" aria-hidden />
+        </div>
       </div>
       <p className="text-xs text-[var(--muted)] md:hidden">横向滑动，点开一本书</p>
 
@@ -187,7 +168,7 @@ export function Bookshelf({
             key={selected.title}
             book={selected}
             clusters={clusters}
-            tone={toneOf(selected, clusters)}
+            tone={toneOf(selected, clusters).background}
             onClose={() => onSelect(null)}
           />
         </div>

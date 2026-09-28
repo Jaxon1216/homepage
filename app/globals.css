@@ -378,19 +378,14 @@ code[data-theme] > span {
 
 /* Inner World bookshelf */
 :root {
-  --spine-1: #24506f;
-  --spine-2: #7a5340;
-  --spine-3: #433c5c;
-  --spine-4: #7d3f4a;
-  --spine-ink: #f7f3ee;
-}
-
-.dark {
-  --spine-1: #6a94b5;
-  --spine-2: #c4957c;
-  --spine-3: #9b93b8;
-  --spine-4: #d4a3ab;
-  --spine-ink: #f7f3ee;
+  --spine-1: #3a6e7e;
+  --spine-1-ink: #f4fafb;
+  --spine-2: #6ea0ae;
+  --spine-2-ink: #143038;
+  --spine-3: #a8d0d8;
+  --spine-3-ink: #1a3a42;
+  --spine-4: #e2eef0;
+  --spine-4-ink: #1a3a42;
 }
 
 .inner-world {
@@ -409,20 +404,21 @@ code[data-theme] > span {
   justify-content: center;
   padding: 0.7rem 0;
   border: 0;
-  color: var(--spine-ink);
+  color: var(--spine-1-ink);
   cursor: pointer;
   transform-origin: center bottom;
   background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.05) 14%,
-    rgba(0, 0, 0, 0) 42%,
-    rgba(0, 0, 0, 0.2) 100%
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 16%,
+    rgba(58, 110, 126, 0) 46%,
+    rgba(58, 110, 126, 0.16) 100%
   );
   box-shadow:
-    inset -8px 0 10px rgba(0, 0, 0, 0.2),
-    inset 3px 0 5px rgba(255, 255, 255, 0.16),
-    1px 8px 12px rgba(15, 23, 42, 0.14);
+    inset 0 0 0 1px rgba(58, 110, 126, 0.28),
+    inset -6px 0 8px rgba(58, 110, 126, 0.16),
+    inset 2px 0 4px rgba(255, 255, 255, 0.35),
+    1px 8px 12px rgba(58, 110, 126, 0.14);
   transition: opacity 0.25s ease, filter 0.25s ease;
 }
 
@@ -433,7 +429,7 @@ code[data-theme] > span {
   bottom: 10px;
   left: 4px;
   width: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: color-mix(in srgb, currentColor 28%, transparent);
   pointer-events: none;
 }
 
@@ -478,8 +474,8 @@ code[data-theme] > span {
   height: 14px;
   margin-top: 2px;
   border-radius: 2px 2px 5px 5px;
-  background: linear-gradient(180deg, #e7e5e4 0%, #a8a29e 38%, #78716c 100%);
-  box-shadow: 0 12px 18px -8px rgba(15, 23, 42, 0.45);
+  background: linear-gradient(180deg, #e7f1f3 0%, #b7cdd4 40%, #7f9aa3 100%);
+  box-shadow: 0 12px 18px -8px rgba(58, 110, 126, 0.35);
 }
 
 .dark .shelf-board {
