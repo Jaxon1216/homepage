@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { FiList } from "react-icons/fi";
 
 interface HeadingItem {
   id: string;
@@ -122,8 +123,8 @@ export function ArticleToc() {
       const activeItem = itemRefs.current[activeId];
       if (!activeItem) return;
 
-      const top = activeItem.offsetTop + activeItem.offsetHeight / 2 - 18;
-      const height = Math.max(28, Math.min(40, activeItem.offsetHeight - 6));
+      const top = activeItem.offsetTop + 4;
+      const height = Math.max(20, activeItem.offsetHeight - 8);
 
       setIndicatorStyle({ top, height });
     };
@@ -151,25 +152,26 @@ export function ArticleToc() {
   };
 
   return (
-    <aside className="hidden xl:block fixed top-28 left-[calc(50%+26rem)] w-64">
-      <div ref={containerRef} className="relative pl-8">
+    <aside className="hidden min-[1400px]:block fixed top-28 left-[calc(50%+26rem)] w-64">
+      <div ref={containerRef} className="relative pl-6">
         <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-[var(--card-border)]" />
         {indicatorStyle && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-0 w-px bg-[var(--accent)] transition-all duration-200"
+            className="pointer-events-none absolute left-0 w-0.5 bg-[var(--accent)] transition-all duration-200"
             style={{ top: indicatorStyle.top, height: indicatorStyle.height }}
           />
         )}
 
-        <div className="mb-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--muted)]">
-            Page Navigation
+        <div className="mb-4">
+          <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
+            <FiList aria-hidden="true" size={16} />
+            On this page
           </p>
         </div>
 
         <nav aria-label="Table of contents" className="no-scrollbar max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {headings.map((heading) => {
               const isActive = heading.id === activeId;
 
@@ -185,16 +187,16 @@ export function ArticleToc() {
                     type="button"
                     onClick={() => scrollToHeading(heading.id)}
                     className={[
-                      "group flex w-full items-start gap-2 rounded-md text-left leading-6 transition-colors",
+                      "group flex w-full items-start rounded-md py-1.5 text-left text-sm leading-5 transition-colors",
                       heading.level === secondLevel
-                        ? "py-0.5 pl-4 text-[14px]"
-                        : "py-1 text-[15px]",
+                        ? "pl-4 font-normal"
+                        : "font-medium",
                       isActive
                         ? "text-[var(--foreground)]"
                         : "text-[var(--muted)] hover:text-[var(--foreground)]",
                     ].join(" ")}
                   >
-                    <span className="line-clamp-2 flex-1 font-medium">{heading.text}</span>
+                    <span className="min-w-0 flex-1 break-words">{heading.text}</span>
                   </button>
                 </li>
               );

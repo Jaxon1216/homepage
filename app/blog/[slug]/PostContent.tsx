@@ -32,7 +32,9 @@ export function PostContent({ meta, children }: PostContentProps) {
         transition={{ duration: 0.5 }}
       >
         <header className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">{meta.title}</h1>
+          <h1 className="mb-4 text-[1.75rem] leading-[1.35] font-semibold sm:text-[1.875rem]">
+            {meta.title}
+          </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)]">
             <span className="flex items-center gap-1">
               <FiCalendar size={14} />
