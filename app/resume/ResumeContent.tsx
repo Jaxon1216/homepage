@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiUser,
@@ -346,10 +346,13 @@ export function ResumeContent() {
                 <h1 className="text-3xl font-bold mb-2">{h.name}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)]">
                   {h.email && (
-                    <span className="flex items-center gap-1">
+                    <a
+                      href={`mailto:${h.email}`}
+                      className="flex items-center gap-1 hover:text-[var(--accent)] transition-colors"
+                    >
                       <FiMail size={14} />
                       {h.email}
-                    </span>
+                    </a>
                   )}
                   <a
                     href={`https://github.com/${h.github}`}
@@ -376,7 +379,7 @@ export function ResumeContent() {
 
               {/* Summary */}
               <div className="mb-6 text-sm text-[var(--muted)] leading-relaxed">
-                {v.summary}
+                {formatResumeText(v.summary)}
               </div>
 
               {/* Education */}
@@ -394,7 +397,7 @@ export function ResumeContent() {
                     {edu.details.length > 0 && (
                       <ul className="mt-1 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)]">
                         {edu.details.map((d, i) => (
-                          <li key={i}>{d}</li>
+                          <li key={i}>{formatResumeText(d)}</li>
                         ))}
                       </ul>
                     )}
@@ -408,7 +411,7 @@ export function ResumeContent() {
                   {v.skills.map((skill, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
-                      <span>{skill}</span>
+                      <span>{formatResumeText(skill)}</span>
                     </li>
                   ))}
                 </ul>
@@ -431,7 +434,7 @@ export function ResumeContent() {
                       </div>
                       {exp.summary && (
                         <p className="mt-1 text-sm text-[var(--muted)] leading-relaxed">
-                          {exp.summary}
+                          {formatResumeText(exp.summary)}
                         </p>
                       )}
                       <ul className="mt-2 text-sm text-[var(--muted)] list-disc list-inside marker:text-[var(--accent)] space-y-1">
@@ -497,7 +500,7 @@ export function ResumeContent() {
                     {v.personalEvaluation.map((line, i) => (
                       <li key={i} className="flex items-start gap-2 text-[var(--muted)]">
                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
-                        <span>{line}</span>
+                        <span>{formatResumeText(line)}</span>
                       </li>
                     ))}
                   </ul>
@@ -517,18 +520,43 @@ function formatResumeText(content: string) {
   return (
     <>
       {content.split(/(\*\*.+?\*\*)/).map((part, index) => {
-        if (part.startsWith("**") && part.endsWith("**")) {
-          return (
-            <strong key={index} className="font-semibold text-[var(--foreground)]">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
+        const isEmphasized = part.startsWith("**") && part.endsWith("**");
+        const text = isEmphasized ? part.slice(2, -2) : part;
 
-        return part;
+        return (
+          <Fragment key={index}>
+            {isEmphasized ? (
+              <strong className="font-semibold text-[var(--foreground)]">
+                {formatResumeLinks(text)}
+              </strong>
+            ) : (
+              formatResumeLinks(text)
+            )}
+          </Fragment>
+        );
       })}
     </>
   );
+}
+
+function formatResumeLinks(content: string) {
+  return content.split(/(https?:\/\/[^\s|，。；、！？）】》]+)/g).map((part, index) => {
+    if (!part.startsWith("http://") && !part.startsWith("https://")) {
+      return part;
+    }
+
+    return (
+      <a
+        key={`${part}-${index}`}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="break-all text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-2 transition-colors hover:decoration-[var(--accent)]"
+      >
+        {part}
+      </a>
+    );
+  });
 }
 
 function ResumeSection({
