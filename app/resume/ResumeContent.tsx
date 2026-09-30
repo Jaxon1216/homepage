@@ -37,6 +37,7 @@ interface ResumeVersion {
   key: string;
   label: string;
   date: string;
+  hidden?: boolean; // 用于控制是否展示该版本
   header: { name: string; email: string; github: string; blog: string };
   sections: {
     summary: string;
@@ -54,6 +55,7 @@ const resumeVersions: ResumeVersion[] = [
     key: "v3-2026-internship",
     label: "2026 9月实习版",
     date: "2026-09",
+    hidden: true, // TODO: 简历版本展示开关，设为 false 时即可展示九月份实习版本
     header: {
       name: siteConfig.name,
       email: "jiangxu05@outlook.com",
@@ -278,8 +280,9 @@ const resumeVersions: ResumeVersion[] = [
 ];
 
 export function ResumeContent() {
-  const [activeVersion, setActiveVersion] = useState(resumeVersions[0].key);
-  const version = resumeVersions.find((v) => v.key === activeVersion)!;
+  const visibleVersions = resumeVersions.filter((v) => !v.hidden);
+  const [activeVersion, setActiveVersion] = useState(visibleVersions[0].key);
+  const version = visibleVersions.find((v) => v.key === activeVersion)!;
   const v = version.sections;
   const h = version.header;
 
@@ -294,7 +297,7 @@ export function ResumeContent() {
           <div className="relative">
             <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-[var(--card-border)]" />
             <div className="space-y-4">
-              {resumeVersions.map((ver) => {
+              {visibleVersions.map((ver) => {
                 const isActive = ver.key === activeVersion;
                 return (
                   <button
