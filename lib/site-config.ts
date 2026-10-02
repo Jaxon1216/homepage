@@ -49,6 +49,7 @@ export const siteConfig = {
         label: "acye - 全栈神",
         href: "https://ye-guan-xing.github.io/",
       },
+      { label: "地山谦", href: "https://dishanqian-blog.pages.dev/" },
     ],
   },
 
