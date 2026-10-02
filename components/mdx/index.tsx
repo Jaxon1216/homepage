@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { Mermaid } from "./Mermaid";
+import { ZoomableImage } from "./ZoomableImage";
 
 function Pre(props: ComponentPropsWithoutRef<"pre">) {
   return <pre {...props} className={`${props.className ?? ""} not-prose`} />;
@@ -30,4 +31,5 @@ export const mdxComponents = {
   pre: Pre,
   figure: Figure,
   div: Div,
+  img: ZoomableImage,
 };

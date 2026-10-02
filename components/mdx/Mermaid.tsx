@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTheme } from "next-themes";
+import { FiMaximize2 } from "react-icons/fi";
+import { Lightbox } from "./ZoomableImage";
 
 export function Mermaid({ chart }: { chart: string }) {
-  const ref = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState("");
+  const [open, setOpen] = useState(false);
   const { resolvedTheme } = useTheme();
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,8 +28,8 @@ export function Mermaid({ chart }: { chart: string }) {
         },
       });
       const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-      mermaid.render(id, chart.trim()).then(({ svg }) => {
-        if (!cancelled) setSvg(svg);
+      mermaid.render(id, chart.trim()).then(({ svg: rendered }) => {
+        if (!cancelled) setSvg(rendered);
       });
     });
     return () => {
@@ -33,11 +37,41 @@ export function Mermaid({ chart }: { chart: string }) {
     };
   }, [chart, resolvedTheme]);
 
+  if (!svg) {
+    return <div className="my-6 min-h-8" aria-hidden="true" />;
+  }
+
   return (
-    <div
-      ref={ref}
-      className="mermaid-wrapper overflow-x-auto my-6 [&_svg]:max-w-full"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+    <>
+      <div className="group relative my-6">
+        <div
+          className="cursor-zoom-in overflow-x-auto rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] [&_svg]:max-w-full"
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          aria-label="放大查看图表"
+          onClick={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-2 bottom-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/55 text-white opacity-80 shadow-sm sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
+        >
+          <FiMaximize2 size={14} />
+        </span>
+      </div>
+      {open
+        ? createPortal(
+            <Lightbox svg={svg} alt="图表" onClose={close} />,
+            document.body
+          )
+        : null}
+    </>
   );
 }
