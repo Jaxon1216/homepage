@@ -14,6 +14,7 @@ import {
   FiTool,
   FiTrendingUp,
 } from "react-icons/fi";
+import { SiX } from "react-icons/si";
 import { siteConfig } from "@/lib/site-config";
 import { MottoBlock } from "@/components/common/MottoBlock";
 
@@ -82,6 +83,7 @@ const toolsAndPlatforms = [
 const contacts = [
   { icon: FiMail, label: "Email", value: siteConfig.email, href: `mailto:${siteConfig.email}` },
   { icon: FiGithub, label: "GitHub", value: `github.com/${siteConfig.github}`, href: `https://github.com/${siteConfig.github}` },
+  { icon: SiX, label: "X", value: siteConfig.x.replace("https://", ""), href: siteConfig.x },
   { icon: FiGlobe, label: "Blog", value: "EastonJiang's blog", href: "https://www.jiangxu.net" },
   { icon: FiBookOpen, label: "Notes", value: "EastonJiang's notes", href: "https://notes.jiangxu.net" },
 ];

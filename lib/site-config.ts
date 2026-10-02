@@ -1,3 +1,5 @@
+const xUrl = "https://x.com/EastonJiang05";
+
 export const siteConfig = {
   name: "江旭",
   nameEn: "EastonJiang",
@@ -7,6 +9,7 @@ export const siteConfig = {
   url: "https://jiangxu.net",
   github: "Jaxon1216",
   email: "jiangxu05@outlook.com",
+  x: xUrl,
 
   nav: [
     { label: "Home", href: "/" },
@@ -22,6 +25,11 @@ export const siteConfig = {
         label: "GitHub",
         href: "https://github.com/Jaxon1216",
         type: "github" as const,
+      },
+      {
+        label: "X",
+        href: xUrl,
+        type: "x" as const,
       },
       {
         label: "jiangxu05@outlook.com",

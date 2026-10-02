@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FiGithub, FiMail, FiFileText, FiCode, FiBookOpen } from "react-icons/fi";
+import { SiX } from "react-icons/si";
 import { siteConfig } from "@/lib/site-config";
 
 const nameChars = siteConfig.name.split("");
@@ -19,6 +20,11 @@ const socials = [
     icon: FiGithub,
     href: `https://github.com/${siteConfig.github}`,
     label: "GitHub",
+  },
+  {
+    icon: SiX,
+    href: siteConfig.x,
+    label: "X",
   },
   ...(siteConfig.email
     ? [{ icon: FiMail, href: `mailto:${siteConfig.email}`, label: "Email" }]
