@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 940" role="img" aria-labelledby="title desc">
+  <title id="title">webpack 从初始化、编译到输出的完整流程</title>
+  <desc id="desc">webpack 命令读取配置并初始化 Compiler；编译阶段从入口创建模块，按规则匹配 loader 并从右到左转换，webpack 随后解析 AST、记录依赖并递归构建，最终把模块组织成 chunk，渲染成带哈希的资源文件并输出。</desc>
+  <defs>
+    <marker id="orangeArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#f0822d" stroke-width="2"/></marker>
+    <marker id="blueArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1 9 5 1 9" fill="none" stroke="#4274c8" stroke-width="2"/></marker>
+    <style>
+      text{font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#27364b}
+      .title{font-size:25px;font-weight:750}.section{font-size:20px;font-weight:750}.box{font-size:17px;font-weight:680}.body{font-size:15px}.tiny{font-size:13px;fill:#67768c}.blue{fill:#4274c8}.white{fill:#fff}.orange{fill:#e97725}.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    </style>
+  </defs>
+  <rect width="1240" height="940" rx="26" fill="#fbfcff"/>
+  <rect x="20" y="20" width="1200" height="900" rx="20" fill="#fff" stroke="#dfe7f1" stroke-width="2"/>
+  <text x="48" y="66" class="title">webpack 一次构建的全流程</text>
+  <text x="48" y="95" class="body" fill="#67768c">配置 → 按入口递归编译模块 → chunk → asset</text>
+
+  <rect x="44" y="151" width="180" height="661" rx="17" fill="#fffaf5" stroke="#f0822d" stroke-width="3"/>
+  <text x="134" y="188" class="section" text-anchor="middle">初始化</text>
+  <rect x="66" y="224" width="136" height="58" rx="10" fill="#4677c9"/><text x="134" y="259" class="box white" text-anchor="middle">webpack 命令</text>
+  <path d="M134 283 V316" stroke="#f0822d" stroke-width="3" marker-end="url(#orangeArrow)"/>
+  <rect x="66" y="330" width="136" height="102" rx="10" fill="#4677c9"/>
+  <text x="134" y="367" class="box white" text-anchor="middle">读取命令参数</text><text x="134" y="394" class="body white" text-anchor="middle">导入配置文件</text><text x="134" y="418" class="body white" text-anchor="middle">合并配置对象</text>
+  <path d="M134 433 V468" stroke="#f0822d" stroke-width="3" marker-end="url(#orangeArrow)"/>
+  <rect x="66" y="483" width="136" height="91" rx="10" fill="#4677c9"/>
+  <text x="134" y="518" class="box white" text-anchor="middle">创建 Compiler</text><text x="134" y="548" class="body white" text-anchor="middle">注册 plugins</text>
+  <text x="134" y="630" class="tiny" text-anchor="middle">一次进程通常只有</text><text x="134" y="653" class="tiny" text-anchor="middle">一个 Compiler</text>
+
+  <path d="M225 480 H253" stroke="#f0822d" stroke-width="5" marker-end="url(#orangeArrow)"/>
+  <rect x="268" y="151" width="745" height="661" rx="17" fill="#fffdfb" stroke="#f0822d" stroke-width="3"/>
+  <text x="640" y="188" class="section" text-anchor="middle">编译 Compilation</text>
+  <text x="640" y="214" class="tiny" text-anchor="middle">每轮构建从入口开始，递归处理命中的模块</text>
+
+  <rect x="291" y="244" width="699" height="61" rx="12" fill="#fff4e7" stroke="#f5c393" stroke-width="2"/>
+  <rect x="305" y="256" width="159" height="37" rx="8" fill="#f0822d"/><text x="385" y="281" class="box white" text-anchor="middle">entry 入口</text>
+  <path d="M467 274 H493" stroke="#f0822d" stroke-width="3" marker-end="url(#orangeArrow)"/>
+  <text x="620" y="281" class="body">解析路径 → 读取模块源码</text>
+  <path d="M826 274 H850" stroke="#f0822d" stroke-width="3" marker-end="url(#orangeArrow)"/>
+  <text x="919" y="281" class="body code" text-anchor="middle">module</text>
+
+  <rect x="291" y="326" width="339" height="287" rx="13" fill="#f5f8ff" stroke="#5079b7" stroke-width="2"/>
+  <text x="460" y="356" class="box" text-anchor="middle">① 匹配规则并运行 loader</text>
+  <rect x="307" y="379" width="307" height="62" rx="8" fill="#4677c9"/>
+  <text x="460" y="404" class="body white" text-anchor="middle">当前模块满足 rule.test 吗？</text>
+  <text x="460" y="429" class="tiny white" text-anchor="middle">例如 .less 命中 /\.less$/</text>
+  <path d="M461 443 V466" stroke="#4274c8" stroke-width="2.5" marker-end="url(#blueArrow)"/>
+  <text x="365" y="466" class="tiny">否：空数组</text><text x="535" y="466" class="tiny">是：读取 use</text>
+  <rect x="307" y="484" width="307" height="103" rx="8" fill="#4677c9"/>
+  <text x="460" y="508" class="body white" text-anchor="middle">合并所有命中的 loader</text>
+  <text x="460" y="536" class="body white" text-anchor="middle">源文件 → less-loader → css-loader</text>
+  <text x="460" y="563" class="body white" text-anchor="middle">→ style-loader → JS</text>
+  <text x="460" y="602" class="tiny" text-anchor="middle">use 数组从右到左执行</text>
+
+  <path d="M632 470 H648" stroke="#4274c8" stroke-width="3" marker-end="url(#blueArrow)"/>
+  <rect x="665" y="326" width="325" height="287" rx="13" fill="#fff8f0" stroke="#f0822d" stroke-width="2"/>
+  <text x="828" y="356" class="box" text-anchor="middle">② AST 与递归依赖</text>
+  <rect x="682" y="377" width="291" height="42" rx="8" fill="#f0822d"/><text x="828" y="404" class="body white" text-anchor="middle">解析转换后的 JS → AST</text>
+  <path d="M828 422 V440" stroke="#f0822d" stroke-width="2.5" marker-end="url(#orangeArrow)"/>
+  <rect x="682" y="455" width="291" height="42" rx="8" fill="#f0822d"/><text x="828" y="482" class="body white" text-anchor="middle">记录 import / require 依赖</text>
+  <path d="M828 499 V517" stroke="#f0822d" stroke-width="2.5" marker-end="url(#orangeArrow)"/>
+  <rect x="682" y="532" width="291" height="42" rx="8" fill="#f0822d"/><text x="828" y="559" class="body white" text-anchor="middle">保存转换代码与模块记录</text>
+  <text x="828" y="601" class="tiny" text-anchor="middle">沿 dependencies 递归；已见模块复用</text>
+
+  <path d="M828 616 V636" stroke="#4274c8" stroke-width="3" marker-end="url(#blueArrow)"/>
+  <rect x="291" y="650" width="699" height="134" rx="12" fill="#fff" stroke="#5079b7" stroke-width="2"/>
+  <text x="312" y="680" class="box">③ 组织 chunk 并渲染 asset</text>
+  <rect x="313" y="703" width="225" height="62" rx="8" fill="#f3f7ff" stroke="#98afd4"/>
+  <circle cx="340" cy="734" r="14" fill="#4677c9"/><circle cx="382" cy="734" r="14" fill="#4677c9"/><circle cx="424" cy="734" r="14" fill="#4677c9"/>
+  <text x="479" y="740" class="body code">chunk</text>
+  <path d="M545 734 H574" stroke="#4274c8" stroke-width="3" marker-end="url(#blueArrow)"/>
+  <rect x="589" y="713" width="61" height="11" rx="5" fill="#f48a2f"/><rect x="589" y="729" width="61" height="11" rx="5" fill="#4677c9"/><rect x="589" y="745" width="61" height="11" rx="5" fill="#81ac55"/>
+  <path d="M659 734 H693" stroke="#4274c8" stroke-width="3" marker-end="url(#blueArrow)"/>
+  <rect x="706" y="703" width="263" height="62" rx="8" fill="#f3f7ff" stroke="#98afd4"/>
+  <text x="837" y="730" class="body code" text-anchor="middle">main.[contenthash].js</text>
+  <text x="837" y="751" class="tiny" text-anchor="middle">asset：可交付文件</text>
+
+  <path d="M1015 480 H1042" stroke="#f0822d" stroke-width="5" marker-end="url(#orangeArrow)"/>
+  <rect x="1056" y="151" width="140" height="661" rx="17" fill="#fffaf5" stroke="#f0822d" stroke-width="3"/>
+  <text x="1126" y="188" class="section" text-anchor="middle">输出</text>
+  <rect x="1070" y="337" width="112" height="134" rx="10" fill="#4677c9"/>
+  <text x="1126" y="377" class="body white" text-anchor="middle">按资源列表</text><text x="1126" y="407" class="body white" text-anchor="middle">生成文件</text><text x="1126" y="437" class="body white" text-anchor="middle">写入 dist/</text>
+  <text x="1126" y="514" class="tiny" text-anchor="middle">dev 模式通常</text><text x="1126" y="538" class="tiny" text-anchor="middle">保存在内存中</text>
+  <text x="620" y="875" class="tiny" text-anchor="middle">注：loader 内部也可能自行使用 AST；图中的 AST 指 webpack 在 loader 之后解析模块并收集依赖。</text>
+</svg>

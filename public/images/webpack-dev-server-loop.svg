@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
+  <title id="title">webpack 开发服务器的内存构建与浏览器刷新闭环</title>
+  <desc id="desc">浏览器向开发服务器请求资源，服务器从内存打包结果取内容并响应；源码变化触发重新打包，随后通知浏览器更新或刷新。</desc>
+  <defs>
+    <marker id="blackArrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M1 1 10 5.5 1 10" fill="none" stroke="#25364b" stroke-width="2"/></marker>
+    <marker id="redArrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M1 1 10 5.5 1 10" fill="none" stroke="#cf4436" stroke-width="2"/></marker>
+    <style>text{font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#25364b}.label{font-size:18px;font-weight:700}.step{font-size:16px;font-weight:650}.muted{font-size:14px;fill:#66758b}</style>
+  </defs>
+  <rect width="1000" height="650" rx="26" fill="#fbfcff"/>
+  <rect x="24" y="24" width="952" height="602" rx="20" fill="#fff" stroke="#dfe7f1" stroke-width="2"/>
+  <text x="54" y="69" font-size="24" font-weight="750">开发服务器：请求、内存产物、源码变化</text>
+  <text x="54" y="98" class="muted">npm run dev / webpack serve</text>
+  <path d="M160 322 C185 185 260 147 440 154" stroke="#25364b" stroke-width="3" fill="none" marker-end="url(#blackArrow)"/>
+  <text x="196" y="199" class="step">① 请求 HTML / JS / CSS</text>
+  <path d="M555 154 C750 145 818 211 825 310" stroke="#25364b" stroke-width="3" fill="none" marker-end="url(#blackArrow)"/>
+  <text x="633" y="204" class="step">② 从内存取出打包结果</text>
+  <path d="M440 184 C329 185 333 327 202 327" stroke="#25364b" stroke-width="3" fill="none" marker-end="url(#blackArrow)"/>
+  <text x="272" y="292" class="step">③ 响应资源</text>
+
+  <g transform="translate(100 323)">
+    <circle cx="55" cy="55" r="49" fill="#fff" stroke="#d9e3ef" stroke-width="2"/>
+    <path d="M55 55 12 31 A49 49 0 0 1 101 40 H59Z" fill="#ea4335"/>
+    <path d="M55 55 101 40 A49 49 0 0 1 31 98Z" fill="#fbbc05"/>
+    <path d="M55 55 31 98 A49 49 0 0 1 12 31Z" fill="#34a853"/>
+    <circle cx="55" cy="55" r="20" fill="#fff"/><circle cx="55" cy="55" r="17" fill="#4285f4"/>
+    <text x="-2" y="138" class="label" text-anchor="end">浏览器</text>
+  </g>
+  <g transform="translate(418 130)">
+    <circle cx="78" cy="50" r="42" fill="#13b887" stroke="#0c946d" stroke-width="3"/>
+    <rect x="56" y="28" width="44" height="44" rx="13" fill="#fff"/>
+    <path d="m68 50 8 8 14-17" fill="none" stroke="#13b887" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="120" class="label" text-anchor="middle">开发服务器 dev server</text>
+  </g>
+  <g transform="translate(786 316)">
+    <rect x="0" y="0" width="32" height="32" rx="7" fill="#3267d5"/><rect x="39" y="0" width="32" height="32" rx="7" fill="#3267d5"/>
+    <rect x="0" y="39" width="32" height="32" rx="7" fill="#3267d5"/><rect x="39" y="39" width="32" height="32" rx="7" fill="#3267d5"/>
+    <path d="M46 6h18v18H46z" fill="#fff"/>
+    <text x="35" y="109" class="label" text-anchor="middle">内存中的打包结果</text>
+    <text x="35" y="132" class="muted" text-anchor="middle">开发态不写 dist/</text>
+  </g>
+  <g transform="translate(449 478)">
+    <path d="M1 18h35l10 10h74v70H1z" fill="#e7aa24" stroke="#b87f0b" stroke-width="2"/><path d="M1 35h119v63H1z" fill="#ffca42"/>
+    <text x="60" y="128" class="label" text-anchor="middle">src/ 源码目录</text>
+  </g>
+  <path d="M572 546 C754 553 688 423 781 383" stroke="#cf4436" stroke-width="3.6" fill="none" marker-end="url(#redArrow)"/>
+  <text x="607" y="506" class="step" fill="#bf392d">① 源码变化 → 重新打包</text>
+  <path d="M450 566 C286 577 161 532 156 430" stroke="#cf4436" stroke-width="3.6" fill="none" marker-end="url(#redArrow)"/>
+  <text x="217" y="527" class="step" fill="#bf392d">② 通知更新 / 必要时整页刷新</text>
+</svg>
