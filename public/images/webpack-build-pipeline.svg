@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 940" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="940" viewBox="0 0 1240 940" role="img" aria-labelledby="title desc">
   <title id="title">webpack 从初始化、编译到输出的完整流程</title>
   <desc id="desc">webpack 命令读取配置并初始化 Compiler；编译阶段从入口创建模块，按规则匹配 loader 并从右到左转换，webpack 随后解析 AST、记录依赖并递归构建，最终把模块组织成 chunk，渲染成带哈希的资源文件并输出。</desc>
   <defs>

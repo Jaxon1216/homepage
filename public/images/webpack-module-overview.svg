@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
   <title id="title">webpack 从模块依赖图生成静态资源</title>
   <desc id="desc">左侧从 index.js 入口出发，箭头指向它引用的 app.js 和 page.hbs，以及后续引用的 Sass 和图片。中间是 webpack，右侧是生成的 JavaScript、CSS 和图片文件。</desc>
   <defs>

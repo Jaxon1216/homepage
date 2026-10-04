@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
   <title id="title">webpack 开发服务器的内存构建与浏览器刷新闭环</title>
   <desc id="desc">浏览器向开发服务器请求资源，服务器从内存打包结果取内容并响应；源码变化触发重新打包，随后通知浏览器更新或刷新。</desc>
   <defs>
