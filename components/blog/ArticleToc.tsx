@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FiList } from "react-icons/fi";
+import { ARTICLE_HEADING_OFFSET, getActiveHeadingIndex, getTocScrollTop } from "@/lib/article-toc";
 
 interface HeadingItem {
   id: string;
@@ -16,6 +17,9 @@ export function ArticleToc() {
     top: number;
     height: number;
   } | null>(null);
+  const [followPaused, setFollowPaused] = useState(false);
+  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
 
@@ -33,11 +37,7 @@ export function ArticleToc() {
     const topLevel = availableLevels.length > 0 ? Math.min(...availableLevels) : null;
     const secondLevel = topLevel !== null && topLevel < 6 ? topLevel + 1 : null;
 
-    if (topLevel === null) {
-      setHeadings([]);
-      setActiveId("");
-      return;
-    }
+    if (topLevel === null) return;
 
     const elements = allHeadingElements
       .map((element) => {
@@ -60,80 +60,90 @@ export function ArticleToc() {
       })
       .filter((item): item is HeadingItem => item !== null);
 
-    setHeadings(elements);
-    setActiveId(elements[0]?.id ?? "");
-
     if (elements.length === 0) return;
+    const initFrame = requestAnimationFrame(() => {
+      setHeadings(elements);
+    });
 
     const observers = elements
       .map((item) => document.getElementById(item.id))
       .filter((item): item is HTMLElement => item !== null);
 
-    const visibleHeadings = new Map<string, number>();
+    const article = document.getElementById("post-content");
+    let frame = 0;
+    const updateActiveHeading = () => {
+      frame = 0;
+      const articleRect = article?.getBoundingClientRect();
+      // Use the end of the article, rather than the comments/footer below it.
+      const atArticleEnd = !!articleRect && articleRect.top < ARTICLE_HEADING_OFFSET &&
+        articleRect.bottom <= window.innerHeight;
+      const index = getActiveHeadingIndex(
+        observers.map((element) => element.getBoundingClientRect().top),
+        ARTICLE_HEADING_OFFSET,
+        atArticleEnd
+      );
+      setActiveId(observers[index]?.id ?? "");
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateActiveHeading);
+    };
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    if (article) resizeObserver.observe(article);
+    scheduleUpdate();
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const id = entry.target.id;
+    return () => {
+      cancelAnimationFrame(initFrame);
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, []);
 
-          if (entry.isIntersecting) {
-            visibleHeadings.set(id, entry.boundingClientRect.top);
-          } else {
-            visibleHeadings.delete(id);
-          }
-        });
-
-        if (visibleHeadings.size > 0) {
-          const nextActive = [...visibleHeadings.entries()].sort(
-            (a, b) => a[1] - b[1]
-          )[0]?.[0];
-
-          if (nextActive) {
-            setActiveId(nextActive);
-          }
-          return;
-        }
-
-        const current = [...observers]
-          .reverse()
-          .find((element) => element.getBoundingClientRect().top <= 140);
-
-        setActiveId(current?.id ?? elements[0]?.id ?? "");
-      },
-      {
-        rootMargin: "-96px 0px -55% 0px",
-        threshold: [0, 0.25, 0.5, 1],
-      }
-    );
-
-    observers.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
+  useEffect(() => () => {
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
   }, []);
 
   useEffect(() => {
-    if (headings.length === 0) {
-      setIndicatorStyle(null);
-      return;
-    }
+    if (headings.length === 0) return;
 
     const updateIndicator = () => {
-      if (!activeId || !containerRef.current) return;
-
+      const nav = navRef.current;
       const activeItem = itemRefs.current[activeId];
-      if (!activeItem) return;
+      if (!nav || !activeItem || nav.clientHeight === 0) return;
 
-      const top = activeItem.offsetTop + 4;
-      const height = Math.max(20, activeItem.offsetHeight - 8);
-
-      setIndicatorStyle({ top, height });
+      // The indicator and items share one positioned, scrollable content layer.
+      setIndicatorStyle({
+        top: activeItem.offsetTop + 4,
+        height: Math.max(20, activeItem.offsetHeight - 8),
+      });
+      if (followPaused) return;
+      const top = getTocScrollTop(
+        nav.scrollTop, nav.clientHeight, activeItem.offsetTop,
+        activeItem.offsetHeight, nav.scrollHeight
+      );
+      if (Math.abs(top - nav.scrollTop) > 1) {
+        nav.scrollTo({ top, behavior: "instant" });
+      }
     };
 
-    updateIndicator();
-    window.addEventListener("resize", updateIndicator);
+    const frame = requestAnimationFrame(updateIndicator);
+    const resizeObserver = new ResizeObserver(updateIndicator);
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
+    if (navRef.current) resizeObserver.observe(navRef.current);
+    return () => {
+      cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+    };
+  }, [activeId, headings, followPaused]);
 
-    return () => window.removeEventListener("resize", updateIndicator);
-  }, [activeId, headings]);
+  const pauseFollowing = () => {
+    setFollowPaused(true);
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => setFollowPaused(false), 1800);
+  };
 
   if (headings.length === 0) {
     return null;
@@ -146,23 +156,16 @@ export function ArticleToc() {
     const element = document.getElementById(id);
     if (!element) return;
 
-    const top = window.scrollY + element.getBoundingClientRect().top - 96;
-    window.scrollTo({ top, behavior: "smooth" });
-    setActiveId(id);
+    const top = window.scrollY + element.getBoundingClientRect().top - ARTICLE_HEADING_OFFSET;
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    setFollowPaused(false);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top, behavior: reducedMotion ? "instant" : "smooth" });
   };
 
   return (
     <aside className="hidden min-[1400px]:block fixed top-28 left-[calc(50%+26rem)] w-64">
-      <div ref={containerRef} className="relative pl-6">
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-[var(--card-border)]" />
-        {indicatorStyle && (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute left-0 w-0.5 bg-[var(--accent)] transition-all duration-200"
-            style={{ top: indicatorStyle.top, height: indicatorStyle.height }}
-          />
-        )}
-
+      <div>
         <div className="mb-4">
           <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
             <FiList aria-hidden="true" size={16} />
@@ -170,38 +173,62 @@ export function ArticleToc() {
           </p>
         </div>
 
-        <nav aria-label="Table of contents" className="no-scrollbar max-h-[calc(100vh-10rem)] overflow-y-auto pr-2">
-          <ul className="space-y-1">
-            {headings.map((heading) => {
-              const isActive = heading.id === activeId;
+        <nav
+          ref={navRef}
+          aria-label="Table of contents"
+          tabIndex={0}
+          onWheel={pauseFollowing}
+          onTouchMove={pauseFollowing}
+          onPointerDown={pauseFollowing}
+          onKeyDown={(event) => {
+            if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab"].includes(event.key)) {
+              pauseFollowing();
+            }
+          }}
+          className="no-scrollbar max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain pr-2"
+        >
+          <div ref={containerRef} className="relative pl-6">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-[var(--card-border)]" />
+            {indicatorStyle && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 w-0.5 bg-[var(--accent)] transition-[top,height] duration-200 motion-reduce:transition-none"
+                style={indicatorStyle}
+              />
+            )}
+            <ul className="space-y-1">
+              {headings.map((heading) => {
+                const isActive = heading.id === activeId;
 
-              return (
-                <li
-                  key={heading.id}
-                  ref={(node) => {
-                    itemRefs.current[heading.id] = node;
-                  }}
-                  className="relative"
-                >
-                  <button
-                    type="button"
-                    onClick={() => scrollToHeading(heading.id)}
-                    className={[
-                      "group flex w-full items-start rounded-md py-1.5 text-left text-sm leading-5 transition-colors",
-                      heading.level === secondLevel
-                        ? "pl-4 font-normal"
-                        : "font-medium",
-                      isActive
-                        ? "text-[var(--foreground)]"
-                        : "text-[var(--muted)] hover:text-[var(--foreground)]",
-                    ].join(" ")}
+                return (
+                  <li
+                    key={heading.id}
+                    ref={(node) => {
+                      itemRefs.current[heading.id] = node;
+                    }}
+                    className="relative"
                   >
-                    <span className="min-w-0 flex-1 break-words">{heading.text}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+                    <button
+                      type="button"
+                      onClick={() => scrollToHeading(heading.id)}
+                      aria-current={isActive ? "location" : undefined}
+                      className={[
+                        "group flex w-full items-start rounded-md py-1.5 text-left text-sm leading-5 transition-colors",
+                        heading.level === secondLevel
+                          ? "pl-4 font-normal"
+                          : "font-medium",
+                        isActive
+                          ? "text-[var(--foreground)]"
+                          : "text-[var(--muted)] hover:text-[var(--foreground)]",
+                      ].join(" ")}
+                    >
+                      <span className="min-w-0 flex-1 break-words">{heading.text}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </nav>
       </div>
     </aside>
