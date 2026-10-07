@@ -78,6 +78,6 @@
   <text x="1126" y="188" class="section" text-anchor="middle">输出</text>
   <rect x="1070" y="337" width="112" height="134" rx="10" fill="#4677c9"/>
   <text x="1126" y="377" class="body white" text-anchor="middle">按资源列表</text><text x="1126" y="407" class="body white" text-anchor="middle">生成文件</text><text x="1126" y="437" class="body white" text-anchor="middle">写入 dist/</text>
-  <text x="1126" y="514" class="tiny" text-anchor="middle">dev 模式通常</text><text x="1126" y="538" class="tiny" text-anchor="middle">保存在内存中</text>
+  <text x="1126" y="514" class="tiny" text-anchor="middle">开发服务器通常</text><text x="1126" y="538" class="tiny" text-anchor="middle">保存在内存中</text>
   <text x="620" y="875" class="tiny" text-anchor="middle">注：loader 内部也可能自行使用 AST；图中的 AST 指 webpack 在 loader 之后解析模块并收集依赖。</text>
 </svg>

@@ -36,7 +36,7 @@
     <rect x="0" y="39" width="32" height="32" rx="7" fill="#3267d5"/><rect x="39" y="39" width="32" height="32" rx="7" fill="#3267d5"/>
     <path d="M46 6h18v18H46z" fill="#fff"/>
     <text x="35" y="109" class="label" text-anchor="middle">内存中的打包结果</text>
-    <text x="35" y="132" class="muted" text-anchor="middle">开发态不写 dist/</text>
+    <text x="35" y="132" class="muted" text-anchor="middle">默认从内存提供</text>
   </g>
   <g transform="translate(449 478)">
     <path d="M1 18h35l10 10h74v70H1z" fill="#e7aa24" stroke="#b87f0b" stroke-width="2"/><path d="M1 35h119v63H1z" fill="#ffca42"/>
