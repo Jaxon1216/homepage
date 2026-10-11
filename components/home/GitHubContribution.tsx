@@ -1,10 +1,34 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FiGithub } from "react-icons/fi";
 import { siteConfig } from "@/lib/site-config";
 
+const CHART_SRC = `https://ghchart.rshah.org/2563eb/${siteConfig.github}`;
+
 export function GitHubContribution() {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      // Sentinel is ~150px below the fold. 200px (comments) would still fetch on first paint.
+      { rootMargin: "80px" }
+    );
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
@@ -16,15 +40,19 @@ export function GitHubContribution() {
       <h2 className="text-2xl font-bold text-center mb-8">GitHub</h2>
 
       <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-xl p-6 overflow-x-auto">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`https://ghchart.rshah.org/2563eb/${siteConfig.github}`}
-          alt="GitHub Contribution Graph"
-          width={896}
-          height={112}
-          className="w-full max-w-3xl mx-auto dark:brightness-90"
-          loading="lazy"
-        />
+        <div ref={sentinelRef} aria-hidden="true" className="h-px" />
+        <div className="w-full max-w-3xl mx-auto aspect-[8/1]">
+          {isVisible ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={CHART_SRC}
+              alt="GitHub Contribution Graph"
+              width={896}
+              height={112}
+              className="w-full h-auto dark:brightness-90"
+            />
+          ) : null}
+        </div>
       </div>
 
       <div className="text-center mt-4">
