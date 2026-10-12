@@ -289,7 +289,7 @@ flowchart TB
 
 ### Compiler
 
-`Compiler` 是**全局唯一**的对象，持有 webpack 的完整配置和整个生命周期的钩子（hooks）。你可以把它理解为"这次 webpack 进程的大管家"。它继承自 `Tapable`——这是 webpack 插件机制的基石，提供了一整套可供插件注册的事件钩子（[Plugin API 文档](https://webpack.js.org/api/plugins/)）。
+`Compiler` 持有 webpack 的完整配置和整个生命周期的钩子（hooks），可以理解为构建流程的大管家。普通单配置构建通常使用一个 `Compiler`，watch 模式下会复用它；多配置构建或子编译器场景则可能有多个实例。webpack 5 的 `Compiler` 不继承 `Tapable`，而是在 `hooks` 上使用 Tapable 提供的钩子类型，让插件注册回调（[Plugin API 文档](https://webpack.js.org/api/plugins/)）。
 
 **hook 就是 webpack 在某个时刻发出的事件。** [Compiler Hooks 官方清单](https://webpack.js.org/api/compiler-hooks/#hooks)很长，不适合逐个背；先按一次构建的时间顺序记住下面几个：
 
@@ -326,7 +326,7 @@ class MyPlugin {
 }
 ```
 
-这里有个容易说反的点：**`apply` 不是事件处理函数，而是注册入口。** webpack 在初始化阶段创建好唯一的 `Compiler` 之后，立刻对每个插件调用一次 `apply(compiler)`——整个进程里通常只跑这一回。你在 `apply` 里做的事，是往 `compiler.hooks.xxx` 上**登记**回调；真正干活，要等后面某个钩子被触发。所以它更像 `window.addEventListener`，不像 `window.onload` 本身。
+这里有个容易说反的点：**`apply` 不是事件处理函数，而是注册入口。** webpack 在初始化阶段创建好 `Compiler` 之后，对该实例配置的插件调用 `apply(compiler)`——通常每个插件在该实例初始化时注册一次。你在 `apply` 里做的事，是往 `compiler.hooks.xxx` 上**登记**回调；真正干活，要等后面某个钩子被触发。所以它更像 `window.addEventListener`，不像 `window.onload` 本身。
 
 登记回调有三种写法，关键区别是 webpack **需不需要等待你的回调完成**：
 
@@ -341,7 +341,7 @@ class MyPlugin {
 ```mermaid
 sequenceDiagram
   participant Init as 初始化
-  participant C as Compiler（全程一个）
+  participant C as Compiler（watch 中复用）
   participant P as plugin.apply
   participant Comp as Compilation（每次构建一个）
   Init->>C: 创建 Compiler
@@ -355,7 +355,7 @@ sequenceDiagram
 
 ### Compilation
 
-`Compilation` 代表**一次具体的构建**。它持有本次构建的所有 `module`、`chunk`、`asset` 以及编译产生的信息。和 `Compiler` 的区别在于：`Compiler` 一个进程只有一个，而 `Compilation` 在 watch 模式下每次文件变更都会**重新创建一个**——每保存一次代码触发的重新编译，就是一个新的 `Compilation`。所以上面那条序列里，`apply` 不会再跑，但 `emit` / `processAssets` 会跟着每次 Compilation 再触发一遍。
+`Compilation` 代表**一次具体的构建**。它持有本次构建的所有 `module`、`chunk`、`asset` 以及编译产生的信息。和 `Compiler` 的区别在于：同一个 `Compiler` 在 watch 模式下持续复用，而每轮由文件变更触发的重新编译都会**创建新的 `Compilation`**——每保存一次代码触发的重新编译，就是一个新的 `Compilation`。所以上面那条序列里，`apply` 不会再跑，但 `emit` / `processAssets` 会跟着每次 Compilation 再触发一遍。
 
 直接读具体代码：`index.js` 里 `import './a.js'`，webpack 就记录「`index.js` 依赖 `a.js`」；接着打开 `a.js`，继续查它导入了谁。`Compilation` 保存这一轮找到的模块、依赖关系和输出资源。图里的箭头都表示**源码里的导入关系**：
 
@@ -398,7 +398,7 @@ flowchart LR
   D --> S["⑤ 存下转换后的模块"]
 ```
 
-loader 的执行窗口是 **②**：文件已经读到内存，但 webpack **还没**开始语法分析。它拿到的是字符串，吐回去的也必须是字符串——而且最终要让 ③ 的解析器认得出。所以：
+loader 的执行窗口是 **②**：文件已经读到内存，但 webpack **还没**开始语法分析。它通常接收字符串，也可以通过 `raw: true` 接收 `Buffer`；输出同样可以是字符串或 `Buffer`，最终内容要符合 ③ 所用模块解析器的要求。所以：
 
 - 对常见的 `javascript/*` 模块处理链，最后交给 webpack 的内容必须是它能解析的 JavaScript；如果只把 Less 转成 CSS 却仍按 JS 模块解析，通常会报 `Module parse failed`。但 webpack 的内置 CSS / Asset Modules 等模块类型有各自规则，不能概括成「所有 loader 最后都必须吐 JS」。
 - **「TSX 一定在第 ③ 步报缺 loader」不准确。** 如果先前连 `.tsx` 路径都没解析到，会报模块找不到；解析到文件但没有合适的转换，可能在 webpack 解析语法时出现 `Module parse failed: Unexpected token`；若 Babel/TS loader 配置错误，也可能先在 loader 内报错。应根据实际错误判断失败发生在**路径解析、loader 转换还是转换后解析**，不要把所有问题归为「缺 loader」。
@@ -407,7 +407,7 @@ loader 的执行窗口是 **②**：文件已经读到内存，但 webpack **还
 
 执行顺序是下一件容易记错的事。
 
-**同一条 `use` 里，链是从右到左（数组里从后往前）执行的。** 比如处理 `.less`：
+**同一条 `use` 里，普通转换阶段（normal）从右到左（数组里从后往前）执行。** loader 还可以有从左到右执行的 pitch 阶段，提前返回时会改变后续执行流程；下面按转换职责理解这条链。比如处理 `.less`：
 
 ```js
 // webpack.config.js
@@ -429,15 +429,15 @@ module.exports = {
 ```mermaid
 flowchart RL
   SRC["源文件 style.less"] -->|"less-loader"| L1["CSS 字符串"]
-  L1 -->|"css-loader"| L2["处理 @import/url 后的 CSS"]
+  L1 -->|"css-loader"| L2["导出 CSS 内容与依赖的 JS module"]
   L2 -->|"style-loader"| OUT["最终 JS module"]
 ```
 
 一步步看这条链子上"内容"是怎么变的：
 
 1. **less-loader**：输入是你写的 `.less` 源码（带变量、嵌套等 Less 语法），输出是标准 CSS 字符串。
-2. **css-loader**：输入上一步的 CSS。它的职责是**解析 CSS 里写的 `@import "./other.css"` 和 `url(./logo.png)`**——因为 CSS 里也会引用其他文件，css-loader 把这些引用也变成 webpack 认识的依赖（也就是让图片、其他 css 也进入依赖图），而不是原样丢给浏览器。
-3. **style-loader**：输入处理好的 CSS，输出一段 **JS 代码**——这段 JS 在运行时会创建一个 `<style>` 标签把样式插进页面。为什么要变成 JS？因为 webpack 最终产物是 JS，样式得靠 JS 在运行时注入。
+2. **css-loader**：输入上一步的 CSS，**解析 CSS 里写的 `@import "./other.css"` 和 `url(./logo.png)`**，输出导出 CSS 内容的 **JS 模块**，并把这些引用变成 webpack 认识的模块依赖，让图片、其他 CSS 也进入依赖图。
+3. **style-loader**：生成加载 css-loader 所产出模块并注入样式的 **JS 代码**，在运行时通过 `<style>` 标签把样式插进页面。这是当前配置选择的样式加载方式；webpack 也可以配合 `MiniCssExtractPlugin` 输出独立 CSS 文件。
 
 回扣开头那张时间线：`css-loader` 并不是让 webpack 去「读懂 CSS」，而是先把 `@import` / `url()` **改写成 JS 里的 `require` / `import`**，再交给 ③ 的 AST 收集依赖。图片能进依赖图，是 loader 先翻译、解析器后记账，两步扣在一起。
 
@@ -680,7 +680,7 @@ button.addEventListener('click', async () => {
 - `/* webpackChunkName: "chart" */` 是 webpack 的魔法注释，产物文件名带上可读前缀，analyzer 里也好认。它不是语言标准。
 - `import()` 早年是提案，**2020 年进了 ES2020**，现在就是标准动态导入，返回 Promise。旧讲义写「草案」是当时的世界。
 
-和 Tree Shaking 打架的典型坑：`await import('lodash')` 会把整个 lodash 打进那个异步块，静态分析看不到你只用了其中一个函数。做法是**自己写一个只具名导出用到的函数的中间模块**，再动态导入这个中间模块；或者继续用 `import debounce from 'lodash/debounce'` 这种路径级按需，而不是动态导入整个库。
+动态导入并不天然妨碍 Tree Shaking，关键还要看包的模块格式，以及工具能否确定实际使用的导出。`await import('lodash')` 通常会把整个 lodash 打进异步产物，主要问题是 lodash 的 CommonJS 格式难以按导出裁剪；仅加一个具名导出的中间模块不能保证解决。若只需要 debounce，可以按路径导入 `lodash/debounce`；若使用 `lodash-es` 等 ESM 包，则可结合明确的导出使用方式进行 Tree Shaking，并检查实际产物。
 
 > 👉 **动手验证**：给入口加一个点击后才 `import('./heavy')` 的按钮，`npm run build` 后 `dist/` 里应多出一个独立 chunk；DevTools 的 Network 里，这个文件要等点击之后才出现请求。
 
