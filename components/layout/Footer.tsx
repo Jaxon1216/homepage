@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { clickAttributes } from "@/lib/analytics/events";
 import { FiGithub, FiMail, FiExternalLink } from "react-icons/fi";
 import { BiLogoTiktok } from "react-icons/bi";
 import { SiX } from "react-icons/si";
@@ -33,6 +34,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    {...clickAttributes("navigation_click", { target_path: item.href, placement: "footer" })}
                     className="text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
                   >
                     {item.label}
@@ -50,6 +52,7 @@ export function Footer() {
                 <li key={link.href}>
                   <a
                     href={link.href}
+                    {...clickAttributes("friend_link_click", { target_id: new URL(link.href).hostname, target_host: new URL(link.href).hostname, placement: "footer" })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
@@ -74,6 +77,7 @@ export function Footer() {
                   <a
                     key={link.href}
                     href={link.href}
+                    {...clickAttributes("contact_click", { channel: link.type, placement: "footer" })}
                     target={isExternal ? "_blank" : undefined}
                     rel={isExternal ? "noopener noreferrer" : undefined}
                     className="flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"

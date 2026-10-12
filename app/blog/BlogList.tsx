@@ -1,5 +1,7 @@
 "use client";
 
+import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
+import { trackEvent } from "@/lib/analytics/client";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,13 +22,19 @@ export function BlogList({ posts, tags }: BlogListProps) {
     ? posts.filter((p) => p.tags.includes(activeTag))
     : posts;
 
+  const changeTag = (tag: string | null) => {
+    if (tag === activeTag) return;
+    trackEvent("blog_filter_change", { from_tag: activeTag ?? "all", to_tag: tag ?? "all", result_count: tag ? posts.filter(post => post.tags.includes(tag)).length : posts.length });
+    setActiveTag(tag);
+  };
+
   return (
     <>
       {/* Tag filter */}
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8">
           <button
-            onClick={() => setActiveTag(null)}
+            onClick={() => changeTag(null)}
             className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
               activeTag === null
                 ? "bg-[var(--accent)] text-white"
@@ -38,7 +46,7 @@ export function BlogList({ posts, tags }: BlogListProps) {
           {tags.map((tag) => (
             <button
               key={tag}
-              onClick={() => setActiveTag(tag)}
+              onClick={() => changeTag(tag)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeTag === tag
                   ? "bg-[var(--accent)] text-white"
@@ -76,6 +84,8 @@ export function BlogList({ posts, tags }: BlogListProps) {
               >
                 <Link
                   href={`/blog/${post.slug}`}
+                  {...clickAttributes("article_open_click", { article_slug: post.slug, position: i + 1, active_tag: activeTag ?? "all", placement: "blog_list" })}
+                  {...viewAttributes("article_card_impression", { article_slug: post.slug, position: i + 1, active_tag: activeTag ?? "all" })}
                   className="flex items-center gap-4 p-4 sm:p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
                 >
                   <div className="min-w-0 flex-1">

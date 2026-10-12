@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/client";
+import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
 import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -302,7 +304,7 @@ export function ResumeContent() {
                 return (
                   <button
                     key={ver.key}
-                    onClick={() => setActiveVersion(ver.key)}
+                    onClick={() => { if (ver.key === activeVersion) return; trackEvent("resume_version_change", { from_version: activeVersion, to_version: ver.key }); setActiveVersion(ver.key); }}
                     className="relative flex items-center gap-3 w-full text-left group"
                   >
                     <div
@@ -336,6 +338,8 @@ export function ResumeContent() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeVersion}
+              data-analytics-resume-version={activeVersion}
+              data-analytics-links="resume_body"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -348,6 +352,7 @@ export function ResumeContent() {
                   {h.email && (
                     <a
                       href={`mailto:${h.email}`}
+                      {...clickAttributes("contact_click", { channel: "email", placement: "resume_header", resume_version: activeVersion })}
                       className="flex items-center gap-1 hover:text-[var(--accent)] transition-colors"
                     >
                       <FiMail size={14} />
@@ -356,6 +361,7 @@ export function ResumeContent() {
                   )}
                   <a
                     href={`https://github.com/${h.github}`}
+                    {...clickAttributes("contact_click", { channel: "github", placement: "resume_header", resume_version: activeVersion })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 hover:text-[var(--accent)] transition-colors"
@@ -366,6 +372,7 @@ export function ResumeContent() {
                   {h.blog && (
                     <a
                       href={`https://${h.blog}`}
+                      {...clickAttributes("contact_click", { channel: "blog", placement: "resume_header", resume_version: activeVersion })}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 hover:text-[var(--accent)] transition-colors"
@@ -383,7 +390,7 @@ export function ResumeContent() {
               </div>
 
               {/* Education */}
-              <ResumeSection icon={FiBook} title="教育背景">
+              <ResumeSection icon={FiBook} title="教育背景" sectionId="education" versionId={activeVersion}>
                 {v.education.map((edu) => (
                   <div key={edu.school} className="mb-3 last:mb-0">
                     <div className="flex justify-between items-start flex-wrap gap-1">
@@ -406,7 +413,7 @@ export function ResumeContent() {
               </ResumeSection>
 
               {/* Skills */}
-              <ResumeSection icon={FiTool} title="专业技能">
+              <ResumeSection icon={FiTool} title="专业技能" sectionId="skills" versionId={activeVersion}>
                 <ul className="space-y-1.5 text-sm">
                   {v.skills.map((skill, i) => (
                     <li key={i} className="flex items-start gap-2">
@@ -419,7 +426,7 @@ export function ResumeContent() {
 
               {/* Experience */}
               {v.experience.length > 0 && (
-                <ResumeSection icon={FiBriefcase} title="实习经历">
+                <ResumeSection icon={FiBriefcase} title="实习经历" sectionId="experience" versionId={activeVersion}>
                   {v.experience.map((exp) => (
                     <div key={exp.title} className="mb-4 last:mb-0">
                       <div className="flex justify-between items-start flex-wrap gap-1">
@@ -449,7 +456,7 @@ export function ResumeContent() {
 
               {/* Projects */}
               {v.projects.length > 0 && (
-                <ResumeSection icon={FiFolder} title="项目经历">
+                <ResumeSection icon={FiFolder} title="项目经历" sectionId="projects" versionId={activeVersion}>
                   {v.projects.map((proj) => (
                     <div key={proj.name} className="mb-4 last:mb-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
@@ -477,7 +484,7 @@ export function ResumeContent() {
               )}
 
               {v.openSource && v.openSource.length > 0 && (
-                <ResumeSection icon={FiGithub} title="开源贡献">
+                <ResumeSection icon={FiGithub} title="开源贡献" sectionId="open_source" versionId={activeVersion}>
                   {v.openSource.map((project) => (
                     <div key={project.name} className="mb-4 last:mb-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
@@ -495,7 +502,7 @@ export function ResumeContent() {
               )}
 
               {v.personalEvaluation && v.personalEvaluation.length > 0 && (
-                <ResumeSection icon={FiUser} title="个人评价">
+                <ResumeSection icon={FiUser} title="个人评价" sectionId="summary" versionId={activeVersion}>
                   <ul className="space-y-1.5 text-sm">
                     {v.personalEvaluation.map((line, i) => (
                       <li key={i} className="flex items-start gap-2 text-[var(--muted)]">
@@ -560,17 +567,21 @@ function formatResumeLinks(content: string) {
 }
 
 function ResumeSection({
+  sectionId,
+  versionId,
   icon: Icon,
   title,
   children,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
+  sectionId: string;
+  versionId: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="mb-6">
-      <h3 className="flex items-center gap-2 text-base font-semibold mb-3 pb-2 border-b border-[var(--card-border)]">
+      <h3 {...viewAttributes("resume_section_view", { section_id: sectionId, version_id: versionId }, "start")} className="flex items-center gap-2 text-base font-semibold mb-3 pb-2 border-b border-[var(--card-border)]">
         <Icon size={16} className="text-[var(--accent)]" />
         {title}
       </h3>

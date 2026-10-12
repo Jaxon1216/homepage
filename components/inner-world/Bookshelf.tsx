@@ -1,5 +1,6 @@
 "use client";
 
+import { viewAttributes } from "@/lib/analytics/events";
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Book, ReadingCluster } from "@/lib/reading";
@@ -45,7 +46,7 @@ export function Bookshelf({
   books: Book[];
   clusters: ReadingCluster[];
   selectedTitle: string | null;
-  onSelect: (title: string | null) => void;
+  onSelect: (title: string | null, reason?: string) => void;
   activeCluster: string | null;
   pinnedCluster: string | null;
   onClusterHover: (key: string | null) => void;
@@ -57,7 +58,7 @@ export function Bookshelf({
   useEffect(() => {
     if (!selected) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onSelect(null);
+      if (event.key === "Escape") onSelect(null, "escape");
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -142,6 +143,7 @@ export function Bookshelf({
                 >
                   <motion.button
                     type="button"
+                    {...viewAttributes("book_impression", { book_id: book.id, stage_id: stageKey })}
                     onClick={() => onSelect(open ? null : book.title)}
                     animate={reduce ? undefined : { y: open ? -12 : 0 }}
                     whileHover={reduce || open ? undefined : { y: -10, rotateX: 8 }}
@@ -169,7 +171,7 @@ export function Bookshelf({
             book={selected}
             clusters={clusters}
             tone={toneOf(selected, clusters).background}
-            onClose={() => onSelect(null)}
+            onClose={() => onSelect(null, "button")}
           />
         </div>
       )}

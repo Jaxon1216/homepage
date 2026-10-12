@@ -1,5 +1,6 @@
 "use client";
 
+import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FiGithub } from "react-icons/fi";
@@ -37,7 +38,7 @@ export function GitHubContribution() {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <h2 className="text-2xl font-bold text-center mb-8">GitHub</h2>
+      <h2 {...viewAttributes("section_view", { section_id: "home_github" }, "start")} className="text-2xl font-bold text-center mb-8">GitHub</h2>
 
       <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-xl p-6 overflow-x-auto">
         <div ref={sentinelRef} aria-hidden="true" className="h-px" />
@@ -47,6 +48,8 @@ export function GitHubContribution() {
             <img
               src={CHART_SRC}
               alt="GitHub Contribution Graph"
+              data-analytics-resource-id="github_contribution"
+              {...viewAttributes("github_chart_view", { placement: "home_github" })}
               width={896}
               height={112}
               className="w-full h-auto dark:brightness-90"
@@ -58,6 +61,7 @@ export function GitHubContribution() {
       <div className="text-center mt-4">
         <a
           href={`https://github.com/${siteConfig.github}`}
+          {...clickAttributes("contact_click", { channel: "github", placement: "home_github" })}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card)] border border-[var(--card-border)] text-sm text-[var(--muted)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"

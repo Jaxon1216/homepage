@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { getAllPosts } from "@/lib/mdx";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
@@ -50,6 +52,16 @@ export default function RootLayout({
           <Footer />
         </ThemeProvider>
         <Analytics />
+        <AnalyticsProvider
+          articlePaths={getAllPosts().map((post) => `/blog/${post.slug}`)}
+          release={(process.env.VERCEL_GIT_COMMIT_SHA ?? "local").slice(0, 12)}
+          enabled={
+            process.env.NODE_ENV === "production" &&
+            process.env.VERCEL_ENV !== "preview" &&
+            process.env.VERCEL_ENV !== "development" &&
+            process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !== "false"
+          }
+        />
       </body>
     </html>
   );

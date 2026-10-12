@@ -1,5 +1,6 @@
 "use client";
 
+import { clickAttributes } from "@/lib/analytics/events";
 import { motion } from "framer-motion";
 import { FiArrowLeft, FiClock, FiCalendar } from "react-icons/fi";
 import Link from "next/link";
@@ -20,6 +21,7 @@ export function PostContent({ meta, children }: PostContentProps) {
     <div className="max-w-3xl mx-auto px-4 py-16">
       <Link
         href="/blog"
+        {...clickAttributes("navigation_click", { target_path: "/blog", placement: "article_back" })}
         className="inline-flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors mb-8"
       >
         <FiArrowLeft size={14} />
@@ -59,7 +61,7 @@ export function PostContent({ meta, children }: PostContentProps) {
           )}
         </header>
 
-        <div id="post-content" className="prose max-w-none">
+        <div id="post-content" data-analytics-article={meta.slug} data-analytics-reading-seconds={meta.readingSeconds} data-analytics-links="article_body" className="prose max-w-none">
           {children}
         </div>
       </motion.article>

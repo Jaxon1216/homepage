@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { mediaId, trackEvent } from "@/lib/analytics/client";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTheme } from "next-themes";
 import { FiMaximize2 } from "react-icons/fi";
@@ -10,7 +11,17 @@ export function Mermaid({ chart }: { chart: string }) {
   const [svg, setSvg] = useState("");
   const [open, setOpen] = useState(false);
   const { resolvedTheme } = useTheme();
-  const close = useCallback(() => setOpen(false), []);
+  const trackedId = useRef("");
+  const close = useCallback((reason: "escape" | "overlay" | "button") => {
+    trackEvent("media_close", { media_type: "mermaid", media_id: trackedId.current, reason });
+    setOpen(false);
+  }, []);
+  const openDiagram = (element: Element) => {
+    if (open) return;
+    trackedId.current = mediaId(element);
+    trackEvent("media_open", { media_type: "mermaid", media_id: trackedId.current });
+    setOpen(true);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -28,9 +39,11 @@ export function Mermaid({ chart }: { chart: string }) {
         },
       });
       const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-      mermaid.render(id, chart.trim()).then(({ svg: rendered }) => {
+      return mermaid.render(id, chart.trim()).then(({ svg: rendered }) => {
         if (!cancelled) setSvg(rendered);
       });
+    }).catch(() => {
+      if (!cancelled) trackEvent("resource_error", { resource_type: "mermaid", resource_id: "diagram", error_code: "render_failed" }, "mermaid-render");
     });
     return () => {
       cancelled = true;
@@ -38,7 +51,7 @@ export function Mermaid({ chart }: { chart: string }) {
   }, [chart, resolvedTheme]);
 
   if (!svg) {
-    return <div className="my-6 min-h-8" aria-hidden="true" />;
+    return <div data-analytics-media="mermaid" className="my-6 min-h-8" aria-hidden="true" />;
   }
 
   return (
@@ -46,15 +59,16 @@ export function Mermaid({ chart }: { chart: string }) {
       <div className="group relative my-6">
         <div
           className="cursor-zoom-in overflow-x-auto rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] [&_svg]:max-w-full"
+          data-analytics-media="mermaid"
           role="button"
           tabIndex={0}
           aria-haspopup="dialog"
           aria-label="放大查看图表"
-          onClick={() => setOpen(true)}
+          onClick={(event) => openDiagram(event.currentTarget)}
           onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              setOpen(true);
+              openDiagram(event.currentTarget);
             }
           }}
           dangerouslySetInnerHTML={{ __html: svg }}

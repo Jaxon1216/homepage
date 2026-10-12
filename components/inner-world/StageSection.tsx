@@ -1,5 +1,7 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/client";
+import { viewAttributes } from "@/lib/analytics/events";
 import { useState } from "react";
 import type { Book, ReadingStage } from "@/lib/reading";
 import { Bookshelf } from "./Bookshelf";
@@ -18,11 +20,20 @@ export function StageSection({ stage }: { stage: ReadingStage }) {
   const [pinnedCluster, setPinnedCluster] = useState<string | null>(null);
   const activeCluster = hoveredCluster ?? pinnedCluster;
 
+  const selectBook = (title: string | null, reason = "toggle") => {
+    if (title === selectedTitle) return;
+    const previous = stage.books.find(book => book.title === selectedTitle);
+    const next = stage.books.find(book => book.title === title);
+    if (previous) trackEvent("book_close", { book_id: previous.id, stage_id: stage.key, reason: next ? "switch" : reason });
+    if (next) trackEvent("book_open", { book_id: next.id, stage_id: stage.key, cluster_id: pinnedCluster ?? "all" });
+    setSelectedTitle(title);
+  };
+
   return (
     <section id={`stage-${stage.key}`} className="scroll-mt-24">
       <div className="mb-6 border-b border-[var(--card-border)] pb-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-2xl font-semibold">
+          <h2 {...viewAttributes("reading_stage_view", { stage_id: stage.key }, "start")} className="text-2xl font-semibold">
             {stage.label}
             {stage.period ? (
               <span className="font-normal text-[var(--muted)]"> · {stage.period}</span>
@@ -45,11 +56,11 @@ export function StageSection({ stage }: { stage: ReadingStage }) {
         books={stage.books}
         clusters={stage.clusters}
         selectedTitle={selectedTitle}
-        onSelect={setSelectedTitle}
+        onSelect={selectBook}
         activeCluster={activeCluster}
         pinnedCluster={pinnedCluster}
         onClusterHover={setHoveredCluster}
-        onClusterPin={(key) => setPinnedCluster((prev) => (prev === key ? null : key))}
+        onClusterPin={(key) => { const next = pinnedCluster === key ? null : key; trackEvent("reading_cluster_change", { stage_id: stage.key, from_cluster: pinnedCluster ?? "all", to_cluster: next ?? "all" }); setPinnedCluster(next); }}
       />
 
     </section>

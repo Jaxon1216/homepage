@@ -1,8 +1,9 @@
+import { clickAttributes } from "@/lib/analytics/events";
 import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-32 text-center">
+    <div data-analytics-page="not_found" className="max-w-3xl mx-auto px-4 py-32 text-center">
       <p className="text-8xl font-bold text-[var(--accent)] animate-fade-up">
         404
       </p>
@@ -18,12 +19,14 @@ export default function NotFound() {
       <div className="mt-8 flex items-center justify-center gap-4 animate-fade-up [animation-delay:0.3s]">
         <Link
           href="/"
+          {...clickAttributes("navigation_click", { target_path: "/", placement: "not_found" })}
           className="px-5 py-2.5 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity"
         >
           Back home
         </Link>
         <Link
           href="/blog"
+          {...clickAttributes("navigation_click", { target_path: "/blog", placement: "not_found" })}
           className="px-5 py-2.5 rounded-lg border border-[var(--card-border)] text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors"
         >
           Read the blog

@@ -1,5 +1,6 @@
 "use client";
 
+import { clickAttributes } from "@/lib/analytics/events";
 import { motion } from "framer-motion";
 import { FiGithub, FiMail, FiFileText, FiCode, FiBookOpen } from "react-icons/fi";
 import { SiX } from "react-icons/si";
@@ -129,6 +130,7 @@ export function HeroSection() {
             <a
               key={social.label}
               href={social.href}
+              {...(social.href === "/resume" ? clickAttributes("navigation_click", { target_path: "/resume", placement: "hero" }) : clickAttributes("contact_click", { channel: social.label.toLowerCase(), placement: "hero" }))}
               target={social.href.startsWith("http") ? "_blank" : undefined}
               rel={
                 social.href.startsWith("http")

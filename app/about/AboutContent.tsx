@@ -1,5 +1,6 @@
 "use client";
 
+import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
@@ -134,7 +135,7 @@ export function AboutContent() {
       </motion.div>
 
       {/* Skills */}
-      <Section icon={FiCode} title="Skills">
+      <Section icon={FiCode} title="Skills" sectionId="about_skills">
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[var(--muted)] mb-5">
           {skillLegend.map((item) => (
             <span key={item}>{item}</span>
@@ -166,7 +167,7 @@ export function AboutContent() {
       </Section>
 
       {/* Tools & Platforms */}
-      <Section icon={FiTool} title="Tools & Platforms">
+      <Section icon={FiTool} title="Tools & Platforms" sectionId="about_tools_platforms">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -193,7 +194,7 @@ export function AboutContent() {
       </Section>
 
       {/* Education & Awards */}
-      <Section icon={FiBook} title="Education & Awards">
+      <Section icon={FiBook} title="Education & Awards" sectionId="about_education">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -213,7 +214,7 @@ export function AboutContent() {
       </Section>
 
       {/* Contact */}
-      <Section icon={FiMail} title="Contact">
+      <Section icon={FiMail} title="Contact" sectionId="about_contact">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -226,6 +227,7 @@ export function AboutContent() {
               key={item.label}
               variants={fadeUp}
               href={item.href}
+              {...(item.label === "Notes" ? clickAttributes("outbound_click", { target_host: "notes.jiangxu.net", target_path: "/", placement: "about" }) : clickAttributes("contact_click", { channel: item.label.toLowerCase(), placement: "about" }))}
               target={item.href.startsWith("mailto:") ? undefined : "_blank"}
               rel={item.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
               className="flex items-center gap-3 p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
@@ -269,17 +271,19 @@ function SkillRow({ skill }: { skill: Skill }) {
 }
 
 function Section({
+  sectionId,
   icon: Icon,
   title,
   children,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
+  sectionId: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="mb-10">
-      <h2 className="flex items-center gap-2 text-base font-semibold mb-4 pb-2 border-b border-[var(--card-border)]">
+      <h2 {...viewAttributes("section_view", { section_id: sectionId }, "start")} className="flex items-center gap-2 text-base font-semibold mb-4 pb-2 border-b border-[var(--card-border)]">
         <Icon size={16} className="text-[var(--accent)]" />
         {title}
       </h2>

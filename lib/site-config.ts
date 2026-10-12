@@ -61,6 +61,7 @@ export const siteConfig = {
   },
   projects: [
     {
+      id: "study-notes",
       name: "Study Notes",
       description:
         "Notes on frontend, backend, and agents, including interview prep and tutorials.",
@@ -70,6 +71,7 @@ export const siteConfig = {
       category: "ForStudy" as const,
     },
     {
+      id: "project-analyzer",
       name: "Project Analyzer",
       description:
         "A skill that reads a codebase and writes a study path, plus the hard parts and highlights.",
@@ -78,6 +80,7 @@ export const siteConfig = {
       category: "ForStudy" as const,
     },
     {
+      id: "genbi",
       name: "GenBI",
       description: "An AI analytics platform that turns natural language into charts.",
       tags: ["React", "Spring Boot", "AI"],

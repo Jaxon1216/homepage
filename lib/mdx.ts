@@ -34,6 +34,7 @@ export interface PostMeta {
   tags: string[];
   cover?: string;
   readingTime: string;
+  readingSeconds: number;
 }
 
 const MARKDOWN_IMAGE_RE = /!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/;
@@ -66,6 +67,7 @@ export function getAllPosts(): PostMeta[] {
       tags: assertAllowedTags(slug, data.tags || []),
       cover: resolveCover(data, content),
       readingTime: stats.text,
+      readingSeconds: stats.time / 1000,
     };
   });
 
@@ -91,6 +93,7 @@ export function getPostBySlug(slug: string) {
       tags: assertAllowedTags(slug, data.tags || []),
       cover: resolveCover(data, content),
       readingTime: stats.text,
+      readingSeconds: stats.time / 1000,
     },
     content,
   };

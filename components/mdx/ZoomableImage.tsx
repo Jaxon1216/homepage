@@ -1,5 +1,6 @@
 "use client";
 
+import { mediaId, trackEvent } from "@/lib/analytics/client";
 import {
   useCallback,
   useEffect,
@@ -56,7 +57,7 @@ export function Lightbox({
   src?: string;
   svg?: string;
   alt: string;
-  onClose: () => void;
+  onClose: (reason: "escape" | "overlay" | "button") => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -95,7 +96,7 @@ export function Lightbox({
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        onClose("escape");
         return;
       }
       if (event.key === "+" || event.key === "=") {
@@ -171,7 +172,7 @@ export function Lightbox({
     }
     const target = event.target as HTMLElement;
     if (target.closest("[data-lightbox-controls], [data-lightbox-image]")) return;
-    onClose();
+    onClose("overlay");
   };
 
   const controlClass =
@@ -230,7 +231,7 @@ export function Lightbox({
         >
           <FiPlus size={18} />
         </button>
-        <button type="button" className={controlClass} aria-label="关闭" onClick={onClose}>
+        <button type="button" className={controlClass} aria-label="关闭" onClick={() => onClose("button")}>
           <FiX size={18} />
         </button>
       </div>
@@ -288,7 +289,17 @@ export function ZoomableImage({
   ...props
 }: ComponentPropsWithoutRef<"img">) {
   const [open, setOpen] = useState(false);
-  const close = useCallback(() => setOpen(false), []);
+  const trackedId = useRef("");
+  const close = useCallback((reason: "escape" | "overlay" | "button") => {
+    trackEvent("media_close", { media_type: "image", media_id: trackedId.current, reason });
+    setOpen(false);
+  }, []);
+  const openImage = (element: Element) => {
+    if (open) return;
+    trackedId.current = mediaId(element);
+    trackEvent("media_open", { media_type: "image", media_id: trackedId.current });
+    setOpen(true);
+  };
 
   if (typeof src !== "string" || src.length === 0) {
     return (
@@ -329,7 +340,7 @@ export function ZoomableImage({
             onClick?.(event);
             if (event.defaultPrevented) return;
             if (event.currentTarget.closest("a")) return;
-            setOpen(true);
+            openImage(event.currentTarget);
           }}
           onKeyDown={(event) => {
             onKeyDown?.(event);
@@ -337,7 +348,7 @@ export function ZoomableImage({
             if (event.currentTarget.closest("a")) return;
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              setOpen(true);
+              openImage(event.currentTarget);
             }
           }}
         />

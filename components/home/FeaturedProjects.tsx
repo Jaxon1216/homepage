@@ -1,5 +1,6 @@
 "use client";
 
+import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
 import { motion } from "framer-motion";
 import { FiExternalLink, FiGithub } from "react-icons/fi";
 import { siteConfig, type Project } from "@/lib/site-config";
@@ -40,7 +41,7 @@ export function FeaturedProjects() {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <h2 className="text-2xl font-bold text-center mb-8">Selected Projects</h2>
+      <h2 {...viewAttributes("section_view", { section_id: "home_projects" }, "start")} className="text-2xl font-bold text-center mb-8">Selected Projects</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {siteConfig.projects.map((project) => (
@@ -61,6 +62,7 @@ function ProjectCard({ project }: { project: Project }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
+      {...viewAttributes("project_impression", { project_id: project.id, category: project.category })}
       className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group flex flex-col"
     >
       <div className="flex items-start justify-between mb-2">
@@ -71,6 +73,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.github && (
             <a
               href={project.github}
+              {...clickAttributes("project_click", { project_id: project.id, category: project.category, destination: "github", placement: "home_projects" })}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
@@ -82,6 +85,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.link && (
             <a
               href={project.link}
+              {...clickAttributes("project_click", { project_id: project.id, category: project.category, destination: "demo", placement: "home_projects" })}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors"

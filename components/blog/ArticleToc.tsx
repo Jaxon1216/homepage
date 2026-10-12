@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics/client";
 import { useEffect, useRef, useState } from "react";
 import { FiList } from "react-icons/fi";
 import { ARTICLE_HEADING_OFFSET, getActiveHeadingIndex, getTocScrollTop } from "@/lib/article-toc";
@@ -210,7 +211,7 @@ export function ArticleToc() {
                   >
                     <button
                       type="button"
-                      onClick={() => scrollToHeading(heading.id)}
+                      onClick={() => { trackEvent("article_toc_click", { heading_id: heading.id, heading_level: heading.level }); scrollToHeading(heading.id); }}
                       aria-current={isActive ? "location" : undefined}
                       className={[
                         "group flex w-full items-start rounded-md py-1.5 text-left text-sm leading-5 transition-colors",

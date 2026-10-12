@@ -10,6 +10,7 @@ export const university = {
   summary: [],
   books: [
     {
+      id: "cruel-and-gentle-world",
       title: "这世界既残酷也温柔",
       author: "孙宇晨",
       progress: "finished",
@@ -20,6 +21,7 @@ export const university = {
         "世界不会因为你年轻就自动给你机会，但年轻最大的优势，是还有大量试错和主动选择的空间。",
     },
     {
+      id: "selected-works-of-mao",
       title: "毛泽东选集",
       author: "毛泽东",
       progress: "partial",

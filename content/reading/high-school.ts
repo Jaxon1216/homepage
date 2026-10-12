@@ -46,6 +46,7 @@ export const highSchool = {
   ],
   books: [
     {
+      id: "les-miserables",
       title: "悲惨世界",
       author: "维克多·雨果",
       clusters: ["suffering"],
@@ -55,6 +56,7 @@ export const highSchool = {
         "对人保留理解和宽容。看一个人，不要只看他的过去和标签；制度正确，也不代表结果一定正义。",
     },
     {
+      id: "to-live",
       title: "活着",
       author: "余华",
       clusters: ["suffering"],
@@ -65,6 +67,7 @@ export const highSchool = {
         "后来才明白，它写的不是如何战胜苦难，而是人如何承受那些无法战胜的东西。",
     },
     {
+      id: "to-kill-a-mockingbird",
       title: "杀死一只知更鸟",
       author: "哈珀·李",
       clusters: ["labels"],
@@ -74,6 +77,7 @@ export const highSchool = {
         "不要轻易站在多数人的一边。学会站到别人的位置理解他，也要有在群体偏见里保持独立判断的能力。",
     },
     {
+      id: "rickshaw-boy",
       title: "骆驼祥子",
       author: "老舍",
       clusters: ["suffering"],
@@ -83,6 +87,7 @@ export const highSchool = {
         "既不要迷信“努力一定成功”，也不要因此否定努力。看待失败时，要同时看到个人选择和结构性环境。",
     },
     {
+      id: "jane-eyre",
       title: "简·爱",
       author: "夏洛蒂·勃朗特",
       clusters: ["love"],
@@ -91,6 +96,7 @@ export const highSchool = {
       takeaway: "先成为完整的自己，再谈爱情。爱别人不能以失去自尊、原则和独立为代价。",
     },
     {
+      id: "ordinary-world",
       title: "平凡的世界",
       author: "路遥",
       clusters: ["suffering"],
@@ -100,6 +106,7 @@ export const highSchool = {
         "别因为生活普通，就觉得人生没有价值。真正重要的可能不是“成功得多大”，而是你怎样面对自己的生活。",
     },
     {
+      id: "kite-runner",
       title: "追风筝的人",
       author: "卡勒德·胡赛尼",
       clusters: ["darkness"],
@@ -109,6 +116,7 @@ export const highSchool = {
         "对自己的错误负责。成长不是证明自己从没犯错，而是有一天愿意回头处理它。",
     },
     {
+      id: "count-of-monte-cristo",
       title: "基督山伯爵",
       author: "大仲马",
       clusters: ["darkness"],
@@ -118,6 +126,7 @@ export const highSchool = {
         "不要让伤害定义你后半生。公平和复仇不是同一件事；有时候最难的不是报复，而是适时停止。",
     },
     {
+      id: "notre-dame-de-paris",
       title: "巴黎圣母院",
       author: "维克多·雨果",
       clusters: ["labels"],
@@ -126,6 +135,7 @@ export const highSchool = {
         "不要用外貌、身份和社会评价判断人。最“体面”的人未必善良，最被嫌弃的人也可能拥有最真诚的感情。",
     },
     {
+      id: "crime-and-punishment",
       title: "罪与罚",
       author: "费奥多尔·陀思妥耶夫斯基",
       clusters: ["darkness"],
@@ -135,6 +145,7 @@ export const highSchool = {
         "理性不能代替道德。当一种理论让你觉得“伤害某个人是合理的”，尤其应该警惕。",
     },
     {
+      id: "wuthering-heights",
       title: "呼啸山庄",
       author: "艾米莉·勃朗特",
       clusters: ["love"],
@@ -144,6 +155,7 @@ export const highSchool = {
         "不要浪漫化痛苦和占有欲。“我离不开你”不一定是深情，也可能是失去边界。",
     },
     {
+      id: "pride-and-prejudice",
       title: "傲慢与偏见",
       author: "简·奥斯汀",
       clusters: ["labels", "love"],
@@ -153,6 +165,7 @@ export const highSchool = {
         "承认自己可能看错人。聪明不是永远判断正确，而是发现证据不对时能够改观点。",
     },
     {
+      id: "million-pound-note",
       title: "百万英镑",
       author: "马克·吐温",
       clusters: ["labels"],
