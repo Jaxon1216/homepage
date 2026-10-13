@@ -1,6 +1,6 @@
 "use client";
 
-import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
+import { clickAttributes } from "@/lib/analytics/events";
 import { trackEvent } from "@/lib/analytics/client";
 import { useState } from "react";
 import Link from "next/link";
@@ -85,7 +85,6 @@ export function BlogList({ posts, tags }: BlogListProps) {
                 <Link
                   href={`/blog/${post.slug}`}
                   {...clickAttributes("article_open_click", { article_slug: post.slug, position: i + 1, active_tag: activeTag ?? "all", placement: "blog_list" })}
-                  {...viewAttributes("article_card_impression", { article_slug: post.slug, position: i + 1, active_tag: activeTag ?? "all" })}
                   className="flex items-center gap-4 p-4 sm:p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group"
                 >
                   <div className="min-w-0 flex-1">

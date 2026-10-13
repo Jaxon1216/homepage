@@ -38,7 +38,7 @@ export function GitHubContribution() {
       transition={{ duration: 0.6 }}
       className="py-16"
     >
-      <h2 {...viewAttributes("section_view", { section_id: "home_github" }, "start")} className="text-2xl font-bold text-center mb-8">GitHub</h2>
+      <h2 className="text-2xl font-bold text-center mb-8">GitHub</h2>
 
       <div className="bg-[var(--card)] border border-[var(--card-border)] rounded-xl p-6 overflow-x-auto">
         <div ref={sentinelRef} aria-hidden="true" className="h-px" />

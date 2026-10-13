@@ -10,9 +10,18 @@
 
 ## 默认事件与诊断开关
 
-默认覆盖单一手动 PV、page_context、导航、项目曝光/点击、社交/联系方式、友情链接/正文外链、博客筛选/文章卡片曝光及入口、文章阅读开始/深度/活跃时长/有效阅读、目录/图片/Mermaid 放大、评论区曝光、简历版本及章节、书架阶段/书籍曝光及展开/主线、404/错误及重试、页面活跃阈值。
+2026-10-13 起，默认自定义事件从 31 类精简为 15 类（schema_version=2），原生手动 PV 继续保留：
 
-`theme_change`、`mobile_menu_toggle`、`media_close`、`book_close`、`comments_load`、`github_chart_view`、`resource_error` 属诊断事件，默认关闭。`page_attention_end` 没有实现，离站尾包可能丢失，采用可靠性更好的活跃阈值。
+- 项目：`project_impression`、`project_click`。
+- 联系与外链：`contact_click`、`friend_link_click`、`outbound_click`。
+- 博客：`blog_filter_change`、`article_open_click`、`article_read_start`、`article_read_qualified`。
+- 简历：`resume_version_view`、`resume_version_change`。
+- 书架：`book_open`。
+- 活跃与故障：`page_engaged`、`not_found_view`、`app_error`。
+
+其余原有默认事件已移除采集代码。内部页面上下文、阅读深度和活跃计时继续用于归因与有效阅读判定，不单独上报。精简只影响后续数据，Umami 中的历史事件不会自动删除。
+
+`theme_change`、`mobile_menu_toggle`、`media_close`、`book_close`、`comments_load`、`github_chart_view`、`resource_error` 属诊断事件，默认关闭。默认的 `page_engaged` 仅在有效活跃满 30 秒时上报一次，不再发送多档时间阈值或离站汇总。
 
 原生 performance 暂未启用：核验的线上 SDK 没有完整 popstate 跟踪，手动 PV 能正确跟踪后退，但无法保证 SDK 自身的性能 URL/区间归因。性能监控继续使用独立性能工具；后续验证 SDK 生命周期后再加入，不与业务事件混用。回放和热图未开启。没有新增下载/搜索/复制等当前不存在的产品能力。
 
@@ -22,7 +31,7 @@
 
 - `NEXT_PUBLIC_ANALYTICS_ENABLED=false`：关闭 Umami。
 - `NEXT_PUBLIC_ANALYTICS_EXPOSURE=false`：关闭曝光事件。
-- `NEXT_PUBLIC_ANALYTICS_READING=false`：关闭文章阅读事件，页面活跃阈值仍保留。
+- `NEXT_PUBLIC_ANALYTICS_READING=false`：关闭文章阅读事件，`page_engaged` 仍保留。
 - `NEXT_PUBLIC_ANALYTICS_DIAGNOSTICS=true`：开启上面的诊断事件。
 - `NEXT_PUBLIC_UMAMI_WEBSITE_ID`、`NEXT_PUBLIC_UMAMI_SCRIPT_URL`：覆盖默认公开采集配置。
 
@@ -54,7 +63,7 @@ location.reload();
 - `components/analytics/AnalyticsProvider.tsx`：单一 PV 生命周期、显式标注的点击、观察器管理。
 - `lib/analytics/exposure.ts` / `attention.ts`：稳定曝光、可见且非空闲的活跃阅读。
 
-为普通链接使用 `clickAttributes`，为曝光目标使用 `viewAttributes`。状态变化、目录和媒体在实际处理函数调用 `trackEvent`。示例：
+为需要采集的链接使用 `clickAttributes`，为项目曝光使用 `viewAttributes`。简历版本、博客筛选和书籍展开等状态变化在实际处理函数调用 `trackEvent`；站内导航、目录和媒体打开不再采集。示例：
 
 ```tsx
 <a href={project.github} {...clickAttributes('project_click', {
@@ -71,9 +80,9 @@ location.reload();
 
 先创建访问概况、项目、文章、简历、书架、质量六组视图。事件总次数用于频次，page_view_id 去重用于同次访问的转化率。精确曝光 CTR 需要同一个资源、同一次页面访问关联；不能直接用总点击次数除总曝光次数。
 
-文章“有效阅读”要求正文深度至少 90%，有效阅读秒数达到 `min(120, max(15, 预计阅读秒数 × 0.3))`。不是阅读理解或完成阅读的证明。邮箱点击是联系意向，Giscus iframe load 不是评论提交。
+文章“有效阅读”要求正文深度至少 90%，有效阅读秒数达到 `min(120, max(15, 预计阅读秒数 × 0.3))`。不是阅读理解或完成阅读的证明。文章访问量使用原生 PV，阅读事件次数 / 文章 PV 可作粗略阅读比例，不能称为用户转化率；不再提供文章卡片与书籍曝光点击率。邮箱点击是联系意向，Giscus iframe load 不是评论提交。
 
-同路径错误展示与恢复视为新的页面激活，各有一个 PV/page_context，并重建观察器；点击 Retry 本身不保证成功。正式主报表可以按 page_type 排除错误状态，质量视图单独看。
+同路径错误展示与恢复视为新的页面激活，各有一个原生 PV，并重建观察器；内部 page_view_id 仍更新。质量视图使用 app_error，按 release 和 page_path 查看。
 
 严格关联指标如后台无法直接配置，需要通过 Umami API 或只读 SQL 计算；当前没有替你创建后台报表、部署备份或计划任务。完整定义见 [设计文档](./umami-tracking-design.md)。
 

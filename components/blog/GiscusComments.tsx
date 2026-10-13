@@ -1,6 +1,5 @@
 "use client";
 
-import { viewAttributes } from "@/lib/analytics/events";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 
@@ -74,7 +73,7 @@ export function GiscusComments() {
   return (
     <div className="mt-12">
       <div ref={sentinelRef} />
-      <div ref={containerRef} {...viewAttributes("comments_view", {}, "start")} />
+      <div ref={containerRef} />
     </div>
   );
 }

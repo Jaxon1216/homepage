@@ -7,7 +7,7 @@ import ts from 'typescript';
 test('曝光稳定期间属性变化，重新计时并上报新状态', () => {
   let time = 0, serial = 0, mutation, frame;
   const timers = new Map(), events = [];
-  const element = { isConnected: true, dataset: { analyticsView: 'article_card_impression', analyticsViewProps: '{"article_slug":"test","active_tag":"all"}' } };
+  const element = { isConnected: true, dataset: { analyticsView: 'project_impression', analyticsViewProps: '{"project_id":"before","category":"ForStudy"}' } };
   const sandbox = {
     Map, Set, JSON,
     document: { body: {}, visibilityState: 'visible', querySelectorAll: () => [element], addEventListener: () => {}, removeEventListener: () => {} },
@@ -24,12 +24,12 @@ test('曝光稳定期间属性变化，重新计时并上报新状态', () => {
   const stop = compiledModule.exports.observeExposures();
   const advance = now => { time = now; for (const [id, timer] of [...timers]) if (timer.at <= now) { timers.delete(id); timer.fn(); } };
   advance(500);
-  element.dataset.analyticsViewProps = '{"article_slug":"test","active_tag":"agent"}';
+  element.dataset.analyticsViewProps = '{"project_id":"after","category":"ForStudy"}';
   mutation(); frame();
   advance(1000);
   assert.equal(events.length, 0);
   advance(1500);
   assert.equal(events.length, 1);
-  assert.equal(events[0].props.active_tag, 'agent');
+  assert.equal(events[0].props.project_id, 'after');
   stop();
 });

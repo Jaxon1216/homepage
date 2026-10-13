@@ -30,8 +30,21 @@ function browser(url = 'https://jiangxu.net/') {
     return compiledModule.exports;
   };
   const api = load(path.resolve('lib/analytics/client.ts'));
-  return { api, sent, sandbox, storage, move: url => { sandbox.location = new URL(url); } };
+  return { api, eventFields: load(path.resolve('lib/analytics/events.ts')).eventFields, sent, sandbox, storage, move: url => { sandbox.location = new URL(url); } };
 }
+
+test('默认仅发送 15 类自定义事件，停报事件不产生隐式 PV，诊断仍默认关闭', () => {
+  const b = browser(); b.api.configureAnalytics(true); b.api.analyticsReady();
+  const retired = ['page_context', 'navigation_click', 'section_view', 'page_attention', 'article_card_impression', 'article_read_depth', 'article_read_time', 'article_toc_click', 'article_link_click', 'media_open', 'comments_view', 'resume_section_view', 'reading_stage_view', 'book_impression', 'reading_cluster_change', 'error_retry_click'];
+  for (const name of retired) b.api.trackEvent(name, {});
+  assert.equal(b.sent.length, 0, 'retired events do not send or activate a page');
+  b.api.activatePage();
+  for (const name of Object.keys(b.eventFields)) b.api.trackEvent(name, {});
+  const expected = ['page_engaged', 'project_impression', 'project_click', 'contact_click', 'friend_link_click', 'outbound_click', 'blog_filter_change', 'article_open_click', 'article_read_start', 'article_read_qualified', 'resume_version_view', 'resume_version_change', 'book_open', 'not_found_view', 'app_error'];
+  assert.deepEqual(b.sent.filter(p => p.name).map(p => p.name).sort(), expected.sort());
+  assert.equal(b.sent.filter(p => !p.name).length, 1, 'native PV remains');
+  assert.ok(b.sent.filter(p => p.name).every(p => p.data.schema_version === 2));
+});
 
 test('开发开关、非生产域名、DNT、作者排除均阻止事件发送', () => {
   for (const mode of ['disabled', 'localhost', 'dnt', 'author']) {
@@ -43,7 +56,7 @@ test('开发开关、非生产域名、DNT、作者排除均阻止事件发送',
     assert.equal(b.sent.length, 0, mode);
   }
 });
-test('SDK 延迟时缓存发生时页面，手动 PV 与上下文都只报一次', () => {
+test('SDK 延迟时缓存发生时页面，手动 PV 只报一次', () => {
   const b = browser('https://jiangxu.net/resume?secret=abc');
   b.api.configureAnalytics(true);
   b.api.activatePage(); b.api.activatePage();
@@ -60,21 +73,20 @@ test('SDK 延迟时缓存发生时页面，手动 PV 与上下文都只报一次
 });
 test('前进后退和 BFCache 激活创建独立页面访问，同页调用不重复 PV', () => {
   const b = browser(); b.api.configureAnalytics(true); b.api.analyticsReady();
-  b.api.activatePage();
-  b.move('https://jiangxu.net/blog'); b.api.activatePage();
-  b.move('https://jiangxu.net/'); b.api.activatePage(); b.api.activatePage();
-  b.api.activatePage(true);
-  const contexts = b.sent.filter(p => p.name === 'page_context');
+  const contexts = [b.api.activatePage()];
+  b.move('https://jiangxu.net/blog'); contexts.push(b.api.activatePage());
+  b.move('https://jiangxu.net/'); contexts.push(b.api.activatePage()); b.api.activatePage();
+  contexts.push(b.api.activatePage(true));
   assert.equal(contexts.length, 4);
   assert.equal(b.sent.filter(p => !p.name).length, 4);
-  assert.equal(new Set(contexts.map(p => p.data.page_view_id)).size, 4);
+  assert.equal(new Set(contexts.map(p => p.id)).size, 4);
 });
 test('未知路径与合法形状的文章 404 都脱敏且不递归', () => {
   for (const pathname of ['/alice@example.com', '/blog/missing']) {
     const b = browser(`https://jiangxu.net${pathname}`);
     b.sandbox.document.querySelector = selector => selector === '[data-analytics-page]' ? { dataset: { analyticsPage: 'not_found' } } : null;
     b.api.configureAnalytics(true); b.api.analyticsReady(); b.api.activatePage();
-    b.api.trackEvent('navigation_click', { target_path: '/' });
+    b.api.trackEvent('contact_click', { channel: 'github' });
     assert.equal(b.sent.filter(p => !p.name).length, 1);
     assert.equal(b.sent.find(p => p.name === 'not_found_view').url, '/:unknown');
   }
@@ -99,7 +111,8 @@ test('真实混合大小写文章保留路径，未知文章和内部 referrer �
   const b = browser('https://jiangxu.net/blog/eventLoop');
   b.api.configureAnalytics(true, ['/blog/eventLoop']); b.api.analyticsReady(); b.api.activatePage();
   assert.equal(b.sent.find(p => !p.name).url, '/blog/eventLoop');
-  assert.equal(b.sent.find(p => p.name === 'page_context').data.article_slug, 'eventLoop');
+  b.api.trackEvent('article_read_start', {}, 'start');
+  assert.equal(b.sent.find(p => p.name === 'article_read_start').data.article_slug, 'eventLoop');
   assert.equal(b.sandbox.homepageAnalyticsBeforeSend('performance', { url: 'https://jiangxu.net/blog/alice-private-token' }).url, '/:unknown');
   const from404 = browser('https://jiangxu.net/');
   from404.sandbox.document.referrer = 'https://jiangxu.net/blog/alice-private-token?email=secret';
@@ -112,15 +125,18 @@ test('路由提交前旧观察器查询上下文，不提前产生新页 PV 或�
   b.api.configureAnalytics(true, ['/blog/eventLoop', '/blog/browserRendering']); b.api.analyticsReady(); b.api.activatePage();
   b.move('https://jiangxu.net/blog/browserRendering');
   assert.equal(b.api.getPageContext(), undefined);
+  b.api.trackEvent('article_read_start', {}, 'start');
   assert.equal(b.sent.filter(p => !p.name).length, 1);
+  assert.equal(b.sent.filter(p => p.name === 'article_read_start').length, 0);
   b.api.activatePage();
   assert.equal(b.sent.filter(p => !p.name).length, 2);
-  assert.equal(b.sent.filter(p => p.name === 'page_context').at(-1).data.article_slug, 'browserRendering');
+  b.api.trackEvent('article_read_start', {}, 'start');
+  assert.equal(b.sent.find(p => p.name === 'article_read_start').data.article_slug, 'browserRendering');
 });
 
 test('曝光达到软预算后，书籍展开与简历版本切换仍可上报', () => {
   const b = browser(); b.api.configureAnalytics(true); b.api.analyticsReady(); b.api.activatePage();
-  for (let i=0;i<160;i++) b.api.trackEvent('section_view', { section_id: `section-${i}` }, `${i}`);
+  for (let i=0;i<160;i++) b.api.trackEvent('project_impression', { project_id: `project-${i}` }, `${i}`);
   b.api.trackEvent('book_open', { book_id: 'to-live', stage_id: 'high-school' });
   b.api.trackEvent('resume_version_change', { from_version: 'old', to_version: 'new' });
   assert.equal(b.sent.filter(p=>p.name==='book_open').length,1);

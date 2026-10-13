@@ -1,7 +1,7 @@
 "use client";
 
 import { trackEvent } from "@/lib/analytics/client";
-import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
+import { clickAttributes } from "@/lib/analytics/events";
 import { Fragment, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -390,7 +390,7 @@ export function ResumeContent() {
               </div>
 
               {/* Education */}
-              <ResumeSection icon={FiBook} title="教育背景" sectionId="education" versionId={activeVersion}>
+              <ResumeSection icon={FiBook} title="教育背景">
                 {v.education.map((edu) => (
                   <div key={edu.school} className="mb-3 last:mb-0">
                     <div className="flex justify-between items-start flex-wrap gap-1">
@@ -413,7 +413,7 @@ export function ResumeContent() {
               </ResumeSection>
 
               {/* Skills */}
-              <ResumeSection icon={FiTool} title="专业技能" sectionId="skills" versionId={activeVersion}>
+              <ResumeSection icon={FiTool} title="专业技能">
                 <ul className="space-y-1.5 text-sm">
                   {v.skills.map((skill, i) => (
                     <li key={i} className="flex items-start gap-2">
@@ -426,7 +426,7 @@ export function ResumeContent() {
 
               {/* Experience */}
               {v.experience.length > 0 && (
-                <ResumeSection icon={FiBriefcase} title="实习经历" sectionId="experience" versionId={activeVersion}>
+                <ResumeSection icon={FiBriefcase} title="实习经历">
                   {v.experience.map((exp) => (
                     <div key={exp.title} className="mb-4 last:mb-0">
                       <div className="flex justify-between items-start flex-wrap gap-1">
@@ -456,7 +456,7 @@ export function ResumeContent() {
 
               {/* Projects */}
               {v.projects.length > 0 && (
-                <ResumeSection icon={FiFolder} title="项目经历" sectionId="projects" versionId={activeVersion}>
+                <ResumeSection icon={FiFolder} title="项目经历">
                   {v.projects.map((proj) => (
                     <div key={proj.name} className="mb-4 last:mb-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
@@ -484,7 +484,7 @@ export function ResumeContent() {
               )}
 
               {v.openSource && v.openSource.length > 0 && (
-                <ResumeSection icon={FiGithub} title="开源贡献" sectionId="open_source" versionId={activeVersion}>
+                <ResumeSection icon={FiGithub} title="开源贡献">
                   {v.openSource.map((project) => (
                     <div key={project.name} className="mb-4 last:mb-0">
                       <div className="flex items-baseline gap-2 flex-wrap">
@@ -502,7 +502,7 @@ export function ResumeContent() {
               )}
 
               {v.personalEvaluation && v.personalEvaluation.length > 0 && (
-                <ResumeSection icon={FiUser} title="个人评价" sectionId="summary" versionId={activeVersion}>
+                <ResumeSection icon={FiUser} title="个人评价">
                   <ul className="space-y-1.5 text-sm">
                     {v.personalEvaluation.map((line, i) => (
                       <li key={i} className="flex items-start gap-2 text-[var(--muted)]">
@@ -567,21 +567,17 @@ function formatResumeLinks(content: string) {
 }
 
 function ResumeSection({
-  sectionId,
-  versionId,
   icon: Icon,
   title,
   children,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
-  sectionId: string;
-  versionId: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="mb-6">
-      <h3 {...viewAttributes("resume_section_view", { section_id: sectionId, version_id: versionId }, "start")} className="flex items-center gap-2 text-base font-semibold mb-3 pb-2 border-b border-[var(--card-border)]">
+      <h3 className="flex items-center gap-2 text-base font-semibold mb-3 pb-2 border-b border-[var(--card-border)]">
         <Icon size={16} className="text-[var(--accent)]" />
         {title}
       </h3>

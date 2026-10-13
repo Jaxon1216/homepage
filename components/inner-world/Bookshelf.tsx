@@ -1,6 +1,5 @@
 "use client";
 
-import { viewAttributes } from "@/lib/analytics/events";
 import { useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { Book, ReadingCluster } from "@/lib/reading";
@@ -143,7 +142,6 @@ export function Bookshelf({
                 >
                   <motion.button
                     type="button"
-                    {...viewAttributes("book_impression", { book_id: book.id, stage_id: stageKey })}
                     onClick={() => onSelect(open ? null : book.title)}
                     animate={reduce ? undefined : { y: open ? -12 : 0 }}
                     whileHover={reduce || open ? undefined : { y: -10, rotateX: 8 }}

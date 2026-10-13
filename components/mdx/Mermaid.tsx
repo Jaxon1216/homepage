@@ -19,7 +19,6 @@ export function Mermaid({ chart }: { chart: string }) {
   const openDiagram = (element: Element) => {
     if (open) return;
     trackedId.current = mediaId(element);
-    trackEvent("media_open", { media_type: "mermaid", media_id: trackedId.current });
     setOpen(true);
   };
 

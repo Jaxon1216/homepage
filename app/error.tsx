@@ -1,7 +1,5 @@
 "use client";
 
-import { trackEvent } from "@/lib/analytics/client";
-import { clickAttributes } from "@/lib/analytics/events";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -29,7 +27,7 @@ export default function GlobalError({
 
       <div className="mt-8 flex items-center justify-center gap-4 animate-fade-up [animation-delay:0.3s]">
         <button
-          onClick={() => { trackEvent("error_retry_click", { error_code: "route_render_error" }); reset(); }}
+          onClick={reset}
           className="px-5 py-2.5 rounded-lg bg-[var(--accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity"
         >
           Retry
@@ -38,7 +36,6 @@ export default function GlobalError({
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/"
-          {...clickAttributes("navigation_click", { target_path: "/", placement: "error" })}
           className="px-5 py-2.5 rounded-lg border border-[var(--card-border)] text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors"
         >
           Back home

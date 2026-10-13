@@ -1,6 +1,6 @@
 "use client";
 
-import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
+import { clickAttributes } from "@/lib/analytics/events";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
@@ -135,7 +135,7 @@ export function AboutContent() {
       </motion.div>
 
       {/* Skills */}
-      <Section icon={FiCode} title="Skills" sectionId="about_skills">
+      <Section icon={FiCode} title="Skills">
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[var(--muted)] mb-5">
           {skillLegend.map((item) => (
             <span key={item}>{item}</span>
@@ -167,7 +167,7 @@ export function AboutContent() {
       </Section>
 
       {/* Tools & Platforms */}
-      <Section icon={FiTool} title="Tools & Platforms" sectionId="about_tools_platforms">
+      <Section icon={FiTool} title="Tools & Platforms">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -194,7 +194,7 @@ export function AboutContent() {
       </Section>
 
       {/* Education & Awards */}
-      <Section icon={FiBook} title="Education & Awards" sectionId="about_education">
+      <Section icon={FiBook} title="Education & Awards">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -214,7 +214,7 @@ export function AboutContent() {
       </Section>
 
       {/* Contact */}
-      <Section icon={FiMail} title="Contact" sectionId="about_contact">
+      <Section icon={FiMail} title="Contact">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -271,19 +271,17 @@ function SkillRow({ skill }: { skill: Skill }) {
 }
 
 function Section({
-  sectionId,
   icon: Icon,
   title,
   children,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
-  sectionId: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="mb-10">
-      <h2 {...viewAttributes("section_view", { section_id: sectionId }, "start")} className="flex items-center gap-2 text-base font-semibold mb-4 pb-2 border-b border-[var(--card-border)]">
+      <h2 className="flex items-center gap-2 text-base font-semibold mb-4 pb-2 border-b border-[var(--card-border)]">
         <Icon size={16} className="text-[var(--accent)]" />
         {title}
       </h2>

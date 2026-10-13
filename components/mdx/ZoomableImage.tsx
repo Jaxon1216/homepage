@@ -297,7 +297,6 @@ export function ZoomableImage({
   const openImage = (element: Element) => {
     if (open) return;
     trackedId.current = mediaId(element);
-    trackEvent("media_open", { media_type: "image", media_id: trackedId.current });
     setOpen(true);
   };
 

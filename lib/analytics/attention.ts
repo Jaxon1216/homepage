@@ -11,14 +11,12 @@ export function observeAttention() {
   let depth = 0;
   let visible = document.visibilityState === 'visible';
   let bodyVisible = false;
-  const thresholds = [15, 30, 60, 120, 300];
   const tick = () => {
     if (getPageContext()?.id !== pageId) return;
     const now = performance.now();
     const elapsed = activeMilliseconds(previous, now, lastInput, visible);
     previous = now;
     active += elapsed;
-    for (const threshold of thresholds) if (active >= threshold * 1000) trackEvent('page_attention', { threshold_seconds: threshold }, `${threshold}`);
     if (active >= 30000) trackEvent('page_engaged', { active_seconds: 30 }, 'engaged');
     const body = document.querySelector<HTMLElement>('[data-analytics-article]');
     if (!body || !umamiConfig.reading) return;
@@ -28,9 +26,7 @@ export function observeAttention() {
     if (bodyVisible && nextBodyVisible) reading += elapsed;
     bodyVisible = nextBodyVisible;
     if (visible && nextBodyVisible) depth = Math.max(depth, readDepth(rect.top, rect.bottom, innerHeight));
-    for (const threshold of [25, 50, 75, 90]) if (depth >= threshold) trackEvent('article_read_depth', { depth: threshold }, `${threshold}`);
     if (reading >= 5000) trackEvent('article_read_start', {}, 'start');
-    for (const threshold of thresholds) if (reading >= threshold * 1000) trackEvent('article_read_time', { threshold_seconds: threshold }, `${threshold}`);
     const estimatedSeconds = Number(body.dataset.analyticsReadingSeconds) || 300;
     const required = qualifiedReadingSeconds(estimatedSeconds);
     if (isQualifiedRead(depth, reading / 1000, required)) trackEvent('article_read_qualified', { required_seconds: required }, 'qualified');

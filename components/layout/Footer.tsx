@@ -34,7 +34,6 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    {...clickAttributes("navigation_click", { target_path: item.href, placement: "footer" })}
                     className="text-sm text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
                   >
                     {item.label}

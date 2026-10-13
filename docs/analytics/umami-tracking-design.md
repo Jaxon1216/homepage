@@ -1,6 +1,6 @@
 # Homepage Umami 埋点体系设计
 
-设计日期：2026-10-12。状态：代码接入完成，部署至正式环境后生效；实现差异和操作说明见 README.md。适用项目：jiangxu.net，Next.js App Router；Umami 仓库当前版本 3.4.0，线上版本需核验。
+设计日期：2026-10-12；精简更新：2026-10-13。状态：代码接入完成，部署至正式环境后生效；实现差异和操作说明见 README.md。适用项目：jiangxu.net，Next.js App Router；Umami 仓库当前版本 3.4.0，线上版本需核验。
 
 ## 1. 目标与方案选择
 
@@ -12,15 +12,15 @@
 
 备选二：Umami 全量点击采集、热图和会话回放。适合短期界面诊断，但噪声、数据量和隐私成本更高；首期采用显式语义事件，回放和热图关闭。
 
-“全”指覆盖完整业务路径，而非每次鼠标移动都发事件。设计覆盖全部现有交互；不存在的下载、搜索、分享按钮仅保留扩展规范。
+2026-10-13 按实际使用反馈将默认自定义事件从 31 类精简到 15 类，保留项目效果、阅读质量和关键主动行为。7 类原有诊断事件仍默认关闭；其余 16 类事件移除采集代码，历史数据保留。站内导航、章节/卡片/书籍曝光、目录和媒体打开不再统计。
 
 ## 2. 数据架构
 
 浏览器 → AnalyticsProvider（环境判断、SDK 生命周期、路由上下文）→ trackEvent（事件类型、属性白名单、去重与限流）→ Umami script.js → Umami /api/send → PostgreSQL。
 
-生产域名使用独立 Website ID；测试环境使用另一个 Website ID，禁止写入生产数据。首页无需数据库连接；DATABASE_URL、后台账号、API 密钥只能存在于 Umami 服务端或离线报表任务。
+正式域名使用 Homepage Website ID；开发和 Preview 禁用采集，隔离浏览器验收截获全部请求，不写生产。如需测试环境真实入库，另建测试 Website ID。首页无需数据库连接；DATABASE_URL、后台账号、API 密钥只能存在于 Umami 服务端或离线报表任务。
 
-实施时核验线上脚本发现自动 PV 没有完整 popstate 跟踪，因此统一关闭 data-auto-pageview，由 Provider 在 React 路由提交后手动产生唯一 PV，并同步语义上下文；不允许自动与手动并存。锚点跳转、主题和简历版本切换、标签筛选均不新增 PV。
+实施时核验线上脚本发现自动 PV 没有完整 popstate 跟踪，因此统一关闭 data-auto-pageview，由 Provider 在 React 路由提交后手动产生唯一 PV，并维护内部页面上下文；不允许自动与手动并存。锚点跳转、主题和简历版本切换、标签筛选均不新增 PV。
 
 使用 data-before-send 清洗 URL/referrer，排除 hash，仅允许 utm_source、utm_medium、utm_campaign；去掉其他 query。外站 referrer 保留域名，内部 referrer 保留规范化 pathname。清洗前后需验证 UTM 报表仍可正确归因。站内导航不加 UTM。
 
@@ -30,31 +30,26 @@
 
 所有自定义事件公共字段：
 
-- schema_version：数字 1，事件含义或去重口径变更必须升级。
+- schema_version：数字 2，事件含义或去重口径变更必须升级。
 - page_type：home / blog_list / article / resume / inner_world / about / footprint / not_found / error。
 - page_path：规范化 pathname，移除 query/hash。
 - page_view_id：每次页面激活生成的短随机 ID；只用于同次访问关联和去重，不用于识别人。SPA 离开再返回创建新 ID，BFCache 恢复按新一次页面激活处理。
 - release：生产部署的短版本标识，用于回归定位。
 
-按事件添加：placement（如 hero、navbar_desktop、navbar_mobile、footer、article_body、resume_header）、target_id（稳定资源 ID）、action、以及下文专有属性。不重复上报 Umami 已有的浏览器、设备、国家等属性。
+按事件添加 placement（如 hero、home_projects、footer、article_body、resume_header）及下文专有属性。友链沿用 target_id/target_host，当前两者均为目标域名；不重复上报 Umami 已有的浏览器、设备、国家等属性。
 
 项目、书籍已在数据源补充稳定 slug，不用数组索引或展示标题作主键。文章使用现有 slug，简历版本使用现有 key，阅读阶段和主线使用现有 key。标签只允许仓库四个合法值，全部标签用 all。
 
 page_view_id 不在常规面板中按值分组。默认不调用 identify，不创建跨月持久 visitor ID，不宣称能识别真实个人或精确跨设备回访。
 
-## 4. 全量事件目录
+## 4. 当前事件目录（15 类默认，7 类诊断）
 
-优先级：P0 首期必备；P1 完整行为分析；P2 按需诊断。每项列出额外属性；均继承公共字段。
+P0/P1 和标注“默认”的事件默认开启；P2 为可选诊断，默认关闭。每项列出额外属性；均继承公共字段。
 
 ### 4.1 全站与流量
 
 - 原生 pageview［P0］：首次页面加载和有效 pathname 切换，由 Provider 唯一触发 SDK 的手动 track，关闭 SDK 自动 PV。不是另建一个同名自定义事件。
-- page_context［P0］：每次页面激活一次；article_slug（文章页）、resume_version（简历页）。用于带 page_view_id 的分析分母，和原生 PV 数量并行核对，不将其计为第二个 PV。
-- navigation_click［P0］：顶部、底部导航、Logo、返回文章列表、404 恢复链接；target_path、placement。只表示点击，不表示目标已加载；成功到达看目标 page_context。
-- section_view［P1］：核心区块曝光；section_id。首页项目区/GitHub 区、About 主要章节、简历各章节、Inner World 各阶段。实际区块进入可视区且稳定可见满 1 秒，每 page_view_id + section_id 一次。
-- page_engaged［P1］：累计有效活跃 30 秒，每次页面访问一次；active_seconds=30。文章的有效阅读另用专门事件。
-- page_attention［P1］：活跃累计到 15/30/60/120/300 秒各一次；threshold_seconds。用于分布和“至少 N 秒”统计，不累加各阈值来计算总时间。它与 page_engaged 含义部分重叠，报表分别使用，不相加。
-- page_attention_end［P2］：SPA 离开/pagehide 时尝试发送累计 active_seconds、max_depth，按页面关闭一次；离站可能丢失，仅作补充，不能作为精确平均时长来源。visibilitychange hidden 只暂停计时，不当作最终离站。
+- page_engaged［默认］：累计有效活跃 30 秒，每次页面访问一次；active_seconds=30。文章的有效阅读另用专门事件，不再上报多档活跃阈值。
 - mobile_menu_toggle［P2］：菜单实际切换后；state=open/closed。
 - theme_change［P2］：用户主动选择后；from_theme、to_theme。初始化或系统自动主题不计。
 
@@ -70,17 +65,10 @@ page_view_id 不在常规面板中按值分组。默认不调用 identify，不�
 ### 4.3 博客列表与文章
 
 - blog_filter_change［P0］：标签实际改变后；from_tag、to_tag、result_count。重复点当前标签不报。
-- article_card_impression［P1］：卡片 50% 可见 1 秒；article_slug、position（从 1 开始）、active_tag。每页面访问 + 文章 + 标签状态一次，不因滚动往返重复。
-- article_open_click［P0］：列表入口；article_slug、position、active_tag、placement=blog_list。直接从搜索引擎进文章没有此事件，使用文章 page_context 统计访问。
+- article_open_click［P0］：列表入口；article_slug、position、active_tag、placement=blog_list。直接从搜索引擎进文章没有此事件，使用文章原生 PV 统计访问。
 - article_read_start［P0］：正文真实可见且累计有效阅读达到 5 秒；article_slug。每页面访问一次。
-- article_read_depth［P0］：正文深度 25/50/75/90%，各阈值一次；article_slug、depth。不含文章头、评论和页脚。只衡量到达，不表示理解或完整阅读。
-- article_read_time［P0］：正文有效阅读累计达到 15/30/60/120/300 秒；article_slug、threshold_seconds，各阈值一次。
 - article_read_qualified［P0］：深度 ≥90%，且有效阅读秒数 ≥ min(120, max(15, 预计阅读秒数 × 0.3))；article_slug、required_seconds；每页面访问一次。只是“达到阅读条件”的代理指标，不命名 read_complete。
-- article_toc_click［P1］：主动点击目录；article_slug、heading_id、heading_level。滚动导致当前目录高亮变化不报；锚点 hash 不生成 PV。
-- article_link_click［P1］：正文内部站内链接；article_slug、target_path。正文外链归 outbound_click，placement=article_body。
-- media_open［P1］：图片或 Mermaid 放大成功后；article_slug、media_type=image/mermaid、media_id（文章内稳定标识）。点击和键盘共用处理入口，各报一次。
 - media_close［P2］：关闭放大层；media_type、media_id、reason=button/overlay/escape。缩放和拖动不逐步上报。
-- comments_view［P1］：评论容器真实可见满 1 秒；article_slug。懒加载 sentinel 的 rootMargin 命中不算实际曝光。
 - comments_load［P2］：Giscus iframe load；article_slug。只表示 iframe 加载，不表示内容可用或评论成功。
 
 Giscus 跨域 iframe 内的评论提交、点赞、登录不监听、不猜测。若未来官方消息协议提供明确成功信号，再单独设计并验证 origin 和消息格式。
@@ -89,33 +77,28 @@ Giscus 跨域 iframe 内的评论提交、点赞、登录不监听、不猜测�
 
 - resume_version_view［P0］：初始版本展示及有效切换后的版本展示；version_id；每页面访问每版本一次。用于版本分母。
 - resume_version_change［P0］：版本实际改变；from_version、to_version。重复点当前版本不报；版本切换不产生新 PV。
-- resume_section_view［P1］：简历章节曝光；version_id、section_id，每页面访问 + 版本 + 章节一次。此处取代简历的通用 section_view，不双报。
 - 简历联系方式使用 contact_click；正文其他外链使用 outbound_click，两者携带 resume_version。
-- About 章节使用 section_view，社交链接使用 contact_click，无需再创建 about_click。
-- reading_stage_view［P1］：阅读阶段进入视口满 1 秒；stage_id。取代 Inner World 阶段的通用 section_view。
-- book_impression［P1］：书脊 50% 可见 1 秒；book_id、stage_id；每页面访问每本一次。
+- About 社交链接使用 contact_click，不再统计章节曝光。
 - book_open［P0］：展开成功；book_id、stage_id、cluster_id（当前固定主线，没有则 all）。直接换书产生新书 open，旧书 close 的 reason=switch。
 - book_close［P2］：实际收起；book_id、stage_id、reason=button/toggle/switch/escape。
-- reading_cluster_change［P1］：点击固定/取消主线；stage_id、from_cluster、to_cluster。hover 不报。
 
 Footprint 当前是 Coming Soon，仅统计页面访问，不虚构地图交互。
 
 ### 4.5 质量与未来扩展
 
-- not_found_view［P0］：404 页面出现；requested_path（脱敏，动态未知段归一为 :unknown），每次页面访问一次。404 恢复点击用 navigation_click。
+- not_found_view［P0］：404 页面出现；requested_path（脱敏，动态未知段归一为 :unknown），每次页面访问一次。不再单独采集 404 恢复点击。
 - app_error［P0］：已有 app/error.tsx 展示；error_code=route_render_error、digest（仅框架提供且校验格式后）。不发完整 message/stack/用户 URL。
-- error_retry_click［P0］：点击现有 reset；error_code。点击不等于恢复；后续正常 page_context 才作为恢复信号。
 - resource_error［P2］：自有图片或 Mermaid 渲染失败；resource_type、resource_id、error_code。每资源每访问一次，禁止转发完整资源 URL/内容。
-- 性能［P1］：线上版本验证后启用 Umami 原生 performance 功能；不手写平行的 LCP/CLS/INP 事件。不能用自定义 page_attention 替代原生性能指标。
+- 性能［P1］：线上版本验证后启用 Umami 原生 performance 功能；不手写平行的 LCP/CLS/INP 事件。不能用 page_engaged 替代原生性能指标。
 - download_click、share_click、code_copy、search_submit［未来］：当前没有对应能力，不在首期接入。只有复制成功才报 code_copy；下载点击不能命名 download_success；搜索词默认不上报，仅结果数量/词长分桶。
 
 ## 5. 曝光、阅读和生命周期口径
 
-普通曝光：目标 50% 可见且 document 可见，连续 1 秒；隐藏或低于阈值重置稳定计时。超高章节不能要求整个节点 50% 面积可见：使用章节标题/起始标记在视口内 1 秒，并将口径记录为 section_start。超宽书脊的横向可见性也要计入 IntersectionObserver。
+项目曝光：卡片 50% 可见且 document 可见，连续 1 秒；隐藏或低于阈值重置稳定计时。项目曝光按同次访问每项目一次去重。章节、书籍和文章卡片不再创建曝光观察目标。
 
 阅读活跃：页面 visible、正文与视口相交，且最近 60 秒存在 scroll/pointerdown/keydown/touchstart；进入文章时给予 60 秒初始阅读窗口。无输入超过 60 秒暂停，重新输入恢复；这是近似阅读时间，会低估静止阅读很久的用户，面板明确标注。只用 performance.now 累积 delta，后台不累计，不按 setInterval 次数推算时间。
 
-深度按正文顶部至正文底部的相对位置计算，正文较短且完整可见可达到 100%；图片加载、字体变化后重算几何。跳到文末可触发深度，但不会绕过有效阅读时长条件。单帧跨越多个阈值按顺序各报一次。
+深度按正文顶部至正文底部的相对位置计算，正文较短且完整可见可达到 100%；图片加载、字体变化后重算几何。跳到文末可触发深度，但不会绕过有效阅读时长条件。深度和时长仅在内存计算，用于 read_start 与 read_qualified，不再单独发送阈值事件。
 
 去重主键 = page_view_id + event_name + 资源 ID + 阈值/状态。一次性曝光/阈值使用主键；主动点击不按页面永久去重，只抑制同一处理链重复触发。合法的重复点击保留。不在客户端或数据库新建跨用户长期去重键。
 
@@ -143,15 +126,15 @@ SDK 未就绪时仅在内存缓存最多 50 条、最长 10 秒，优先保留�
 
 项目曝光点击率：同一 project_id 下，发生 project_click 且有 project_impression 的 distinct page_view_id / 曝光 distinct page_view_id。所有点击次数单独展示；未满 1 秒就点击的记录属于“未满足曝光条件点击”，不得通过补造 impression 修正分母。GitHub 与 demo 分开。
 
-文章列表点击率：同一文章、标签下，有曝光且点击的 distinct page_view_id / 卡片曝光 distinct page_view_id。直接访问文章不算列表点击。
+文章列表入口：按 article_slug、active_tag 查看 article_open_click 次数，不再计算文章卡片曝光点击率。直接访问文章不算列表点击。
 
-文章有效阅读率：article_read_qualified 的 distinct page_view_id / 同 article_slug 的 page_context distinct page_view_id。另展示 read_start、深度、阅读时间阈值分布。不能用事件总次数除 PV 后称为用户转化率。
+文章阅读：展示同 article_slug 的原生 PV、article_read_start 和 article_read_qualified 次数。有效阅读次数 / 文章 PV 仅作粗略阅读比例；没有 page_context 分母，不宣称基于 page_view_id 的精确到访转化率或用户转化率。
 
 简历版本意向率：携带相同版本的 contact_click distinct page_view_id / resume_version_view distinct page_view_id。多版本同次访问可以分别进入各版本分母；全站汇总再去重。邮箱点击只作为高意向代理。
 
-书籍展开率：有 book_impression 且 book_open 的 distinct page_view_id / 同 book_id 曝光 distinct page_view_id。主线按固定选择统计，不将 hover 当兴趣。
+书籍兴趣：按 book_id、stage_id 查看 book_open 次数，cluster_id 表示展开时的固定主线。不再计算书籍曝光展开率，也不单独统计主线切换。
 
-建议漏斗：home page_context → project_impression → project_click；blog_list page_context → article_open_click → article_read_start → article_read_qualified；resume page_context → contact_click。文章漏斗匹配同一个 article_slug；项目匹配同一个 project_id，不能混合 A 曝光和 B 点击。
+建议漏斗：project_impression → project_click；article_open_click → article_read_start → article_read_qualified；resume_version_view → contact_click。文章漏斗匹配同一个 article_slug，跨页面按 session 关联；项目匹配同一个 project_id，不能混合 A 曝光和 B 点击。
 
 跨页面漏斗使用 Umami 自身 session 关联、30 分钟业务观察窗口和有序步骤；page_view_id 仅关联单页面。原生后台若不支持事件属性关联或精确时间窗，面板标记原生口径；需要严格口径的指标通过 Umami API/只读 SQL 离线计算，不能声称所有自定义指标都能直接点击配置。
 
@@ -173,25 +156,25 @@ SDK 未就绪时仅在内存缓存最多 50 条、最长 10 秒，优先保留�
 
 ## 9. 实施阶段和验收
 
-P0：稳定 Umami 域名及 homepage Website ID、生产/测试隔离、URL 清洗、统一 API、PV/page_context、项目曝光点击、联系方式、博客筛选和文章入口、阅读指标、简历版本、书籍展开、404/错误与重试。此阶段即可解决长期统计和核心转化问题。
+当前默认 15 类：page_engaged、project_impression、project_click、contact_click、friend_link_click、outbound_click、blog_filter_change、article_open_click、article_read_start、article_read_qualified、resume_version_view、resume_version_change、book_open、not_found_view、app_error。原生 PV 独立保留。
 
-P1：内容曝光、目录/图片/正文链接、阅读阶段/主线、评论曝光、活跃阈值、原生性能、六组报表及严格指标的离线查询。P2：菜单/主题/关闭事件、资源错误、离站汇总、诊断开关；只有分析需求明确时上线。
+7 类可选诊断：mobile_menu_toggle、theme_change、media_close、book_close、comments_load、github_chart_view、resource_error，默认关闭。原生性能、后台报表和严格指标的离线查询仍需独立验收；离站汇总未实现。
 
 采集所需配置已提供：Umami 稳定域名、Homepage Website ID 和生产域名；线上 tracker 已在隔离浏览器中核验。数据库套餐、备份和后台报表仍需单独验收，不影响现有事件定义。
 
 验收清单：
 
-- 首次进入、SPA 前进后退、刷新、BFCache 各只有一次 PV 和一次 page_context；预取链接不产生访问。
+- 首次进入、SPA 前进后退、刷新、BFCache 各只有一次原生 PV；内部上下文分别激活，预取链接不产生访问，不再发送 page_context。
 - 目录锚点、主题、筛选、版本切换不新增 PV；快速切换路由无旧页计时/曝光泄漏。
-- 同一项目/书籍反复滚动只曝光一次；小于 1 秒不算曝光；合法重复点击保留。
+- 同一项目反复滚动只曝光一次；小于 1 秒不算曝光；合法重复点击保留。书籍和文章卡片不再产生曝光事件。
 - 项目点击不再产生 outbound_click；键盘 Enter/Space 和鼠标各执行一次。
 - 文章直达文末有深度但无瞬间 qualified；隐藏标签页和空闲不累计时间；短文章、迟加载图片、无目录文章正常。
-- 版本 A/B 的章节和联系事件绑定正确版本；隐藏简历版本不进入事件。
+- 版本 A/B 的展示和联系事件绑定正确版本；隐藏简历版本不进入事件。章节曝光不再采集。
 - Giscus 仅计可观察信号，load 不冒充提交成功。
 - SDK 延迟、脚本阻断、离线、冷启动、队列满时网站交互正常；旧页队列 URL 正确，不做不安全重试。
 - 本地/Preview/作者排除/DNT 不写生产；query、邮箱、stack、未知动态 URL 不泄漏。
 - Umami 入库属性与事件目录一致；严格指标用测试会话验证 A 曝光+B 点击不计 A 转化，多次点击不让 CTR 超过 100%。
-- 7 天试运行后记录 PV/page_context 差异、每 PV 的事件数、存储增长、采集失败；依据实测调整预算，不预设虚假流量与成本。
+- 精简后按 schema_version=2 观察每 PV 的事件数、保留事件分布、存储增长和采集失败；不与旧口径混合计算，不预设虚假流量与成本。
 
 ## 10. 依据与限制
 

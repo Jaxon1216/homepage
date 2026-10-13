@@ -1,7 +1,6 @@
 "use client";
 
 import { trackEvent } from "@/lib/analytics/client";
-import { viewAttributes } from "@/lib/analytics/events";
 import { useState } from "react";
 import type { Book, ReadingStage } from "@/lib/reading";
 import { Bookshelf } from "./Bookshelf";
@@ -33,7 +32,7 @@ export function StageSection({ stage }: { stage: ReadingStage }) {
     <section id={`stage-${stage.key}`} className="scroll-mt-24">
       <div className="mb-6 border-b border-[var(--card-border)] pb-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 {...viewAttributes("reading_stage_view", { stage_id: stage.key }, "start")} className="text-2xl font-semibold">
+          <h2 className="text-2xl font-semibold">
             {stage.label}
             {stage.period ? (
               <span className="font-normal text-[var(--muted)]"> · {stage.period}</span>
@@ -60,7 +59,7 @@ export function StageSection({ stage }: { stage: ReadingStage }) {
         activeCluster={activeCluster}
         pinnedCluster={pinnedCluster}
         onClusterHover={setHoveredCluster}
-        onClusterPin={(key) => { const next = pinnedCluster === key ? null : key; trackEvent("reading_cluster_change", { stage_id: stage.key, from_cluster: pinnedCluster ?? "all", to_cluster: next ?? "all" }); setPinnedCluster(next); }}
+        onClusterPin={(key) => setPinnedCluster((prev) => prev === key ? null : key)}
       />
 
     </section>

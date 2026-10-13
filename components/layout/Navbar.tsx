@@ -1,6 +1,5 @@
 "use client";
 
-import { clickAttributes } from "@/lib/analytics/events";
 import { trackEvent } from "@/lib/analytics/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,7 +19,6 @@ export function Navbar() {
       <nav className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link
           href="/"
-          {...clickAttributes("navigation_click", { target_path: "/", placement: "navbar_logo" })}
           className="flex items-center gap-2 text-lg font-bold text-[var(--accent)] hover:opacity-80 transition-opacity"
         >
           <Image
@@ -45,7 +43,6 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                {...clickAttributes("navigation_click", { target_path: item.href, placement: "navbar_desktop" })}
                 className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive
                     ? "bg-[var(--accent-light)] text-[var(--accent)] font-medium"
@@ -89,7 +86,6 @@ export function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    {...clickAttributes("navigation_click", { target_path: item.href, placement: "navbar_mobile" })}
                     onClick={() => setMobileOpen(false)}
                     className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                       isActive

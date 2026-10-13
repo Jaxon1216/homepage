@@ -31,7 +31,7 @@ test('曝光去重保留合法重复点击，预算不丢弃核心交互', () =>
 test('队列过期、限制容量，优先保留核心点击和发生时的页面', () => {
   const queue = new core.EventQueue();
   queue.push({ url: '/resume', name: 'contact_click' }, 0, true);
-  for (let i = 0; i < 60; i++) queue.push({ url: '/blog', name: 'section_view' }, 1000, false);
+  for (let i = 0; i < 60; i++) queue.push({ url: '/', name: 'project_impression' }, 1000, false);
   const batch = queue.drain(2000);
   assert.equal(batch.length, 50);
   assert.equal(batch[0].url, '/resume');

@@ -21,7 +21,7 @@ let release = umamiConfig.release;
 const queue = new EventQueue<Job>();
 const interactionEvents = new Set<EventName>([
   'book_open', 'book_close', 'resume_version_change', 'blog_filter_change',
-  'reading_cluster_change', 'media_open', 'media_close', 'theme_change', 'mobile_menu_toggle',
+  'media_close', 'theme_change', 'mobile_menu_toggle',
 ]);
 const isCritical = (name?: EventName) => !name || /click$/.test(name) || interactionEvents.has(name) || name === 'app_error';
 
@@ -44,7 +44,7 @@ export function configureAnalytics(enabled: boolean, paths: readonly string[] = 
 }
 function deliver(job: Job) {
   if (!canTrack()) { queue.clear(); return; }
-  if (!ready || !window.umami) { queue.push(job, Date.now(), job.name === 'page_context' || isCritical(job.name)); return; }
+  if (!ready || !window.umami) { queue.push(job, Date.now(), isCritical(job.name)); return; }
   // Freeze the URL at occurrence time: delayed events must not inherit a later route.
   try {
     void window.umami.track(base => ({ ...base, url: job.url, referrer: job.referrer, title: job.title,
@@ -84,7 +84,6 @@ export function activatePage(force = false) {
   previousUrl = url;
   context = { pathname: location.pathname, path, url, type, id: crypto.randomUUID().slice(0, 18), ledger: new EventLedger() };
   deliver({ url, referrer, title: 'Homepage' });
-  trackEvent('page_context', {} , 'context');
   if (type === 'not_found') trackEvent('not_found_view', { requested_path: '/:unknown' }, 'not-found');
   return context;
 }
@@ -108,7 +107,7 @@ export function trackEvent<N extends EventName>(name: N, props: EventProperties<
   if (resume?.dataset.analyticsResumeVersion) inherited.resume_version = resume.dataset.analyticsResumeVersion;
   deliver({ url: current.url, referrer: '', title: 'Homepage', name, data: {
     ...pickProperties({ ...inherited, ...props }, eventFields[name]),
-    schema_version: 1, page_type: current.type, page_path: current.path, page_view_id: current.id, release,
+    schema_version: 2, page_type: current.type, page_path: current.path, page_view_id: current.id, release,
   } });
 }
 
@@ -128,15 +127,10 @@ export function trackContentLink(link: HTMLAnchorElement, placement: string) {
     const target = new URL(link.href);
     if (target.protocol === 'mailto:') { trackEvent('contact_click', { channel: 'email', placement, ...version }); return; }
     if (!['http:', 'https:'].includes(target.protocol)) return;
-    if (target.origin === location.origin) {
-      if (target.pathname === location.pathname && target.hash) return;
-      if (placement === 'article_body') trackEvent('article_link_click', { target_path: pageUrl(target.pathname).split('?')[0] });
-      else trackEvent('navigation_click', { target_path: pageUrl(target.pathname).split('?')[0], placement });
-    } else {
-      // Links originate in authored content; strip query/hash and reject non-path characters.
-      const targetPath = /^\/[a-zA-Z0-9_./-]{0,100}$/.test(target.pathname) ? target.pathname : '/:redacted';
-      trackEvent('outbound_click', { target_host: target.hostname, target_path: targetPath, placement, ...version });
-    }
+    if (target.origin === location.origin) return;
+    // Links originate in authored content; strip query/hash and reject non-path characters.
+    const targetPath = /^\/[a-zA-Z0-9_./-]{0,100}$/.test(target.pathname) ? target.pathname : '/:redacted';
+    trackEvent('outbound_click', { target_host: target.hostname, target_path: targetPath, placement, ...version });
   } catch { /* invalid href */ }
 }
 

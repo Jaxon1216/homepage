@@ -130,7 +130,7 @@ export function HeroSection() {
             <a
               key={social.label}
               href={social.href}
-              {...(social.href === "/resume" ? clickAttributes("navigation_click", { target_path: "/resume", placement: "hero" }) : clickAttributes("contact_click", { channel: social.label.toLowerCase(), placement: "hero" }))}
+              {...(social.href === "/resume" ? {} : clickAttributes("contact_click", { channel: social.label.toLowerCase(), placement: "hero" }))}
               target={social.href.startsWith("http") ? "_blank" : undefined}
               rel={
                 social.href.startsWith("http")
