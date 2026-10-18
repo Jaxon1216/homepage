@@ -1,51 +1,59 @@
 "use client";
 
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import { FiArrowUpRight, FiGithub } from "react-icons/fi";
 import { clickAttributes, viewAttributes } from "@/lib/analytics/events";
-import { motion } from "framer-motion";
-import { FiExternalLink, FiGithub } from "react-icons/fi";
 import { siteConfig, type Project } from "@/lib/site-config";
 
-const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
-  resume: {
-    bg: "bg-blue-50 dark:bg-blue-950/40",
-    text: "text-blue-600 dark:text-blue-400",
-    border: "border-blue-200 dark:border-blue-800",
-  },
-  vibecoding: {
-    bg: "bg-purple-50 dark:bg-purple-950/40",
-    text: "text-purple-600 dark:text-purple-400",
-    border: "border-purple-200 dark:border-purple-800",
-  },
-  ForStudy: {
-    bg: "bg-emerald-50 dark:bg-emerald-950/40",
-    text: "text-emerald-600 dark:text-emerald-400",
-    border: "border-emerald-200 dark:border-emerald-800",
-  },
-  Developing: {
-    bg: "bg-amber-50 dark:bg-amber-950/40",
-    text: "text-amber-600 dark:text-amber-400",
-    border: "border-amber-200 dark:border-amber-800",
-  },
-};
-
-function getCategoryLabel(key: string) {
-  return siteConfig.projectCategories.find((c) => c.key === key)?.label ?? key;
-}
+const focusStyles =
+  "focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]";
 
 export function FeaturedProjects() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.section
-      initial={{ opacity: 0, y: 30 }}
+      id="projects"
+      aria-labelledby="projects-heading"
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="py-16"
+      viewport={{ once: true, amount: "some" }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
+      className="scroll-mt-24 py-16"
     >
-      <h2 className="text-2xl font-bold text-center mb-8">Selected Projects</h2>
+      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 id="projects-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Selected Projects
+          </h2>
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
+            Tools for focus, learning, and making sense of data.
+          </p>
+        </div>
+        <a
+          href={`https://github.com/${siteConfig.github}?tab=repositories`}
+          target="_blank"
+          rel="noopener noreferrer"
+          {...clickAttributes("outbound_click", {
+            target_host: "github.com",
+            target_path: `/${siteConfig.github}`,
+            placement: "home_projects",
+          })}
+          className={`group/repos inline-flex min-h-11 w-fit shrink-0 items-center gap-1.5 text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)] ${focusStyles}`}
+        >
+          All repositories
+          <FiArrowUpRight
+            size={16}
+            aria-hidden="true"
+            className="transition-transform motion-safe:group-hover/repos:-translate-y-0.5 motion-safe:group-hover/repos:translate-x-0.5"
+          />
+        </a>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {siteConfig.projects.map((project) => (
-          <ProjectCard key={project.name} project={project} />
+          <ProjectCard key={project.id} project={project} />
         ))}
       </div>
     </motion.section>
@@ -53,69 +61,97 @@ export function FeaturedProjects() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
-  const colors = categoryColors[project.category] ?? categoryColors.resume;
-  const categoryLabel = getCategoryLabel(project.category);
+  const primaryHref = project.link || project.github;
+  const primaryLabel = project.link ? project.linkLabel : "View repository";
+  const primaryDestination = primaryHref.startsWith("https://github.com/") ? "github" : "demo";
+  const primaryAnalytics = clickAttributes("project_click", {
+    project_id: project.id,
+    category: project.category,
+    destination: primaryDestination,
+    placement: "home_projects",
+  });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
-      {...viewAttributes("project_impression", { project_id: project.id, category: project.category })}
-      className="p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] hover:border-[var(--accent)]/30 transition-colors group flex flex-col"
+    <article
+      {...viewAttributes("project_impression", {
+        project_id: project.id,
+        category: project.category,
+      })}
+      className="group/project flex h-full flex-col overflow-hidden rounded-[20px] border border-[var(--card-border)] bg-[var(--background)] transition-[border-color,box-shadow] duration-300 hover:border-[var(--muted)]/40 hover:shadow-[0_16px_40px_-24px_rgba(15,23,42,0.35)] focus-within:border-[var(--accent)]/60 dark:bg-[var(--card)] dark:hover:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.6)]"
     >
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold group-hover:text-[var(--accent)] transition-colors">
+      <a
+        href={primaryHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${primaryLabel}: ${project.name} (opens in a new tab)`}
+        {...primaryAnalytics}
+        className="relative block aspect-[3/2] shrink-0 overflow-hidden border-b border-[var(--card-border)] bg-[var(--card)] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[var(--accent)]"
+      >
+        <Image
+          src={project.preview}
+          alt={project.previewAlt}
+          fill
+          loading="lazy"
+          sizes="(min-width: 1024px) 484px, (min-width: 768px) calc((100vw - 56px) / 2), calc(100vw - 32px)"
+          className="object-cover transition-transform duration-500 motion-safe:group-hover/project:scale-[1.025]"
+        />
+      </a>
+
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <p className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
+          {project.kind}
+        </p>
+        <h3 className="text-xl font-semibold tracking-tight text-[var(--foreground)] sm:text-[22px]">
           {project.name}
         </h3>
-        <div className="flex gap-2 shrink-0 ml-2">
-          {project.github && (
+        <p className="mt-3 flex-1 text-sm leading-7 text-[var(--muted)]">
+          {project.description}
+        </p>
+
+        <ul aria-label={`${project.name} technologies`} className="mt-5 flex flex-wrap gap-x-3 gap-y-1.5">
+          {project.tags.map((tag) => (
+            <li key={tag} className="font-mono text-[11px] leading-5 text-[var(--muted)]">
+              {tag}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-x-5 border-t border-[var(--card-border)] pt-3">
+          <a
+            href={primaryHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${primaryLabel}: ${project.name} (opens in a new tab)`}
+            {...primaryAnalytics}
+            className={`group/cta inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:text-[var(--accent)] ${focusStyles}`}
+          >
+            {primaryLabel}
+            <FiArrowUpRight
+              size={17}
+              aria-hidden="true"
+              className="transition-transform motion-safe:group-hover/cta:-translate-y-0.5 motion-safe:group-hover/cta:translate-x-0.5"
+            />
+          </a>
+          {project.link && project.github && (
             <a
               href={project.github}
-              {...clickAttributes("project_click", { project_id: project.id, category: project.category, destination: "github", placement: "home_projects" })}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-              aria-label="GitHub"
+              aria-label={`${project.name} source on GitHub (opens in a new tab)`}
+              {...clickAttributes("project_click", {
+                project_id: project.id,
+                category: project.category,
+                destination: "github",
+                placement: "home_projects",
+              })}
+              className={`inline-flex min-h-11 items-center gap-1.5 text-sm text-[var(--muted)] transition-colors hover:text-[var(--foreground)] ${focusStyles}`}
             >
-              <FiGithub size={16} />
-            </a>
-          )}
-          {project.link && (
-            <a
-              href={project.link}
-              {...clickAttributes("project_click", { project_id: project.id, category: project.category, destination: "demo", placement: "home_projects" })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors"
-              aria-label="Live link"
-            >
-              <FiExternalLink size={16} />
+              <FiGithub size={15} aria-hidden="true" />
+              Source
             </a>
           )}
         </div>
       </div>
-
-      <p className="text-sm text-[var(--muted)] mb-3 leading-relaxed flex-1">
-        {project.description}
-      </p>
-
-      <div className="flex flex-wrap gap-2 items-center">
-        <span
-          className={`px-2 py-0.5 text-xs rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}
-        >
-          {categoryLabel}
-        </span>
-        {project.tags.map((tag) => (
-          <span
-            key={tag}
-            className="px-2 py-0.5 text-xs rounded bg-[var(--accent-light)] text-[var(--accent)]"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </motion.div>
+    </article>
   );
 }
