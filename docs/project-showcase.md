@@ -11,7 +11,7 @@ Metadata was read using `gh api` and `gh repo view` as the authenticated public 
 
 ## Asset production
 
-These are illustrated product concepts based on current features, not screenshots. Generated with the built-in ImageGen tool, then resized and encoded as 1440 × 960 WebP images using Sharp. The image ratio is 3:2; matching card containers reserve layout space. Next Image supplies responsive variants and lazy loading. All meaningful project information and actions remain HTML text.
+These are illustrated product concepts based on current features, not screenshots. Generated with the built-in ImageGen tool, then resized and encoded as 1440 × 960 WebP images using Sharp. The source images are 3:2; compact cards use a fixed 16:9 preview window that crops the outer safe margins. Next Image supplies responsive variants and lazy loading. All meaningful project information and actions remain HTML text.
 
 Final assets live in `public/images/projects/`. The four files are `pomotimer.webp`, `study-notes.webp`, `project-analyzer.webp`, and `genbi.webp`.
 
@@ -24,6 +24,7 @@ Final assets live in `public/images/projects/`. The four files are `pomotimer.we
 - A 10% section visibility threshold hid the tall gallery on short landscape viewports. Reproduced at 740 × 320, then changed the trigger to `amount: "some"`; the same production check confirmed opacity returns to 1.
 - The original project impression and click attributes remain; release/source links use the GitHub destination and Notes uses the demo destination.
 - Independent code and asset review found no remaining required changes.
+- Compact follow-up: the gallery is capped at 880px with 16px gaps and two columns from 640px. Browser checks at 640px, 698px, 1440px, and 390px found no horizontal overflow; the current 698px side panel shows two cards per row. At desktop width each card is about 474px tall, down from about 614px. Production build and component ESLint passed again.
 
 ## Final prompts
 
