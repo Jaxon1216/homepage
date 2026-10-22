@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1206" height="984.0" viewBox="0 0 1206 984.0">
+<title>commit：DOM、生命周期与 Effects 的执行时机</title>
+<desc>上部四阶段对齐轨道，root.current 位于 mutation 与 layout 之间；下部 passive cleanup→setup 与可变 paint 注释；最后以一个 DOM 删除局部例子展示卸载处理在相应节点移除之前。</desc>
+<rect data-role="canvas" x="0" y="0" width="1206" height="984.0" fill="#fbfcfd"/>
+<text data-role="title" x="36" y="51.0" font-family="Noto Sans SC" font-size="30" fill="#1f2329" font-weight="bold" text-anchor="start">commit：DOM、生命周期与 Effects 的执行时机</text>
+<text data-role="label" x="36" y="87.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">普通客户端更新的关键时机；root.current 在 mutation 后、layout 前切换</text>
+<rect data-role="commit-phase" x="144" y="147.0" width="252" height="54" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="270.0" y="181.2" font-family="Noto Sans SC" font-size="24" fill="#5b7fcb" font-weight="bold" text-anchor="middle">before mutation</text>
+<polyline data-role="phase-progression" points="396,174.0 414,174.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="408.0,168.0 414,174.0 408.0,180.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="commit-phase" x="414" y="147.0" width="270" height="54" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="549.0" y="181.2" font-family="Noto Sans SC" font-size="24" fill="#4e9d6d" font-weight="bold" text-anchor="middle">mutation</text>
+<polyline data-role="phase-progression" points="684,174.0 702,174.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="696.0,168.0 702,174.0 696.0,180.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<rect data-role="commit-phase" x="702" y="147.0" width="180" height="54" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="792.0" y="168.6" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="middle">root.current</text>
+<text data-role="label" x="792.0" y="190.2" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="middle">切换</text>
+<polyline data-role="phase-progression" points="882,174.0 900,174.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="894.0,168.0 900,174.0 894.0,180.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<rect data-role="commit-phase" x="900" y="147.0" width="270" height="54" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="1035.0" y="181.2" font-family="Noto Sans SC" font-size="24" fill="#4e9d6d" font-weight="bold" text-anchor="middle">layout</text>
+<text data-role="label" x="36" y="165.0" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="normal" text-anchor="start">render</text>
+<text data-role="label" x="36" y="186.6" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="normal" text-anchor="start">完成</text>
+<polyline data-role="render-to-commit" points="90,174.0 144,174.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="138.0,168.0 144,174.0 138.0,180.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="36" y="267.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">DOM</text>
+<polyline data-role="alignment-track" points="144,303.6 1170,303.6" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="36" y="339.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">类组件</text>
+<polyline data-role="alignment-track" points="144,375.6 1170,375.6" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="36" y="447.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">布局 Effect</text>
+<polyline data-role="alignment-track" points="144,483.6 1170,483.6" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="36" y="546.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">Ref</text>
+<polyline data-role="alignment-track" points="144,582.6 1170,582.6" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<rect data-role="commit-event" x="144" y="237.0" width="252" height="54" rx="6.0" fill="#f5f6f8" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="label" x="156.0" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">旧页面</text>
+<rect data-role="commit-event" x="414" y="237.0" width="270" height="54" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="426.0" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">逐节点修改 DOM</text>
+<rect data-role="commit-event" x="702" y="237.0" width="180" height="54" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="714.0" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">新 current</text>
+<rect data-role="commit-event" x="900" y="237.0" width="270" height="54" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="912.0" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">DOM 已更新</text>
+<rect data-role="commit-event" x="144" y="309.0" width="252" height="63.0" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="156.0" y="336.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">getSnapshotBeforeUpdate</text>
+<rect data-role="commit-event" x="414" y="309.0" width="270" height="81.0" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="label" x="426.0" y="336.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">componentWillUnmount</text>
+<text data-role="label" x="426.0" y="363.0" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">卸载时；对应 DOM 移除前</text>
+<rect data-role="commit-event" x="900" y="309.0" width="270" height="81.0" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="label" x="912.0" y="336.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">componentDidUpdate</text>
+<text data-role="label" x="912.0" y="363.0" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">挂载：componentDidMount</text>
+<rect data-role="commit-event" x="414" y="417.0" width="270" height="81.0" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="426.0" y="444.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">useLayoutEffect</text>
+<text data-role="label" x="426.0" y="471.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">旧 cleanup</text>
+<rect data-role="commit-event" x="900" y="417.0" width="270" height="81.0" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="912.0" y="444.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">useLayoutEffect</text>
+<text data-role="label" x="912.0" y="471.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">新 setup</text>
+<rect data-role="commit-event" x="414" y="516.0" width="270" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="label" x="426.0" y="543.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">相关 ref detach</text>
+<rect data-role="commit-event" x="900" y="516.0" width="270" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="label" x="912.0" y="543.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">ref attach</text>
+<text data-role="mutation-order-note" x="36" y="606.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">mutation 内按 Fiber 遍历交错执行，不表示所有 cleanup 都先于所有 DOM 更改。</text>
+<text data-role="sync-commit-note" x="36" y="636.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">普通同步 mutation / layout 连续执行，不能用时间切片中断。</text>
+<text data-role="effect-dependency-note" x="36" y="667.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">Effect 轨以依赖变化为例；依赖不变时跳过对应 cleanup / setup。</text>
+<text data-role="label" x="36" y="696.0" font-family="Noto Sans SC" font-size="24" fill="#5b7fcb" font-weight="bold" text-anchor="start">passive Effects</text>
+<text data-role="label" x="36" y="726.6" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">commit 后处理</text>
+<rect data-role="passive-old-cleanup" x="252" y="670.8" width="324" height="81.0" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="270" y="701.4" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">useEffect 旧 cleanup</text>
+<text data-role="label" x="270" y="728.4" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">更新时先清理上一次 Effect</text>
+<polyline data-role="passive-cleanup-setup" points="576,711.3 648,711.3" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="642.0,705.3 648,711.3 642.0,717.3" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="passive-new-setup" x="648" y="670.8" width="324" height="81.0" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="666" y="701.4" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">useEffect 新 setup</text>
+<text data-role="label" x="666" y="728.4" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">执行这次提交对应的 Effect</text>
+<text data-role="mount-update-unmount-note" x="36" y="775.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">挂载没有旧 cleanup；更新先旧 cleanup 再新 setup；卸载只有 cleanup。</text>
+<rect data-role="paint-flexible-position" x="36" y="786.0" width="1134" height="54" rx="6.0" fill="#fff4d9" stroke="#c8a33e" stroke-width="1.5"/>
+<polyline data-role="paint-position-varies" points="54,813.0 108,813.0" fill="none" stroke="#c8a33e" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="102.0,807.0 108,813.0 102.0,819.0" fill="none" stroke="#c8a33e" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="60.0,807.0 54,813.0 60.0,819.0" fill="none" stroke="#c8a33e" stroke-width="2.0"/>
+<text data-role="label" x="126" y="820.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">绘制机会：layout 后，passive 可能在浏览器 paint 前，也可能在 paint 后。</text>
+<text data-role="label" x="36" y="867.0" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">局部看删除：只保证对应卸载处理先于该节点 DOM 移除</text>
+<rect data-role="local-deletion-cleanup" x="36" y="876.0" width="558" height="81.0" rx="6.0" fill="#fdebec" stroke="#c94c4c" stroke-width="1.5"/>
+<text data-role="label" x="54" y="903.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">对应组件的卸载处理</text>
+<text data-role="label" x="54" y="931.8" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">componentWillUnmount / layout cleanup</text>
+<polyline data-role="local-cleanup-before-removal" points="594,916.5 684,916.5" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="678.0,910.5 684,916.5 678.0,922.5" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<rect data-role="local-dom-removal" x="684" y="876.0" width="360" height="81.0" rx="6.0" fill="#fdebec" stroke="#c94c4c" stroke-width="1.5"/>
+<text data-role="label" x="702" y="921.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">移除对应 DOM 节点</text>
+</svg>

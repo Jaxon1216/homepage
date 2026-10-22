@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1133" height="923" viewBox="0 0 1133 923">
+<title>Fiber 节点放大图</title>
+<desc>Row B 保存 props、Hooks 状态、Effects、工作标记，并通过 child、sibling、return 连接树，通过 alternate 连接另一个版本。函数组件 stateNode 为 null，宿主 li Fiber 的 stateNode 指向真实 DOM li。</desc>
+<rect data-role="canvas" x="0" y="0" width="1133" height="923" rx="8" fill="#fbfcfd" stroke="none" stroke-width="2"/>
+<text data-role="label" x="36" y="66" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="start" fill="#1f2329">Fiber：工作单元，也是状态容器</text>
+<text data-role="label" x="36" y="102" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">结构指针说明位置；字段保存下一步工作所需的信息</text>
+<rect data-role="fiber-cutaway" x="347.4" y="309.0" width="437.7600000000001" height="316.79999999999995" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="367.2" y="345.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">Row B</text>
+<text data-role="label" x="765.3600000000001" y="345.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="end" fill="#4e5969">函数组件 Fiber</text>
+<polyline data-role="cutaway-divider" points="365.4,363.0 767.1600000000001,363.0" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="367.2" y="384.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">type = Row</text>
+<text data-role="label" x="553.6800000000001" y="384.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">Row 函数引用</text>
+<text data-role="label" x="367.2" y="415.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">key = &quot;B&quot;</text>
+<text data-role="label" x="553.6800000000001" y="415.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">来自元素.key（item.id）</text>
+<text data-role="label" x="367.2" y="445.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">pendingProps</text>
+<text data-role="label" x="553.6800000000001" y="445.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">本轮输入</text>
+<text data-role="label" x="367.2" y="476.40000000000003" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">memoizedProps</text>
+<text data-role="label" x="553.6800000000001" y="476.40000000000003" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">已处理的输入</text>
+<text data-role="label" x="367.2" y="507.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">memoizedState</text>
+<text data-role="label" x="553.6800000000001" y="507.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">Hooks 链表（含 draft）</text>
+<text data-role="label" x="367.2" y="537.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">updateQueue</text>
+<text data-role="label" x="553.6800000000001" y="537.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">Effects 等（若存在）</text>
+<text data-role="label" x="367.2" y="568.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#1f2329">flags / lanes</text>
+<text data-role="label" x="553.6800000000001" y="568.2" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">提交标记 / 工作优先级</text>
+<text data-role="label" x="367.2" y="598.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#c94c4c">stateNode = null</text>
+<text data-role="label" x="553.6800000000001" y="598.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">函数组件没有实例</text>
+<rect data-role="fiber-neighbor" x="469.08" y="120" width="194.4" height="72" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="566.28" y="150.6" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">List</text>
+<text data-role="label" x="566.28" y="174.9" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">父 Fiber</text>
+<rect data-role="fiber-neighbor" x="36" y="354.0" width="194.4" height="72" rx="8" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="133.2" y="384.6" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">Row A</text>
+<text data-role="label" x="133.2" y="408.9" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">前一个兄弟</text>
+<rect data-role="fiber-neighbor" x="902.1600000000001" y="354.0" width="194.4" height="72" rx="8" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="999.3600000000001" y="384.6" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">Row C</text>
+<text data-role="label" x="999.3600000000001" y="408.9" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">下一个兄弟</text>
+<rect data-role="fiber-neighbor" x="36" y="553.8" width="194.4" height="72" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2" stroke-dasharray="6 5"/>
+<text data-role="label" x="133.2" y="584.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">Row B′</text>
+<text data-role="label" x="133.2" y="608.6999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">另一个版本</text>
+<rect data-role="fiber-neighbor" x="439.32959999999997" y="742.8" width="253.90080000000003" height="72" rx="8" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="566.28" y="773.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">li</text>
+<text data-role="label" x="566.28" y="797.6999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">宿主 Fiber</text>
+<rect data-role="fiber-neighbor" x="902.1600000000001" y="742.8" width="194.4" height="72" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="999.3600000000001" y="773.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">&lt;li&gt;</text>
+<text data-role="label" x="999.3600000000001" y="797.6999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">真实 DOM 节点</text>
+<polyline data-role="pointer" points="566.28,309.0 566.28,192" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="559.8,198.48 566.28,192 572.76,198.48" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="577.98" y="256.35" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#5b7fcb">return</text>
+<polyline data-role="pointer" points="230.4,390.0 347.4,390.0" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="340.91999999999996,383.52 347.4,390.0 340.91999999999996,396.48" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="288.9" y="375.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">sibling</text>
+<polyline data-role="pointer" points="785.1600000000001,390.0 902.1600000000001,390.0" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="895.6800000000001,383.52 902.1600000000001,390.0 895.6800000000001,396.48" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="843.6600000000001" y="375.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">sibling</text>
+<polyline data-role="pointer" points="566.28,625.8 566.28,742.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="559.8,736.3199999999999 566.28,742.8 572.76,736.3199999999999" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="577.98" y="693.66" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#7b67c9">child</text>
+<polyline data-role="pointer" points="347.4,576.8399999999999 230.4,576.8399999999999" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="236.88,570.3599999999999 230.4,576.8399999999999 236.88,583.3199999999999" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="pointer" points="230.4,607.8 347.4,607.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="340.91999999999996,601.3199999999999 347.4,607.8 340.91999999999996,614.28" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="288.9" y="541.1999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">alternate</text>
+<polyline data-role="pointer" points="693.2304,778.8 902.1600000000001,778.8" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="895.6800000000001,772.3199999999999 902.1600000000001,778.8 895.6800000000001,785.28" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="797.6952000000001" y="763.5" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e9d6d">stateNode</text>
+<text data-role="label" x="36" y="859.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">return = 父 Fiber 指针；sibling 只指向下一个兄弟。</text>
+<text data-role="label" x="36" y="890.4" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#7b67c9">切到另一个工作单元时，这些字段让 React 能继续构建结果。</text>
+</svg>

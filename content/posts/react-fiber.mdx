@@ -1,0 +1,368 @@
+---
+title: "深入理解 React Fiber：一次更新如何变成页面变化"
+date: "2026-10-22"
+description: "跟着一个列表从首次渲染走到页面更新，讲清 type、key 的来源，以及 React 元素、Fiber、Diff、双缓冲、commit 和生命周期如何衔接。"
+tags: ["大前端"]
+cover: /images/react-fiber/01-update-pipeline.png
+---
+
+# 先让这个列表出现在页面上
+
+假设页面上有 A、B、C、D 四行，每行都有一个备注输入框。
+
+我们先看它第一次怎样出现在页面上，再点击 B 的按钮修改备注，最后把列表调整成 B、D、A、E。React 元素、Fiber、Diff 和 commit，就沿着这段过程逐步出现。
+
+列表代码如下，`items` 由外层维护，依次包含 `{ id: 'A' }` 到 `{ id: 'D' }`：
+
+```jsx
+import { useState } from 'react';
+
+function List({ items }) {
+  return items.map(item => <Row key={item.id} item={item} />);
+}
+
+function Row({ item }) {
+  const [draft, setDraft] = useState('原备注');
+
+  return (
+    <li>
+      <input value={draft} onChange={e => setDraft(e.target.value)} />
+      {item.id}
+      <button onClick={() => setDraft('已确认')}>确认备注</button>
+    </li>
+  );
+}
+```
+
+在入口处，把它交给 React：
+
+```jsx
+import { createRoot } from 'react-dom/client';
+
+const root = createRoot(container);
+root.render(<ul><List items={items} /></ul>);
+```
+
+`container` 是页面上已有的容器。下面沿着这次渲染往下看，只讨论普通 ReactDOM 客户端，源码对照 [React v19.3.1](https://github.com/facebook/react/tree/v19.3.1)。
+
+# 第一步：JSX 先创建元素描述
+
+JavaScript 求值 `<List items={items} />` 时，会创建一个 **React 元素对象**，其中的相关字段可以理解为 `{ type: List, key: null, props: { items } }`。
+
+平时说的“虚拟 DOM”，在这里可以先理解为这些描述界面的 React 元素。它们是 JavaScript 对象，还不是浏览器中的节点。
+
+此时只是记录“这里要渲染 List，传入这些 items”，**List 函数还没有被调用**，它里面的 `map` 和 Row 也没有执行。因此，现在还没有一棵完整的列表元素树，更没有对应的列表 DOM。
+
+现代 JSX 转换通常通过 `jsx`／`jsxs` 创建元素，旧转换使用 `React.createElement`。`root.render` 接收这些描述，安排后续渲染工作。
+
+# 第二步：React 创建 Fiber，再执行 List
+
+`createRoot` 已经为根建立了 HostRoot Fiber。处理这次渲染时，React 再根据传入的元素，逐步处理 ul、List 等子 Fiber。
+
+React 计算本次待提交结果的这段工作，称为 **render 阶段**。
+
+**Fiber 是 React 为这份渲染工作维护的节点。** 它保存要处理什么组件、输入是什么、状态是什么，以及下一步该走到哪里。元素负责描述界面，Fiber 负责记录处理这份描述所需的信息。
+
+List 元素的 `type` 指向 List 函数。React 为它创建函数组件 Fiber，在 `beginWork` 中处理这个 Fiber 时，才调用 List。List 的 `map` 随之执行，返回 A、B、C、D 对应的四个 Row 元素。
+
+## type、key 是从哪里来的？
+
+取 B 这一项，List 执行到的是：
+
+```jsx
+<Row key={item.id} item={item} />
+```
+
+自动 JSX 转换可以近似理解为 `_jsx(Row, { item }, item.id)`。当 `item.id` 为 `'B'` 时，创建的元素包含：
+
+```js
+// 只展示本文关心的字段
+{
+  type: Row,
+  key: 'B',
+  props: { item }
+}
+```
+
+**`type: Row` 确实引用我们写下的 Row 函数本体。** 本例的 Row 是函数组件，React 会在渲染时调用它，不会通过 `new Row()` 创建组件实例。
+
+如果写的是 `class Row extends React.Component`，type 就保存这个类的引用。React 挂载时创建实例，渲染时调用实例的 `render()`；实例另存于 Fiber 的 `stateNode`。所以，type 指出的是“使用哪个组件”，并不是组件实例。[类组件的实例创建](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiberClassComponent.js#L588)
+
+函数名也不参与身份比较。若写 `const Alias = Row`，`<Alias />` 与 `<Row />` 的 type 仍是同一个引用；两个名字相同、但引用不同的函数，则是不同类型。
+
+对于 `<input />` 这样的宿主标签，type 是字符串 `'input'`。大写组件与小写宿主标签的区别，在创建元素时就已经确定。[React 元素的 type](https://react.dev/reference/react/createElement)
+
+**`key` 来自开发者写的 JSX 属性。** 这里 `key={item.id}` 产生 `'B'`；传入普通数字时会转成字符串，例如 `key={7}` 得到 `'7'`。没有写 key，元素的 key 就是 `null`。列表比较时使用位置作为后备匹配依据，并不意味着 React 自动给 `element.key` 填上 index。
+
+key 也不属于普通 props。这个 Row 收到的是 `props.item`，不会收到 `props.key`。元素创建时对 key 的处理，可以对照 [jsxProd 源码](https://github.com/facebook/react/blob/v19.3.1/packages/react/src/jsx/ReactJSXElement.js#L291)。
+
+## 这些字段怎样进入 Fiber？
+
+第一次挂载 B 时，React 从 Row 元素读取 `type`、`key`、`props`，传给 Fiber 的创建逻辑。下面是 [createFiberFromElement](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiber.js#L748) 的连续 11 行局部源码：
+
+```js
+const type = element.type;
+const key = element.key;
+const pendingProps = element.props;
+const fiber = createFiberFromTypeAndProps(
+  type,
+  key,
+  pendingProps,
+  owner,
+  mode,
+  lanes,
+);
+```
+
+`createFiberFromTypeAndProps` 较长，它先判断节点类别、解析 type，再创建 Fiber。[关键赋值](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiber.js#L727) 是下面连续 4 行源码：
+
+```js
+const fiber = createFiber(fiberTag, pendingProps, key, mode);
+fiber.elementType = type;
+fiber.type = resolvedType;
+fiber.lanes = lanes;
+```
+
+对应到本例，各字段的去向如下：
+
+| 元素里的信息 | Fiber 中的去向 |
+| --- | --- |
+| `type: Row` | `elementType` 保存原类型；本例的 `type` 也指向 Row 函数 |
+| `key: 'B'` | Fiber 的 `key` 继续保存 `'B'` |
+| `props: { item }` | 交给 `pendingProps`，作为本次待处理的输入 |
+
+React 还会根据 type 判断节点类别：本例 Row 是普通函数，Fiber 的 `tag` 就是 `FunctionComponent`；input 对应 `HostComponent`。**tag 表示节点类别，type 则指出具体是哪一个组件或标签。**
+
+这就是 `createFiberFromElement → createFiberFromTypeAndProps` 的主要工作。type 和 key 都有明确来源，并不是 React 给每个 Fiber 随机分配的身份编号。
+
+这里以普通函数组件为例；`memo`、`lazy` 等包装类型还涉及原始类型与解析后类型的区别，不能一概认为 `type` 与 `elementType` 总相等。
+
+# 第三步：执行 Row，继续处理它返回的元素
+
+React 会从 A 开始逐行处理。下面只展开 B：它的 Row Fiber 已经存在，React 才在处理这个 Fiber 时调用 Row 函数。
+
+实际调用发生在 `renderWithHooks` 中。下面是[连续 3 行局部源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiberHooks.js#L599)，这里的 `Component` 对应 Row，返回的 `children` 才是下一层元素：
+
+```js
+let children = __DEV__
+  ? callComponentInDEV(Component, props, secondArg)
+  : Component(props, secondArg);
+```
+
+`useState('原备注')` 为这一行初始化备注。相关 Hook 记录通过 Row Fiber 的 `memoizedState` 关联起来，后续更新时可以继续找到这份状态。
+
+Row 执行到 return，才产生 li、input、button 等 React 元素。React 再根据这些元素处理下一层 Fiber。**元素的产生与 Fiber 的处理，是随着组件执行逐层推进的。**
+
+从这份描述到 Fiber，再到稍后生成的 DOM，三者的关系如下。图中只展开 B 子树，省略外层 ul、其他行、静态文字和按钮。
+
+<ArticleImage src="/images/react-fiber/02-element-fiber-dom.png" alt="List 中的 JSX 如何提供 React 元素和 Fiber 的 type、key，以及宿主 DOM 的对应关系" width="2368" height="1744" loading="eager" decoding="async" />
+
+## 工作怎样沿着树继续？
+
+React 通过深度优先的方式推进 Fiber，主要分为两个方向：
+
+- **向下：beginWork。** 处理当前节点，执行组件、计算状态、协调子节点。例如调用 List 得到 Row 元素，再调用 Row 得到 li 等元素。
+- **回溯：completeWork。** 当前节点没有待处理的子节点后，完成它的工作。有兄弟节点就处理兄弟，否则回到父节点继续完成。
+
+<ArticleImage src="/images/react-fiber/04-fiber-traversal.png" alt="Fiber 从 beginWork 向下再经 completeWork 回溯的遍历路线" width="2364" height="1592" loading="lazy" decoding="async" />
+
+对应到指针，`child` 指向第一个子节点，`sibling` 指向下一个兄弟，`return` 指向父节点。例如 List 的第一个孩子是 Row A，A 的下一个兄弟是 Row B，B 的父节点仍是 List。
+
+处理到宿主节点时，React 可以在 `completeWork` 中创建、组装真正的 DOM，并让宿主 Fiber 的 `stateNode` 指向它。此时节点还没有插入当前页面。[宿主实例创建源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiberCompleteWork.js#L1425)
+
+**Row 是函数组件，没有自己的 DOM；li、input 这些宿主节点才对应真实 DOM。** Fiber 树表达组件与宿主节点的工作关系，因此不会与 DOM 树一一对应。
+
+# 第四步：commit 把结果放到页面上
+
+这一轮 render 完成后，React 已经准备好了可提交的结果。接下来进入 **commit**，把需要挂载的宿主节点接入页面，并处理相关 ref、布局 Effect 等工作。
+
+浏览器随后完成必要的样式计算、布局和绘制，列表才真正出现在屏幕上。
+
+第一次渲染就这样连起来了：**JSX 创建描述 → React 建立 Fiber、执行组件 → 继续处理返回的元素 → 准备宿主节点 → commit 挂载 → 浏览器显示**。[渲染与提交](https://react.dev/learn/render-and-commit)
+
+# 现在点击 B，更新怎样发生？
+
+列表已经挂载。点击 B 行的“确认备注”，`setDraft('已确认')` 会请求更新 B 的状态。React 将更新加入相应队列，根据优先级安排工作。
+
+这次工作的目标很具体：把 B 输入框的 value 从“原备注”变成“已确认”。
+
+<ArticleImage src="/images/react-fiber/01-update-pipeline.png" alt="B 的状态更新经过触发、调度、render、commit 和浏览器绘制" width="2464" height="1336" loading="lazy" decoding="async" />
+
+之前建立的 Fiber 现在派上了用场：类型和 key 记录身份，Hook 链保存状态，父子兄弟指针说明工作的位置。
+
+<ArticleImage src="/images/react-fiber/03-fiber-node.png" alt="Fiber 的 type 和 key 来自元素，其他字段保存状态、输入与节点关系" width="2272" height="1840" loading="lazy" decoding="async" />
+
+React 再次执行 B 的 Row。运行到 `useState` 时，读到本次更新后的 draft，随后返回 input 等子节点的新描述。input 的类型仍是 `'input'`，可以保留已有宿主节点，记录必要的属性变化。
+
+**这是 B 自身的状态更新，不要求 List 重新执行。** React 会根据更新信息跳过可以复用的工作，不需要为了改一个输入框就重新执行整棵树。
+
+## 计算新结果时，旧页面怎么办？
+
+React 通过两版 Fiber 准备更新：**current** 是上一次已经提交的树，**workInProgress** 是本次 render 正在处理的树，常简称 WIP。
+
+两版中的对应节点通过 `alternate` 关联。匹配成功后，React 可以取出或创建另一版 Fiber，接着已有身份和状态计算；新建一个元素对象，不等于必须新建一份组件状态。
+
+<ArticleImage src="/images/react-fiber/05-double-buffer.png" alt="更新前、构建中、提交后，current 与 workInProgress 的变化" width="2528" height="1504" loading="lazy" decoding="async" />
+
+在 B 的新备注准备完成前，current 仍代表上一次提交的状态。WIP 记录新状态和待提交的变化。**两版宿主 Fiber 可以指向同一个已有 DOM 节点**，双缓冲并不需要复制两套页面。[createWorkInProgress 源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiber.js#L323)
+
+commit 应用必要的 DOM 变更，并把 `root.current` 指向完成的工作树。B 显示“已确认”，这版树成为后续更新的起点。
+
+# 父组件重排列表，Diff 怎样认出原来的 B？
+
+接着，外层组件更新 items，把 **A、B、C、D** 调整为 **B、D、A、E**。这一次 List 的输入发生变化，List 会重新执行，返回新顺序的 Row 元素。
+
+与刚才 B 自身更新不同，这次确实产生了新的一组 `<Row />` 描述。React 需要判断：排到第一个的 B，还能否接续原来第二个 B 的备注？
+
+当父节点处理自己的子节点时，React 拿到的是：
+
+**本次返回的新 React 元素，与 current 树中已有的子 Fiber。**
+
+React 结合它们的身份与类型，决定哪些节点可以接续，哪些需要新建或删除。这个过程发生在 render 阶段，同时构建 WIP、记录变更；实际 DOM 操作留到 commit。
+
+## key 和 type 如何决定复用？
+
+在同一个父节点下，React 使用 key 或位置寻找旧候选，再检查类型是否兼容。
+
+例如先用 `key="B"` 找到旧的 B，再比较类型。本例的普通函数组件，关键比较是旧 Fiber 的 `elementType` 与新元素的 `type` 是否仍指向同一个 Row 函数。匹配成功，就能接续 B 的身份与状态；换成另一个函数引用，即使函数名和 key 都相同，也需要替换。
+
+<ArticleImage src="/images/react-fiber/06-identity-diff.png" alt="新 React 元素通过 key 或位置寻找旧 Fiber，再检查 type 决定复用或替换" width="2336" height="1536" loading="lazy" decoding="async" />
+
+**复用的含义是接续身份、状态，以及可复用的宿主节点。** Row 仍可能因为新 props 或自身状态更新而重新执行；执行组件也不意味着重建它的 DOM。
+
+这套匹配主要发生在同一个父节点的子集合内。React 不会仅凭相同 key，把另一个父节点下的组件状态搬过来。[状态保留与重置](https://react.dev/learn/preserving-and-resetting-state)
+
+## 列表如何处理插入、删除和移动？
+
+继续看这次 **A、B、C、D → B、D、A、E** 的重排，每行都使用自己的 ID 作为 key。
+
+数组协调先从头尝试顺序匹配。这个例子第一项的 key 就不同，React 会转而为剩余旧节点建立 Map，再按新列表逐项寻找候选：B、D、A 找到同类型旧节点，E 需要新建，最后未使用的 C 被删除。
+
+完整数组协调函数较长，下面用伪代码只展开这个例子进入的 Map 分支，省略文本、包装类型和 ref 等处理：
+
+```js
+// 流程伪代码：remainingNewElements 是带新索引的元素序列
+const remaining = mapRemainingOldChildren(currentChild);
+for (const [index, element] of remainingNewElements) {
+  const lookup = element.key ?? index;
+  const oldFiber = remaining.get(lookup);
+  let next;
+  if (oldFiber && oldFiber.elementType === element.type) {
+    next = createWorkInProgress(oldFiber, element.props);
+    remaining.delete(lookup);
+  } else {
+    next = createFiberFromElement(element, mode, lanes);
+  }
+  placeOrMarkMove(next, index);
+  appendToWipChildren(next);
+}
+markDeletions(remaining);
+```
+
+这里比较的是**新元素与 current 子 Fiber**；匹配后接着旧状态创建或复用 WIP。源码可对照 [updateElement](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactChildFiber.js#L601) 与[数组协调的 Map 分支](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactChildFiber.js#L1308)。
+
+移动还需要看旧位置。React 用 `lastPlacedIndex` 记录此前按顺序保留的旧位置：
+
+| 新顺序 | 旧索引 | 判断 | 保留位置 |
+| --- | --- | --- | --- |
+| B | 1 | 保留 | 1 |
+| D | 3 | 保留 | 3 |
+| A | 0 | 移动 | 3 |
+| E | 无 | 新增 | 3 |
+
+<ArticleImage src="/images/react-fiber/07-list-diff.png" alt="列表从 ABCD 变为 BDAE 时，匹配、位置判断和变更提交的分步过程" width="2476" height="1824" loading="lazy" decoding="async" />
+
+这里的“保留”表示无需为该项标记移动，不代表它的最终数字索引不变。删除 C、把 A 移到 D 后面，再插入 E，就能得到目标顺序。移动已有节点也会改变周围节点的位置。
+
+React 在这个过程中记录 Placement 等标记，并在父 Fiber 上记录待删除的子节点。commit 再把这些工作落实到 DOM。若 Row 自身没有 DOM，移动会落实到它对应的宿主节点。
+
+列表 Diff 使用启发式规则，**不保证得到理论上最少的 DOM 操作**。顺序扫描、Map 与移动判断可以对照 [reconcileChildrenArray](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactChildFiber.js#L1177) 和 [placeChild](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactChildFiber.js#L511)。
+
+## 为什么 key 要唯一、稳定？
+
+用 `key={item.id}` 时，重排后的 B 仍然找到原来的 B，备注“已确认”也继续属于 B。
+
+如果改成 `key={index}`，React 识别的就是位置。新列表第 0 项 B 会接续原来 A 的“原备注”，第 1 项 D 则会拿到原来 B 的“已确认”。数据换了，组件身份却留在原位置。
+
+<ArticleImage src="/images/react-fiber/08-key-state.png" alt="相同重排下，稳定 ID key 保留数据身份，index key 让状态留在位置上" width="2368" height="1673" loading="lazy" decoding="async" />
+
+所以，**唯一是为了区分同一组兄弟，稳定是为了在前后两次渲染中认出同一项**。业务 ID 通常很适合；本地数据也可以在创建时生成一次 ID，后续一直使用。
+
+每次 render 都生成随机 key，会让旧身份不断失效，造成重新挂载、状态重置。反过来，主动改变 key 也可以用于重置表单状态。
+
+# 时间切片为什么能让页面保持响应？
+
+四行列表处理得很快。如果有几千行，一轮 render 长时间占着主线程，输入和绘制就只能等待。
+
+早期 React 主要依靠同步递归推进工作，进度留在 JavaScript 调用栈里，不方便暂停后继续。Fiber 把节点、关系和进度放进显式的数据结构，让 React 可以按工作单元推进。**Fiber 提供保存进度的基础，调度机制决定何时继续、何时让出主线程。**
+
+并发 render 的工作循环可以简化理解为：
+
+```js
+// 机制示意，省略优先级、异常处理等实现细节
+while (nextWork !== null && !shouldYield()) {
+  nextWork = performOneUnit(nextWork);
+}
+```
+
+在工作单元之间，如果需要让出，React 保存进度并退出当前任务。浏览器获得处理输入和绘制的机会，React 后续再继续工作；如果来了更紧急的更新，过时的结果也可能被重做或放弃。
+
+<ArticleImage src="/images/react-fiber/09-time-slicing.png" alt="并发 render 让出主线程，处理紧急输入后继续或重做未提交工作" width="2496" height="1599" loading="lazy" decoding="async" />
+
+中断期间，尚未提交的计算不会逐块出现在当前页面上；用户仍看到上一次已提交的结果。等本次结果准备好，再进入提交。[React 官方：并发渲染](https://react.dev/blog/2022/03/29/react-v18#what-is-concurrent-react)
+
+**可中断的是并发 render 工作。** 普通提交中的 DOM mutation 和 layout 工作仍需同步完成；一个组件函数内部的长循环也无法被 React 从中间抢占。紧急更新还可能采用同步 render，不能认为所有更新都会时间切片。
+
+## MessageChannel 在这里做什么？
+
+在普通浏览器环境下，Scheduler 的一种任务调度实现使用 `MessageChannel`：向一个 port 发送消息，在另一个 port 的消息任务中继续执行工作。它让 React 能在任务之间归还执行权，并没有新建一个线程来执行组件。
+
+相比不断嵌套的 `setTimeout`，这条路径可以避开计时器嵌套后的最小延迟限制。具体调度方式还取决于运行环境，源码中也有 `setImmediate`、`setTimeout` 等分支。[Scheduler 源码](https://github.com/facebook/react/blob/v19.3.1/packages/scheduler/src/forks/Scheduler.js#L531)
+
+时间切片也不等于“固定每 5ms 暂停，下一帧恢复”。让出阈值属于实现细节，恢复发生在后续调度机会，浏览器是否绘制还由它自己决定。
+
+# commit 与生命周期是什么关系？
+
+前面已经走过首次挂载、备注更新和列表重排。它们都在 render 中准备结果，再在 commit 中落实变化。现在把生命周期和 Effect 放回这条时间轴，以普通更新为例：
+
+**before mutation → mutation → current 切换 → layout**，之后处理相应的 passive Effects。
+
+<ArticleImage src="/images/react-fiber/10-commit-lifecycle.png" alt="commit 各阶段、current 切换、类生命周期与 layout/passive Effects 的对应时间轴" width="2400" height="1984" loading="lazy" decoding="async" />
+
+**before mutation** 可以在 DOM 变化前读取信息。类组件的 `getSnapshotBeforeUpdate` 就在这里获取滚动位置等快照。
+
+**mutation** 应用节点插入、删除、移动和属性更新，也处理相关的 ref 解绑、layout Effect 清理等工作。删除组件时，`componentWillUnmount` 与 layout Effect 的清理在对应 DOM 移除前进行。
+
+随后，**`root.current` 指向完成的工作树**。这一步位于 mutation 之后、layout 之前，因此 layout 阶段观察到的是本次提交的树。[提交顺序源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiberWorkLoop.js#L4051)
+
+**layout** 阶段会执行 `componentDidMount`／`componentDidUpdate`、相关 ref 的绑定，以及 `useLayoutEffect` 的 setup。此时 DOM 已更新，浏览器还没绘制，适合需要立即测量和调整布局的场景；这里的工作也会阻塞绘制。[useLayoutEffect](https://react.dev/reference/react/useLayoutEffect)
+
+**passive Effects** 处理 `useEffect` 的清理和 setup。依赖变化时，先执行上一次 Effect 的清理，再用新的依赖执行 setup；卸载时也会清理。非交互更新通常允许浏览器先绘制，但交互触发的 Effect 可能提前执行，不能把它固定排在 paint 之后。[useEffect](https://react.dev/reference/react/useEffect)
+
+## 挂载、更新、卸载该怎样理解？
+
+挂载、更新、卸载描述的是组件经历的过程；render、commit 描述的是 React 处理工作的阶段。把两者放在一起看，常见类生命周期就有了位置：
+
+| 组件过程 | render 中的典型方法 | commit 中的典型方法 |
+| --- | --- | --- |
+| 挂载 | constructor、getDerivedStateFromProps、render | componentDidMount |
+| 更新 | getDerivedStateFromProps、shouldComponentUpdate、render | getSnapshotBeforeUpdate、componentDidUpdate |
+| 卸载 | 不需要再渲染该组件 | componentWillUnmount |
+
+render 可能被重试或放弃，所以组件函数、类组件的 render 及渲染前计算需要保持纯净。被放弃的一次 render，也不会凭空对应一次成功挂载。这是旧的 `UNSAFE_` 渲染前生命周期难以适应并发模型的重要原因。
+
+函数组件用 Effect 表达与外部系统的同步。**一次 setup 与 cleanup，描述的是一次同步的建立和停止**；依赖改变也会停止再建立，不能直接把 `useEffect([])` 当成类组件生命周期方法的等价替换。开发环境的 Strict Mode 还会额外检查渲染纯度和清理逻辑。[Effect 的生命周期](https://react.dev/learn/lifecycle-of-reactive-effects)
+
+回到 B 的备注更新：React 元素描述新的输入框属性，WIP Fiber 记录新状态和待提交工作，commit 把必要变化提交到已有输入框。列表重排时，稳定的 key 继续把 B 与原来的状态关联起来；在这些计算尚未提交时，current 保持上一次已提交的结果。
+
+# 参考资料与配图
+
+文中的配图使用同一个简化例子，只展开与当前问题有关的节点。可下载 [十张配图的 SVG 源文件](/images/react-fiber/react-fiber-diagrams.zip)，用于放大、编辑或引用。
+
+除文中链接的官方文档与固定版本源码外，还参考了：
+
+- [React Lifecycle Methods diagram](https://github.com/wojtekmaj/react-lifecycle-methods-diagram)：类组件生命周期时序。
+- [图解 React 原理与源码](https://github.com/7kms/react-illustration-series)及其中的 [Fiber 树构造准备](https://7km.top/main/fibertree-prepare/)：对象关系、双缓冲与工作流程，主要基于 React 17.0.2。
+- [mini-react](https://github.com/lizuncong/mini-react)：用于对照精简实现，主要基于 React 17.0.1。
+
+旧资料中的 JSX 转换方式、effect 链表和调度细节与现代实现存在差异，本文按前述官方版本核对。

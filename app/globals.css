@@ -174,10 +174,20 @@ body {
   border-collapse: collapse;
   font-size: 0.95em;
   margin: 1.5rem 0;
-  display: block;
-  overflow-x: auto;
+  display: table;
   border: 1px solid var(--card-border);
   border-radius: 8px;
+}
+
+.prose .table-wrapper table {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.prose .table-wrapper:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .prose thead {

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1188" height="831.0" viewBox="0 0 1188 831.0">
+<title>key 决定状态跟着谁：数据，还是位置</title>
+<desc>顶行共同旧列表 A B C D；下方两列分别展示新 B D A E，每行用带颜色的旧身份圆标→新数据条表示归属，明确区分数据 ID、key 和 Fiber 来源。</desc>
+<rect data-role="canvas" x="0" y="0" width="1188" height="831.0" fill="#fbfcfd"/>
+<text data-role="title" x="36" y="51.0" font-family="Noto Sans SC" font-size="30" fill="#1f2329" font-weight="bold" text-anchor="start">key 决定状态跟着谁：数据，还是位置</text>
+<text data-role="label" x="36" y="87.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">旧 ABCD → 新 BDAE；每行独立 useState(&#x27;原备注&#x27;)，只有 B 已确认</text>
+<text data-role="label" x="36" y="147.0" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="start">共同起点：旧列表（颜色标记旧 Fiber 身份）</text>
+<rect data-role="shared-old-row" x="36.0" y="156" width="265.5" height="72" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="54.0" y="183.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">数据 A · 位置 0</text>
+<text data-role="label" x="54.0" y="210" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">Fiber A：原备注</text>
+<rect data-role="shared-old-row" x="319.5" y="156" width="265.5" height="72" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="337.5" y="183.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">数据 B · 位置 1</text>
+<text data-role="label" x="337.5" y="210" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="normal" text-anchor="start">Fiber B：已确认</text>
+<rect data-role="shared-old-row" x="603.0" y="156" width="265.5" height="72" rx="6.0" fill="#f5f6f8" stroke="#b8bec8" stroke-width="2.0"/>
+<text data-role="label" x="621.0" y="183.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">数据 C · 位置 2</text>
+<text data-role="label" x="621.0" y="210" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">Fiber C：原备注</text>
+<rect data-role="shared-old-row" x="886.5" y="156" width="265.5" height="72" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="904.5" y="183.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">数据 D · 位置 3</text>
+<text data-role="label" x="904.5" y="210" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">Fiber D：原备注</text>
+<text data-role="label" x="36" y="291.0" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">稳定 key={id}</text>
+<circle data-role="old-fiber-identity" cx="63.0" cy="363.0" r="27.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="369.0" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="middle">旧B</text>
+<polyline data-role="fiber-state-migration" points="90.0,363.0 144,363.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="138.0,357.0 144,363.0 138.0,369.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="144" y="327.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#7b67c9" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="144" y="327.0" width="6.0" height="72" fill="#7b67c9"/>
+<text data-role="label" x="162" y="354.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 0 · 数据 B · key=B</text>
+<text data-role="label" x="162" y="381.0" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="start">draft：已确认（来自旧B）</text>
+<circle data-role="old-fiber-identity" cx="63.0" cy="453.0" r="27.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="459.0" font-family="Noto Sans SC" font-size="18" fill="#4e9d6d" font-weight="bold" text-anchor="middle">旧D</text>
+<polyline data-role="fiber-state-migration" points="90.0,453.0 144,453.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="138.0,447.0 144,453.0 138.0,459.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="144" y="417.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#4e9d6d" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="144" y="417.0" width="6.0" height="72" fill="#4e9d6d"/>
+<text data-role="label" x="162" y="444.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 1 · 数据 D · key=D</text>
+<text data-role="label" x="162" y="471.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（来自旧D）</text>
+<circle data-role="old-fiber-identity" cx="63.0" cy="543.0" r="27.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="549.0" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="bold" text-anchor="middle">旧A</text>
+<polyline data-role="fiber-state-migration" points="90.0,543.0 144,543.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="138.0,537.0 144,543.0 138.0,549.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="144" y="507.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="144" y="507.0" width="6.0" height="72" fill="#5b7fcb"/>
+<text data-role="label" x="162" y="534.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 2 · 数据 A · key=A</text>
+<text data-role="label" x="162" y="561.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（来自旧A）</text>
+<circle data-role="old-fiber-identity" cx="63.0" cy="633.0" r="27.0" fill="#f5f6f8" stroke="#b8bec8" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="639.0" font-family="Noto Sans SC" font-size="18" fill="#b8bec8" font-weight="bold" text-anchor="middle">新建</text>
+<polyline data-role="fiber-state-migration" points="90.0,633.0 144,633.0" fill="none" stroke="#b8bec8" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="138.0,627.0 144,633.0 138.0,639.0" fill="none" stroke="#b8bec8" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="144" y="597.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#b8bec8" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="144" y="597.0" width="6.0" height="72" fill="#b8bec8"/>
+<text data-role="label" x="162" y="624.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 3 · 数据 E · key=E</text>
+<text data-role="label" x="162" y="651.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（新初值）</text>
+<text data-role="label" x="630.0" y="291.0" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">key={index}</text>
+<circle data-role="old-fiber-identity" cx="657.0" cy="363.0" r="27.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="657.0" y="369.0" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="bold" text-anchor="middle">旧A</text>
+<polyline data-role="fiber-state-migration" points="684.0,363.0 738.0,363.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="732.0,357.0 738.0,363.0 732.0,369.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="738.0" y="327.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#5b7fcb" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="738.0" y="327.0" width="6.0" height="72" fill="#5b7fcb"/>
+<text data-role="label" x="756.0" y="354.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 0 · 数据 B · key=0</text>
+<text data-role="label" x="756.0" y="381.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（来自旧A）</text>
+<circle data-role="old-fiber-identity" cx="657.0" cy="453.0" r="27.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="657.0" y="459.0" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="middle">旧B</text>
+<polyline data-role="fiber-state-migration" points="684.0,453.0 738.0,453.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="732.0,447.0 738.0,453.0 732.0,459.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="738.0" y="417.0" width="414.0" height="72" rx="6.0" fill="#fdebec" stroke="#c94c4c" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="738.0" y="417.0" width="6.0" height="72" fill="#7b67c9"/>
+<text data-role="label" x="756.0" y="444.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 1 · 数据 D · key=1</text>
+<text data-role="label" x="756.0" y="471.0" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="start">draft：已确认（来自旧B）</text>
+<text data-role="state-mismatch" x="1134.0" y="471.0" font-family="Noto Sans SC" font-size="16" fill="#c94c4c" font-weight="bold" text-anchor="end">错位</text>
+<circle data-role="old-fiber-identity" cx="657.0" cy="543.0" r="27.0" fill="#f5f6f8" stroke="#b8bec8" stroke-width="2.0"/>
+<text data-role="label" x="657.0" y="549.0" font-family="Noto Sans SC" font-size="18" fill="#b8bec8" font-weight="bold" text-anchor="middle">旧C</text>
+<polyline data-role="fiber-state-migration" points="684.0,543.0 738.0,543.0" fill="none" stroke="#b8bec8" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="732.0,537.0 738.0,543.0 732.0,549.0" fill="none" stroke="#b8bec8" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="738.0" y="507.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#b8bec8" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="738.0" y="507.0" width="6.0" height="72" fill="#b8bec8"/>
+<text data-role="label" x="756.0" y="534.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 2 · 数据 A · key=2</text>
+<text data-role="label" x="756.0" y="561.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（来自旧C）</text>
+<circle data-role="old-fiber-identity" cx="657.0" cy="633.0" r="27.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="657.0" y="639.0" font-family="Noto Sans SC" font-size="18" fill="#4e9d6d" font-weight="bold" text-anchor="middle">旧D</text>
+<polyline data-role="fiber-state-migration" points="684.0,633.0 738.0,633.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="732.0,627.0 738.0,633.0 732.0,639.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<rect data-role="new-data-row" x="738.0" y="597.0" width="414.0" height="72" rx="6.0" fill="#ffffff" stroke="#4e9d6d" stroke-width="2.0"/>
+<rect data-role="fiber-identity-stripe" x="738.0" y="597.0" width="6.0" height="72" fill="#4e9d6d"/>
+<text data-role="label" x="756.0" y="624.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">位置 3 · 数据 E · key=3</text>
+<text data-role="label" x="756.0" y="651.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft：原备注（来自旧D）</text>
+<polyline data-role="footer-rule" points="36,705.0 1152,705.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="key-note" x="36" y="735.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">稳定 key：B 的状态跟着 B；旧 C 删除，E 新建。index key：状态留在原位置。</text>
+<text data-role="key-note" x="36" y="768.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">key 需要在同组兄弟中稳定、唯一；数据 ID 与 Fiber 身份要分开看。</text>
+<text data-role="key-note" x="36" y="800.4" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">每次 render 都生成随机 key，会使旧身份失效，重新挂载并丢失组件 state。</text>
+</svg>

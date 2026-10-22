@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { Mermaid } from "./Mermaid";
+import { ArticleImage } from "./ArticleImage";
 
 function Pre(props: ComponentPropsWithoutRef<"pre">) {
   return <pre {...props} className={`${props.className ?? ""} not-prose`} />;
@@ -26,8 +27,23 @@ function Div(props: ComponentPropsWithoutRef<"div">) {
   return <div {...props} />;
 }
 
+function Table(props: ComponentPropsWithoutRef<"table">) {
+  return (
+    <div
+      className="table-wrapper"
+      role="region"
+      aria-label="表格，可左右滚动"
+      tabIndex={0}
+    >
+      <table {...props} />
+    </div>
+  );
+}
+
 export const mdxComponents = {
   pre: Pre,
   figure: Figure,
   div: Div,
+  table: Table,
+  ArticleImage,
 };
