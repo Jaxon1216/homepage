@@ -157,16 +157,62 @@ Row 执行到 return，才产生 li、input、button 等 React 元素。React �
 
 <ArticleImage src="/images/react-fiber/02-element-fiber-dom.png" alt="List 中的 JSX 如何提供 React 元素和 Fiber 的 type、key，以及宿主 DOM 的对应关系" width="2368" height="1744" loading="eager" decoding="async" />
 
+## 三种结构放在一起看
+
+上图只展开 B 这一行。为了同时看清多个兄弟节点，下面临时换用一个 App／Content 页面骨架。这里使用类组件，它们的 type 指向类，`stateNode` 保存组件实例：
+
+<details>
+<summary>图中的 JSX 示例</summary>
+
+```jsx
+import { Component } from 'react';
+import { createRoot } from 'react-dom/client';
+class App extends Component {
+  render() {
+    return (
+      <div className="app">
+        <header>header</header>
+        <Content />
+        <footer>footer</footer>
+      </div>
+    );
+  }
+}
+class Content extends Component {
+  render() {
+    return <><p>1</p><p>2</p><p>3</p></>;
+  }
+}
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+```
+
+</details>
+
+页面已有 `<div id="root"></div>` 作为挂载容器。以 `root.render(<App />)` 为入口，三种结构对应如下。左侧汇总的是组件逐层执行后产生的元素，并不是 JSX 一次性生成了一棵完整的元素树。
+
+<ArticleImage src="/images/react-fiber/11-three-tree-overview.png" alt="App 和 Content 的 JSX 逐层产生 React 元素，经 Fiber 的 child、sibling、return 组织，最终对应宿主 DOM 结构" width="2511" height="2424" loading="lazy" decoding="async" />
+
+这张图参考[《图解 React》中的三者关系图](https://7km.top/main/fibertree-prepare/)，重新绘制并按本文版本校正。
+
+先看少掉的一层：本例 Content 直接返回的 Fragment 没有 key 和 ref，会在当前这层协调时展开，因此图中没有额外的 Fragment Fiber。这是本例的处理条件，不能推导为“Fragment 都没有 Fiber”。[Fragment 的展开条件](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactChildFiber.js#L1872)
+
+再沿着图，区分三种关系：
+
+- **元素之间不全是 children。** App 到 div、Content 到 Fragment 是 `render()` 的返回关系；div 内部的 header、Content、footer，才来自 div 的 `props.children`。
+- **Fiber 用指针组织工作。** `child` 只指向第一个孩子，`sibling` 单向指向下一个兄弟，每个孩子的 `return` 都回到实际父 Fiber。例如三个 p 的父节点都是 Content。
+- **组件不会额外包一层 DOM。** App、Content 都保留在 Fiber 树中，DOM 里则直接是 div 下的 header、三个 p 和 footer。宿主 Fiber 的 `stateNode` 指向 DOM，类组件的 `stateNode` 则指向组件实例。
+
 ## 工作怎样沿着树继续？
 
-React 通过深度优先的方式推进 Fiber，主要分为两个方向：
+回到列表，React 通过深度优先的方式推进 Fiber，主要分为两个方向：
 
 - **向下：beginWork。** 处理当前节点，执行组件、计算状态、协调子节点。例如调用 List 得到 Row 元素，再调用 Row 得到 li 等元素。
 - **回溯：completeWork。** 当前节点没有待处理的子节点后，完成它的工作。有兄弟节点就处理兄弟，否则回到父节点继续完成。
 
 <ArticleImage src="/images/react-fiber/04-fiber-traversal.png" alt="Fiber 从 beginWork 向下再经 completeWork 回溯的遍历路线" width="2364" height="1592" loading="lazy" decoding="async" />
 
-对应到指针，`child` 指向第一个子节点，`sibling` 指向下一个兄弟，`return` 指向父节点。例如 List 的第一个孩子是 Row A，A 的下一个兄弟是 Row B，B 的父节点仍是 List。
+在对应的 Fiber 上，List 的 `child` 指向 Row A，Row A 的 `sibling` 指向 Row B，Row B 的 `return` 仍指向 List。
 
 处理到宿主节点时，React 可以在 `completeWork` 中创建、组装真正的 DOM，并让宿主 Fiber 的 `stateNode` 指向它。此时节点还没有插入当前页面。[宿主实例创建源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiberCompleteWork.js#L1425)
 
@@ -357,7 +403,7 @@ render 可能被重试或放弃，所以组件函数、类组件的 render 及�
 
 # 参考资料与配图
 
-文中的配图使用同一个简化例子，只展开与当前问题有关的节点。可下载 [十张配图的 SVG 源文件](/images/react-fiber/react-fiber-diagrams.zip)，用于放大、编辑或引用。
+正文主要沿用同一个列表例子，三种结构总览图另用 App／Content 页面骨架展开完整关系。可下载 [十一张配图的 SVG 源文件](/images/react-fiber/react-fiber-diagrams.zip)，用于放大、编辑或引用。
 
 除文中链接的官方文档与固定版本源码外，还参考了：
 
