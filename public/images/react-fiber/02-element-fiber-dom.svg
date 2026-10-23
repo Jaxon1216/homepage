@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1188" height="866.0" viewBox="0 0 1188 866.0">
+<title>React 元素、Fiber、DOM：三种结构，各司其职</title>
+<desc>上部来源带交代 item.id 到 key 的来源；左列局部元素描述含函数引用 type、key 与 props，中列首次挂载创建的 Fiber 含同一函数引用、pendingProps 与初始 state，右列仅在宿主行出现 DOM。</desc>
+<rect data-role="canvas" x="0" y="0" width="1188" height="866.0" fill="#fbfcfd"/>
+<text data-role="title" x="36" y="51.0" font-family="Noto Sans SC" font-size="30" fill="#1f2329" font-weight="bold" text-anchor="start">React 元素、Fiber、DOM：三种结构，各司其职</text>
+<text data-role="label" x="36" y="87.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">首次挂载 List 中的 B 子树：Row → li → input</text>
+<rect data-role="jsx-source-strip" x="36" y="120" width="1116" height="81.0" rx="6.0" fill="#eef3ff" stroke="#dadde3" stroke-width="1.5"/>
+<text data-role="jsx-source" x="54" y="147.0" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="normal" text-anchor="start">List 执行到 &lt;Row key={item.id} item={item} /&gt;，item.id = &#x27;B&#x27;</text>
+<text data-role="jsx-source" x="54" y="174.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">得到 Row React 元素；React 处理 Row Fiber 时执行 Row，得到 li / input 元素。</text>
+<text data-role="column-heading" x="36" y="237.0" font-family="Noto Sans SC" font-size="24" fill="#5b7fcb" font-weight="bold" text-anchor="start">React 元素</text>
+<text data-role="label" x="36" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">组件执行，逐步产生局部描述</text>
+<text data-role="column-heading" x="450" y="237.0" font-family="Noto Sans SC" font-size="24" fill="#7b67c9" font-weight="bold" text-anchor="start">Fiber 节点</text>
+<text data-role="label" x="450" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">保存工作进度与组件状态</text>
+<text data-role="column-heading" x="900" y="237.0" font-family="Noto Sans SC" font-size="24" fill="#4e9d6d" font-weight="bold" text-anchor="start">真实 DOM</text>
+<text data-role="label" x="900" y="264.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">只有宿主节点对应 DOM</text>
+<rect data-role="element-node" x="36" y="291.0" width="306" height="157" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="54" y="316.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">Row React 元素</text>
+<text data-role="label" x="54" y="339.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: Row（函数引用）</text>
+<text data-role="label" x="54" y="361.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">key: &#x27;B&#x27;（来自 item.id）</text>
+<text data-role="label" x="54" y="382.8" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">props: { item }</text>
+<rect data-role="element-node" x="36" y="484.0" width="306" height="92" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="54" y="509.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;li&gt;…&lt;/li&gt;</text>
+<text data-role="label" x="54" y="532.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: &quot;li&quot;</text>
+<rect data-role="element-node" x="36" y="612.0" width="306" height="92" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="1.5"/>
+<text data-role="label" x="54" y="637.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;input value={draft} /&gt;</text>
+<text data-role="label" x="54" y="660.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: &quot;input&quot;</text>
+<rect data-role="fiber-node" x="450" y="291.0" width="342" height="157" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="468" y="316.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">Row · FunctionComponent</text>
+<text data-role="label" x="468" y="339.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: Row（同一函数引用）</text>
+<text data-role="label" x="468" y="361.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">key: &#x27;B&#x27;</text>
+<text data-role="label" x="468" y="382.8" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">pendingProps: { item }</text>
+<text data-role="label" x="468" y="404.4" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">draft: &#x27;原备注&#x27;（执行 Row 后）</text>
+<text data-role="label" x="468" y="426.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">stateNode: null</text>
+<rect data-role="fiber-node" x="450" y="484.0" width="342" height="92" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="468" y="509.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">li</text>
+<text data-role="label" x="468" y="532.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">HostComponent</text>
+<text data-role="label" x="468" y="554.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: &quot;li&quot;</text>
+<rect data-role="fiber-node" x="450" y="612.0" width="342" height="92" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="1.5"/>
+<text data-role="label" x="468" y="637.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">input</text>
+<text data-role="label" x="468" y="660.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">HostComponent</text>
+<text data-role="label" x="468" y="682.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">type: &quot;input&quot;</text>
+<rect data-role="dom-node" x="900" y="484.0" width="252" height="92" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="918" y="509.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;li&gt;</text>
+<text data-role="label" x="918" y="532.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">DOM 节点</text>
+<rect data-role="dom-node" x="900" y="612.0" width="252" height="92" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="1.5"/>
+<text data-role="label" x="918" y="637.2" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;input&gt;</text>
+<text data-role="label" x="918" y="660.6" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">value: 原备注</text>
+<polyline data-role="connector" points="54,448.0 54,484.0" fill="none" stroke="#5b7fcb" stroke-width="2.0" stroke-dasharray="6.0 6.0"/>
+<polyline data-role="line-arrow" points="48.0,478.0 54,484.0 60.0,478.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="472.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">React 执行 Row</text>
+<polyline data-role="connector" points="54,576.0 54,612.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="48.0,606.0 54,612.0 60.0,606.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="63.0" y="600.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">children</text>
+<polyline data-role="connector" points="621.0,448.0 621.0,484.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="615.0,478.0 621.0,484.0 627.0,478.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="630.0" y="472.0" font-family="Noto Sans SC" font-size="16" fill="#7b67c9" font-weight="normal" text-anchor="start">child</text>
+<polyline data-role="connector" points="621.0,576.0 621.0,612.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="615.0,606.0 621.0,612.0 627.0,606.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="630.0" y="600.0" font-family="Noto Sans SC" font-size="16" fill="#7b67c9" font-weight="normal" text-anchor="start">child</text>
+<polyline data-role="connector" points="1026.0,576.0 1026.0,612.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="1020.0,606.0 1026.0,612.0 1032.0,606.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="1035.0" y="600.0" font-family="Noto Sans SC" font-size="16" fill="#4e9d6d" font-weight="normal" text-anchor="start">子节点</text>
+<polyline data-role="element-fiber-mapping" points="342,369.5 450,369.5" fill="none" stroke="#5b7fcb" stroke-width="2.0" stroke-dasharray="6.0 6.0"/>
+<polyline data-role="line-arrow" points="444.0,363.5 450,369.5 444.0,375.5" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="mount-fiber-creation" x="396.0" y="360.5" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="middle">创建 Fiber</text>
+<polyline data-role="element-fiber-mapping" points="342,530.0 450,530.0" fill="none" stroke="#5b7fcb" stroke-width="2.0" stroke-dasharray="6.0 6.0"/>
+<polyline data-role="line-arrow" points="444.0,524.0 450,530.0 444.0,536.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="element-fiber-mapping" points="342,658.0 450,658.0" fill="none" stroke="#5b7fcb" stroke-width="2.0" stroke-dasharray="6.0 6.0"/>
+<polyline data-role="line-arrow" points="444.0,652.0 450,658.0 444.0,664.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="state-node-mapping" points="792,530.0 900,530.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="894.0,524.0 900,530.0 894.0,536.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="846.0" y="521.0" font-family="Noto Sans SC" font-size="16" fill="#4e9d6d" font-weight="normal" text-anchor="middle">stateNode</text>
+<polyline data-role="state-node-mapping" points="792,658.0 900,658.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="894.0,652.0 900,658.0 894.0,664.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="846.0" y="649.0" font-family="Noto Sans SC" font-size="16" fill="#4e9d6d" font-weight="normal" text-anchor="middle">stateNode</text>
+<text data-role="empty-function-dom-slot" x="1026.0" y="369.5" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="middle">无对应 DOM</text>
+<text data-role="label" x="1026.0" y="394.7" font-family="Noto Sans SC" font-size="16" fill="#6b7280" font-weight="normal" text-anchor="middle">stateNode: null</text>
+<polyline data-role="footer-rule" points="36,740.0 1152,740.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="type-key-props-creation" x="36" y="772.4" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="normal" text-anchor="start">type / key 识别身份；props 进入 pendingProps；本图首次挂载，创建 Fiber。</text>
+<text data-role="key-outside-props" x="36" y="803.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">key 来自 item.id，由 React 单独处理，不在 props 中；Row 的 type 是函数引用。</text>
+<text data-role="takeaway" x="36" y="833.6" font-family="Noto Sans SC" font-size="18" fill="#c94c4c" font-weight="normal" text-anchor="start">不是“三套 DOM”：元素描述 UI，Fiber 保存状态与工作，DOM 承载宿主输出。</text>
+</svg>

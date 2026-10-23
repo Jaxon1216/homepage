@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1498" height="901" viewBox="0 0 1498 901">
+<title>current 与 workInProgress 双缓冲</title>
+<desc>更新前 root.current 指向 a，构建中 b 处理新 draft；两个版本的宿主 input Fiber 指向同一个已有 DOM；提交后该 DOM 更新并且 root.current 指向 b，a 成为以后可复用的另一版。</desc>
+<rect data-role="canvas" x="0" y="0" width="1498" height="901" rx="8" fill="#fbfcfd" stroke="none" stroke-width="2"/>
+<text data-role="label" x="36" y="66" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="start" fill="#1f2329">current 是指针，两版 Fiber 轮换工作</text>
+<text data-role="label" x="36" y="102" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">a / b 是两个版本；current / WIP 是它们此刻承担的角色</text>
+<text data-role="label" x="36.0" y="127.19999999999999" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#5b7fcb">① 更新前</text>
+<text data-role="label" x="261.72" y="174" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">root.current</text>
+<polyline data-role="current-pointer" points="261.72,192 129.78000000000003,192 129.78000000000003,210.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="123.66000000000003,203.88 129.78000000000003,210.0 135.90000000000003,203.88" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="host-root-fiber" x="54.00000000000003" y="213.6" width="151.56" height="45.0" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="129.78000000000003" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">HostRoot a</text>
+<polyline data-role="omitted-ancestor-chain" points="129.78000000000003,258.6 129.78000000000003,327.0" fill="none" stroke="#5b7fcb" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="123.66000000000003,320.88 129.78000000000003,327.0 135.90000000000003,320.88" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="139.68000000000004" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="54.00000000000003" y="330.6" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="129.78000000000003" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">Row B</text>
+<text data-role="label" x="129.78000000000003" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#5b7fcb">draft: 原备注</text>
+<polyline data-role="child-pointer" points="129.78000000000003,390.0 129.78000000000003,422.4" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="123.66000000000003,416.28 129.78000000000003,422.4 135.90000000000003,416.28" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="54.00000000000003" y="426.0" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="129.78000000000003" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">li</text>
+<polyline data-role="child-pointer" points="129.78000000000003,485.4 129.78000000000003,517.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="123.66000000000003,511.67999999999995 129.78000000000003,517.8 135.90000000000003,511.67999999999995" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="54.00000000000003" y="521.4" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="129.78000000000003" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">input</text>
+<text data-role="label" x="129.78000000000003" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="129.78000000000003" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">当前版本</text>
+<rect data-role="host-root-fiber" x="317.88" y="213.6" width="151.56" height="45.0" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="393.66" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">HostRoot b</text>
+<polyline data-role="omitted-ancestor-chain" points="393.66,258.6 393.66,327.0" fill="none" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="387.54,320.88 393.66,327.0 399.78000000000003,320.88" fill="none" stroke="#dadde3" stroke-width="2"/>
+<text data-role="label" x="403.56" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="317.88" y="330.6" width="151.56" height="59.4" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="393.66" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e5969">Row B</text>
+<text data-role="label" x="393.66" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">按需创建</text>
+<polyline data-role="child-pointer" points="393.66,390.0 393.66,422.4" fill="none" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="387.54,416.28 393.66,422.4 399.78000000000003,416.28" fill="none" stroke="#dadde3" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="317.88" y="426.0" width="151.56" height="59.4" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="393.66" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e5969">li</text>
+<polyline data-role="child-pointer" points="393.66,485.4 393.66,517.8" fill="none" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="387.54,511.67999999999995 393.66,517.8 399.78000000000003,511.67999999999995" fill="none" stroke="#dadde3" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="317.88" y="521.4" width="151.56" height="59.4" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="393.66" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e5969">input</text>
+<text data-role="label" x="393.66" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="393.66" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">或复用</text>
+<polyline data-role="alternate-pair" points="205.56000000000003,348.42 317.88,348.42" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="311.76,342.3 317.88,348.42 311.76,354.54" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="alternate-pair" points="317.88,373.36800000000005 205.56000000000003,373.36800000000005" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="211.68000000000004,367.24800000000005 205.56000000000003,373.36800000000005 211.68000000000004,379.48800000000006" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="261.72" y="320.7" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">alternate</text>
+<rect data-role="shared-existing-dom" x="63.00000000000003" y="688.8" width="397.44" height="63.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="261.72" y="715.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">同一个已有 input DOM</text>
+<text data-role="label" x="261.72" y="740.0999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#1f2329">value = &quot;原备注&quot;</text>
+<polyline data-role="shared-state-node" points="54.00000000000003,560.01 26.719200000000015,560.01 26.719200000000015,668.0999999999999 240.12000000000003,668.0999999999999 240.12000000000003,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="234.00000000000003,679.9799999999999 240.12000000000003,686.0999999999999 246.24000000000004,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="shared-state-node" points="469.44000000000005,560.01 496.72080000000005,560.01 496.72080000000005,668.0999999999999 283.32000000000005,668.0999999999999 283.32000000000005,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="277.20000000000005,679.9799999999999 283.32000000000005,686.0999999999999 289.44000000000005,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="261.72" y="651.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e9d6d">stateNode</text>
+<text data-role="label" x="36.0" y="789.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">b 若已存在，可供下次复用</text>
+<polyline data-role="time-frame-divider" points="505.44000000000005,109.19999999999999 505.44000000000005,793" fill="none" stroke="#dadde3" stroke-width="2"/>
+<text data-role="label" x="523.44" y="127.19999999999999" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#5b7fcb">② 构建中</text>
+<text data-role="label" x="749.1600000000001" y="174" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">root.current</text>
+<polyline data-role="current-pointer" points="749.1600000000001,192 617.22,192 617.22,210.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="611.1,203.88 617.22,210.0 623.34,203.88" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="host-root-fiber" x="541.44" y="213.6" width="151.56" height="45.0" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="617.22" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">HostRoot a</text>
+<polyline data-role="omitted-ancestor-chain" points="617.22,258.6 617.22,327.0" fill="none" stroke="#5b7fcb" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="611.1,320.88 617.22,327.0 623.34,320.88" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="627.12" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="541.44" y="330.6" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="617.22" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">Row B</text>
+<text data-role="label" x="617.22" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#5b7fcb">draft: 原备注</text>
+<polyline data-role="child-pointer" points="617.22,390.0 617.22,422.4" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="611.1,416.28 617.22,422.4 623.34,416.28" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="541.44" y="426.0" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="617.22" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">li</text>
+<polyline data-role="child-pointer" points="617.22,485.4 617.22,517.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="611.1,511.67999999999995 617.22,517.8 623.34,511.67999999999995" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="541.44" y="521.4" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="617.22" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">input</text>
+<text data-role="label" x="617.22" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="617.22" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">当前版本</text>
+<rect data-role="host-root-fiber" x="805.3200000000002" y="213.6" width="151.56" height="45.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="881.1000000000001" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">HostRoot b</text>
+<polyline data-role="omitted-ancestor-chain" points="881.1000000000001,258.6 881.1000000000001,327.0" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="874.9800000000001,320.88 881.1000000000001,327.0 887.2200000000001,320.88" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="891.0000000000001" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="805.3200000000002" y="330.6" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="881.1000000000001" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">Row B</text>
+<text data-role="label" x="881.1000000000001" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">draft: 已确认</text>
+<polyline data-role="child-pointer" points="881.1000000000001,390.0 881.1000000000001,422.4" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="874.9800000000001,416.28 881.1000000000001,422.4 887.2200000000001,416.28" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="805.3200000000002" y="426.0" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="881.1000000000001" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">li</text>
+<polyline data-role="child-pointer" points="881.1000000000001,485.4 881.1000000000001,517.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="874.9800000000001,511.67999999999995 881.1000000000001,517.8 887.2200000000001,511.67999999999995" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="805.3200000000002" y="521.4" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="881.1000000000001" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">input</text>
+<text data-role="label" x="881.1000000000001" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="881.1000000000001" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">待提交 flags</text>
+<polyline data-role="alternate-pair" points="693.0,348.42 805.3200000000002,348.42" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="799.2000000000002,342.3 805.3200000000002,348.42 799.2000000000002,354.54" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="alternate-pair" points="805.3200000000002,373.36800000000005 693.0,373.36800000000005" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="699.12,367.24800000000005 693.0,373.36800000000005 699.12,379.48800000000006" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="749.1600000000001" y="320.7" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">alternate</text>
+<rect data-role="shared-existing-dom" x="550.44" y="688.8" width="397.44" height="63.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="749.1600000000001" y="715.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">同一个已有 input DOM</text>
+<text data-role="label" x="749.1600000000001" y="740.0999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#1f2329">value = &quot;原备注&quot;</text>
+<polyline data-role="shared-state-node" points="541.44,560.01 514.1592,560.01 514.1592,668.0999999999999 727.5600000000001,668.0999999999999 727.5600000000001,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="721.44,679.9799999999999 727.5600000000001,686.0999999999999 733.6800000000001,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="shared-state-node" points="956.8800000000001,560.01 984.1608000000001,560.01 984.1608000000001,668.0999999999999 770.7600000000001,668.0999999999999 770.7600000000001,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="764.6400000000001,679.9799999999999 770.7600000000001,686.0999999999999 776.8800000000001,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="749.1600000000001" y="651.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e9d6d">stateNode</text>
+<text data-role="label" x="523.44" y="789.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">WIP 正在形成，a 仍是当前版本</text>
+<polyline data-role="unfinished-work" points="993.2544000000001,370.668 993.2544000000001,408.82800000000003" fill="none" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="997.7544000000001" y="399.288" font-family="Noto Sans SC" font-size="24" font-weight="400" text-anchor="start" fill="#4e5969">…</text>
+<polyline data-role="time-frame-divider" points="992.88,109.19999999999999 992.88,793" fill="none" stroke="#dadde3" stroke-width="2"/>
+<text data-role="label" x="1010.88" y="127.19999999999999" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#5b7fcb">③ 提交后</text>
+<text data-role="label" x="1236.6" y="174" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">root.current</text>
+<polyline data-role="current-pointer" points="1236.6,192 1368.54,192 1368.54,210.0" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1362.42,203.88 1368.54,210.0 1374.6599999999999,203.88" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<rect data-role="host-root-fiber" x="1028.8799999999999" y="213.6" width="151.56" height="45.0" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1104.6599999999999" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">HostRoot a</text>
+<polyline data-role="omitted-ancestor-chain" points="1104.6599999999999,258.6 1104.6599999999999,327.0" fill="none" stroke="#5b7fcb" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="1098.54,320.88 1104.6599999999999,327.0 1110.7799999999997,320.88" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1114.56" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="1028.8799999999999" y="330.6" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1104.6599999999999" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">Row B</text>
+<text data-role="label" x="1104.6599999999999" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#5b7fcb">draft: 原备注</text>
+<polyline data-role="child-pointer" points="1104.6599999999999,390.0 1104.6599999999999,422.4" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1098.54,416.28 1104.6599999999999,422.4 1110.7799999999997,416.28" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="1028.8799999999999" y="426.0" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1104.6599999999999" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">li</text>
+<polyline data-role="child-pointer" points="1104.6599999999999,485.4 1104.6599999999999,517.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1098.54,511.67999999999995 1104.6599999999999,517.8 1110.7799999999997,511.67999999999995" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="1028.8799999999999" y="521.4" width="151.56" height="59.4" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1104.6599999999999" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">input</text>
+<text data-role="label" x="1104.6599999999999" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="1104.6599999999999" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">另一版本</text>
+<rect data-role="host-root-fiber" x="1292.76" y="213.6" width="151.56" height="45.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1368.54" y="244.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">HostRoot b</text>
+<polyline data-role="omitted-ancestor-chain" points="1368.54,258.6 1368.54,327.0" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="1362.42,320.88 1368.54,327.0 1374.6599999999999,320.88" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1378.44" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">省略祖先</text>
+<rect data-role="fiber-version-node" x="1292.76" y="330.6" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1368.54" y="354.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">Row B</text>
+<text data-role="label" x="1368.54" y="379.20000000000005" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">draft: 已确认</text>
+<polyline data-role="child-pointer" points="1368.54,390.0 1368.54,422.4" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1362.42,416.28 1368.54,422.4 1374.6599999999999,416.28" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="1292.76" y="426.0" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1368.54" y="462.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">li</text>
+<polyline data-role="child-pointer" points="1368.54,485.4 1368.54,517.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1362.42,511.67999999999995 1368.54,517.8 1374.6599999999999,511.67999999999995" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="fiber-version-node" x="1292.76" y="521.4" width="151.56" height="59.4" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1368.54" y="557.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">input</text>
+<text data-role="label" x="1368.54" y="607.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">props.value</text>
+<text data-role="label" x="1368.54" y="636.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">当前版本</text>
+<polyline data-role="alternate-pair" points="1180.4399999999998,348.42 1292.76,348.42" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1286.64,342.3 1292.76,348.42 1286.64,354.54" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="alternate-pair" points="1292.76,373.36800000000005 1180.4399999999998,373.36800000000005" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1186.5599999999997,367.24800000000005 1180.4399999999998,373.36800000000005 1186.5599999999997,379.48800000000006" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1236.6" y="320.7" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">alternate</text>
+<rect data-role="shared-existing-dom" x="1037.8799999999999" y="688.8" width="397.44" height="63.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1236.6" y="715.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">同一个已有 input DOM</text>
+<text data-role="label" x="1236.6" y="740.0999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#1f2329">value = &quot;已确认&quot;</text>
+<polyline data-role="shared-state-node" points="1028.8799999999999,560.01 1001.5991999999999,560.01 1001.5991999999999,668.0999999999999 1215.0,668.0999999999999 1215.0,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1208.88,679.9799999999999 1215.0,686.0999999999999 1221.12,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="shared-state-node" points="1444.32,560.01 1471.6008,560.01 1471.6008,668.0999999999999 1258.1999999999998,668.0999999999999 1258.1999999999998,686.0999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1252.08,679.9799999999999 1258.1999999999998,686.0999999999999 1264.3199999999997,679.9799999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1236.6" y="651.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e9d6d">stateNode</text>
+<text data-role="label" x="1010.88" y="789.5999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">b 成为当前版本，a 留待以后复用</text>
+<text data-role="label" x="36" y="839.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">HostRoot 下省略祖先，仅展示 Row B → li → input；构建中其余工作以虚线省略。</text>
+<text data-role="label" x="36" y="870.4" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#7b67c9">另一版 Fiber 按需创建或复用，并非每次完整复制整棵树。</text>
+</svg>

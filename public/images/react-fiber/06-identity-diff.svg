@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1170" height="768.0" viewBox="0 0 1170 768.0">
+<title>Diff 先认身份，再检查类型</title>
+<desc>三个并列实例，各自按元素→旧候选→WIP 从上到下排列；匹配依据写在箭头旁，结果用状态前后对照显示。底部统一说明兄弟范围、render 与 commit 边界。</desc>
+<rect data-role="canvas" x="0" y="0" width="1170" height="768.0" fill="#fbfcfd"/>
+<text data-role="title" x="36" y="51.0" font-family="Noto Sans SC" font-size="30" fill="#1f2329" font-weight="bold" text-anchor="start">Diff 先认身份，再检查类型</text>
+<text data-role="label" x="36" y="87.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">同一父节点下：先用 key（无 key 时看位置）找旧候选，再检查 type 是否兼容</text>
+<text data-role="case-heading" x="36" y="156" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">① key、type 都相同</text>
+<text data-role="label" x="36" y="183.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">新 React 元素</text>
+<rect data-role="new-react-element" x="36" y="192" width="342" height="54" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="54" y="225.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;Row key=&quot;B&quot; /&gt;</text>
+<polyline data-role="candidate-search" points="207.0,246 207.0,327.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="201.0,321.0 207.0,327.0 213.0,321.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="216.0" y="286.5" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">key B → 找到 Row B</text>
+<rect data-role="old-current-candidate" x="36" y="327.0" width="342" height="72" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="54" y="354.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">current: Row · key B</text>
+<text data-role="label" x="54" y="381.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">draft = &#x27;已确认&#x27;</text>
+<polyline data-role="identity-outcome" points="207.0,399.0 207.0,498" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="201.0,492.0 207.0,498 213.0,492.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="216.0" y="439.5" font-family="Noto Sans SC" font-size="16" fill="#4e9d6d" font-weight="normal" text-anchor="start">type 都是 Row</text>
+<rect data-role="work-in-progress-result" x="36" y="498" width="342" height="108" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="54" y="525.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">WIP: Row · key B</text>
+<text data-role="label" x="54" y="552.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">draft = &#x27;已确认&#x27;</text>
+<text data-role="label" x="54" y="579.0" font-family="Noto Sans SC" font-size="18" fill="#4e9d6d" font-weight="normal" text-anchor="start">接续原来的身份与状态</text>
+<text data-role="case-heading" x="414" y="156" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">② key 相同，type 不同</text>
+<text data-role="label" x="414" y="183.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">新 React 元素</text>
+<rect data-role="new-react-element" x="414" y="192" width="342" height="54" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="432" y="225.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;OtherRow key=&quot;B&quot; /&gt;</text>
+<polyline data-role="candidate-search" points="585.0,246 585.0,327.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="579.0,321.0 585.0,327.0 591.0,321.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="594.0" y="286.5" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">key B → 找到 Row B</text>
+<rect data-role="old-current-candidate" x="414" y="327.0" width="342" height="72" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="432" y="354.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">current: Row · key B</text>
+<text data-role="label" x="432" y="381.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">draft = &#x27;已确认&#x27;</text>
+<polyline data-role="identity-outcome" points="585.0,399.0 585.0,498" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="579.0,492.0 585.0,498 591.0,492.0" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<text data-role="label" x="594.0" y="439.5" font-family="Noto Sans SC" font-size="16" fill="#c94c4c" font-weight="normal" text-anchor="start">OtherRow ≠ Row</text>
+<polyline data-role="old-identity-deleted" points="732.0,330.0 744.0,342.0" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<polyline data-role="old-identity-deleted" points="732.0,342.0 744.0,330.0" fill="none" stroke="#c94c4c" stroke-width="2.0"/>
+<rect data-role="work-in-progress-result" x="414" y="498" width="342" height="108" rx="6.0" fill="#fdebec" stroke="#c94c4c" stroke-width="2.0"/>
+<text data-role="label" x="432" y="525.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">WIP: OtherRow · key B</text>
+<text data-role="label" x="432" y="552.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">state 按初始值创建</text>
+<text data-role="label" x="432" y="579.0" font-family="Noto Sans SC" font-size="18" fill="#c94c4c" font-weight="normal" text-anchor="start">旧 Row 记录删除</text>
+<text data-role="case-heading" x="792" y="156" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">③ 找不到这个 key</text>
+<text data-role="label" x="792" y="183.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">新 React 元素</text>
+<rect data-role="new-react-element" x="792" y="192" width="342" height="54" rx="6.0" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="810" y="225.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">&lt;Row key=&quot;E&quot; /&gt;</text>
+<polyline data-role="candidate-search" points="963.0,246 963.0,327.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="957.0,321.0 963.0,327.0 969.0,321.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="972.0" y="286.5" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="start">key E → 未找到</text>
+<rect data-role="old-current-candidate" x="792" y="327.0" width="342" height="72" rx="6.0" fill="#f3eeff" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="810" y="354.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">旧兄弟集合：A、B、C、D</text>
+<text data-role="label" x="810" y="381.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">没有 key E 的候选</text>
+<polyline data-role="identity-outcome" points="963.0,399.0 963.0,498" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="957.0,492.0 963.0,498 969.0,492.0" fill="none" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="972.0" y="439.5" font-family="Noto Sans SC" font-size="16" fill="#4e9d6d" font-weight="normal" text-anchor="start">没有旧身份可复用</text>
+<rect data-role="work-in-progress-result" x="792" y="498" width="342" height="108" rx="6.0" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2.0"/>
+<text data-role="label" x="810" y="525.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="start">WIP: Row · key E</text>
+<text data-role="label" x="810" y="552.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">state 按初始值创建</text>
+<text data-role="label" x="810" y="579.0" font-family="Noto Sans SC" font-size="18" fill="#4e9d6d" font-weight="normal" text-anchor="start">记录新增</text>
+<polyline data-role="footer-rule" points="36,633.0 1134,633.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="matching-boundary" x="36" y="665.4" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">render 中完成匹配并记录标记；DOM 的实际更改发生在 commit。</text>
+<text data-role="matching-boundary" x="36" y="697.8" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">旧集合中最终没被使用的 Fiber，会被记录删除。</text>
+<text data-role="matching-boundary" x="36" y="730.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">key 只在同一组兄弟中有意义，不能跨父节点搬状态；“复用”也不等于不执行 Row。</text>
+</svg>

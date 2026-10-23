@@ -1,143 +1,49 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { FiList } from "react-icons/fi";
-import { ARTICLE_HEADING_OFFSET, getActiveHeadingIndex, getTocScrollTop } from "@/lib/article-toc";
+import {
+  createContext, useContext, useEffect, useId, useMemo, useRef, useState,
+  type MouseEvent, type ReactNode, type RefObject,
+} from "react";
+import { useReducedMotion } from "framer-motion";
+import Link from "next/link";
+import { FiChevronDown, FiList } from "react-icons/fi";
+import { getTocScrollTop } from "@/lib/article-toc";
+import { useArticleToc, type ArticleTocState } from "./useArticleToc";
+import styles from "./ArticleToc.module.css";
 
-interface HeadingItem {
-  id: string;
-  text: string;
-  level: number;
+interface TocContextValue extends ArticleTocState { reducedMotion: boolean }
+const TocContext = createContext<TocContextValue | null>(null);
+
+export function ArticleTocProvider({ contentRef, slug, children }: {
+  contentRef: RefObject<HTMLElement | null>;
+  slug: string;
+  children: ReactNode;
+}) {
+  const state = useArticleToc(contentRef, slug);
+  const reducedMotion = useReducedMotion() === true;
+  const value = useMemo(() => ({ ...state, reducedMotion }), [state, reducedMotion]);
+  return <TocContext.Provider value={value}>{children}</TocContext.Provider>;
 }
 
-export function ArticleToc() {
-  const [headings, setHeadings] = useState<HeadingItem[]>([]);
-  const [activeId, setActiveId] = useState<string>("");
-  const [indicatorStyle, setIndicatorStyle] = useState<{
-    top: number;
-    height: number;
-  } | null>(null);
-  const [followPaused, setFollowPaused] = useState(false);
+interface TrackPosition { x: number; top: number; bottom: number; start: number; end: number }
+interface TrackGeometry { d: string; height: number; viewportHeight: number; positions: TrackPosition[] }
+
+function TocItems({ state, onSelect }: {
+  state: TocContextValue;
+  onSelect?: (event: MouseEvent<HTMLAnchorElement>, id: string) => void;
+}) {
+  const { headings, currentId, startIndex, endIndex, direction, reducedMotion } = state;
+  const viewportRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLUListElement>(null);
+  const positionedRef = useRef(false);
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const navRef = useRef<HTMLElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
-
-  useEffect(() => {
-    const allHeadingElements = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        "#post-content h1, #post-content h2, #post-content h3, #post-content h4, #post-content h5, #post-content h6"
-      )
-    );
-
-    const availableLevels = allHeadingElements
-      .map((element) => Number(element.tagName.replace("H", "")))
-      .filter((level) => Number.isFinite(level));
-
-    const topLevel = availableLevels.length > 0 ? Math.min(...availableLevels) : null;
-    const secondLevel = topLevel !== null && topLevel < 6 ? topLevel + 1 : null;
-
-    if (topLevel === null) return;
-
-    const elements = allHeadingElements
-      .map((element) => {
-        const level = Number(element.tagName.replace("H", ""));
-        const text = element.textContent?.trim() ?? "";
-
-        if (
-          !element.id ||
-          !text ||
-          (level !== topLevel && level !== secondLevel)
-        ) {
-          return null;
-        }
-
-        return {
-          id: element.id,
-          text,
-          level,
-        };
-      })
-      .filter((item): item is HeadingItem => item !== null);
-
-    if (elements.length === 0) return;
-    const initFrame = requestAnimationFrame(() => {
-      setHeadings(elements);
-    });
-
-    const observers = elements
-      .map((item) => document.getElementById(item.id))
-      .filter((item): item is HTMLElement => item !== null);
-
-    const article = document.getElementById("post-content");
-    let frame = 0;
-    const updateActiveHeading = () => {
-      frame = 0;
-      const articleRect = article?.getBoundingClientRect();
-      // Use the end of the article, rather than the comments/footer below it.
-      const atArticleEnd = !!articleRect && articleRect.top < ARTICLE_HEADING_OFFSET &&
-        articleRect.bottom <= window.innerHeight;
-      const index = getActiveHeadingIndex(
-        observers.map((element) => element.getBoundingClientRect().top),
-        ARTICLE_HEADING_OFFSET,
-        atArticleEnd
-      );
-      setActiveId(observers[index]?.id ?? "");
-    };
-    const scheduleUpdate = () => {
-      if (!frame) frame = requestAnimationFrame(updateActiveHeading);
-    };
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    const resizeObserver = new ResizeObserver(scheduleUpdate);
-    if (article) resizeObserver.observe(article);
-    scheduleUpdate();
-
-    return () => {
-      cancelAnimationFrame(initFrame);
-      cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-    };
-  }, []);
+  const clipId = useId();
+  const [geometry, setGeometry] = useState<TrackGeometry | null>(null);
+  const [followPaused, setFollowPaused] = useState(false);
 
   useEffect(() => () => {
     if (pauseTimer.current) clearTimeout(pauseTimer.current);
   }, []);
-
-  useEffect(() => {
-    if (headings.length === 0) return;
-
-    const updateIndicator = () => {
-      const nav = navRef.current;
-      const activeItem = itemRefs.current[activeId];
-      if (!nav || !activeItem || nav.clientHeight === 0) return;
-
-      // The indicator and items share one positioned, scrollable content layer.
-      setIndicatorStyle({
-        top: activeItem.offsetTop + 4,
-        height: Math.max(20, activeItem.offsetHeight - 8),
-      });
-      if (followPaused) return;
-      const top = getTocScrollTop(
-        nav.scrollTop, nav.clientHeight, activeItem.offsetTop,
-        activeItem.offsetHeight, nav.scrollHeight
-      );
-      if (Math.abs(top - nav.scrollTop) > 1) {
-        nav.scrollTo({ top, behavior: "instant" });
-      }
-    };
-
-    const frame = requestAnimationFrame(updateIndicator);
-    const resizeObserver = new ResizeObserver(updateIndicator);
-    if (containerRef.current) resizeObserver.observe(containerRef.current);
-    if (navRef.current) resizeObserver.observe(navRef.current);
-    return () => {
-      cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-    };
-  }, [activeId, headings, followPaused]);
 
   const pauseFollowing = () => {
     setFollowPaused(true);
@@ -145,92 +51,226 @@ export function ArticleToc() {
     pauseTimer.current = setTimeout(() => setFollowPaused(false), 1800);
   };
 
-  if (headings.length === 0) {
-    return null;
-  }
-
-  const topLevel = Math.min(...headings.map((heading) => heading.level));
-  const secondLevel = topLevel < 6 ? topLevel + 1 : null;
-
-  const scrollToHeading = (id: string) => {
-    const element = document.getElementById(id);
-    if (!element) return;
-
-    const top = window.scrollY + element.getBoundingClientRect().top - ARTICLE_HEADING_OFFSET;
+  const resumeFollowing = () => {
     if (pauseTimer.current) clearTimeout(pauseTimer.current);
     setFollowPaused(false);
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top, behavior: reducedMotion ? "instant" : "smooth" });
   };
 
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      if (!content.clientHeight || !content.clientWidth) return;
+      const bounds = content.getBoundingClientRect();
+      const links = Array.from(content.querySelectorAll<HTMLAnchorElement>("a"));
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const positions: TrackPosition[] = [];
+      let d = "";
+      links.forEach((link, index) => {
+        const rect = link.getBoundingClientRect();
+        const style = getComputedStyle(link);
+        const x = 8.5 + headings[index].depth * 12;
+        const top = rect.top - bounds.top + parseFloat(style.paddingTop);
+        const bottom = rect.bottom - bounds.top - parseFloat(style.paddingBottom);
+        if (index === 0) d = `M ${x} ${top}`;
+        else {
+          const previous = positions[index - 1];
+          d += ` C ${previous.x} ${previous.bottom + 6} ${x} ${top - 6} ${x} ${top}`;
+        }
+        path.setAttribute("d", d);
+        const start = path.getTotalLength();
+        d += ` L ${x} ${bottom}`;
+        path.setAttribute("d", d);
+        positions.push({ x, top, bottom, start, end: path.getTotalLength() });
+      });
+      const viewportHeight = viewportRef.current?.clientHeight ?? 0;
+      setGeometry((previous) => previous?.d === d && previous.height === bounds.height &&
+        previous.viewportHeight === viewportHeight
+        ? previous : { d, height: bounds.height, viewportHeight, positions });
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(measure); };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(content);
+    if (viewportRef.current) observer.observe(viewportRef.current);
+    content.querySelectorAll("a").forEach((item) => observer.observe(item));
+    schedule();
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); };
+  }, [headings]);
+
+  useEffect(() => {
+    if (followPaused) return;
+    const frame = requestAnimationFrame(() => {
+      const viewport = viewportRef.current;
+      const content = contentRef.current;
+      if (!viewport || !content || !viewport.clientHeight) return;
+      const item = content.querySelectorAll("a")[direction === "up" ? startIndex : endIndex];
+      if (!item) return;
+      const bounds = viewport.getBoundingClientRect();
+      const rect = item.getBoundingClientRect();
+      const itemTop = viewport.scrollTop + rect.top - bounds.top - viewport.clientTop;
+      const top = getTocScrollTop(
+        viewport.scrollTop, viewport.clientHeight, itemTop,
+        rect.height, viewport.scrollHeight
+      );
+      if (Math.abs(top - viewport.scrollTop) > 1) {
+        viewport.scrollTo({ top, behavior: positionedRef.current && !reducedMotion ? "smooth" : "instant" });
+      }
+      positionedRef.current = true;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [headings, startIndex, endIndex, direction, geometry, reducedMotion, followPaused]);
+
+  const first = geometry?.positions[startIndex];
+  const last = geometry?.positions[endIndex];
+  const arrowDistance = direction === "up" ? first?.start : last?.end;
   return (
-    <aside className="hidden min-[1400px]:block fixed top-28 left-[calc(50%+26rem)] w-64">
-      <div>
-        <div className="mb-4">
-          <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
-            <FiList aria-hidden="true" size={16} />
-            On this page
-          </p>
-        </div>
+    <nav ref={viewportRef} aria-label="本文目录" className={styles.viewport}
+      tabIndex={0}
+      onWheel={pauseFollowing}
+      onTouchMove={pauseFollowing}
+      onPointerDown={pauseFollowing}
+      onKeyDown={(event) => {
+        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab"].includes(event.key)) {
+          pauseFollowing();
+        }
+      }}>
+      <ul ref={contentRef} className={styles.items}>
+        {geometry && first && last && (
+          <li aria-hidden="true" className={styles.track}>
+            <svg width="32" height={geometry.height} className={styles.trackSvg}>
+              <defs><clipPath id={clipId}>
+                <rect x="0" y={first.top} width="32" height={last.bottom - first.top} />
+              </clipPath></defs>
+              <path d={geometry.d} className={styles.trackBase} />
+              <path d={geometry.d} clipPath={`url(#${clipId})`} className={styles.trackActive} />
+            </svg>
+            <span className={styles.arrow} data-direction={direction}
+              style={{ offsetPath: `path("${geometry.d}")`, offsetDistance: `${arrowDistance ?? 0}px` }}>
+              <svg width="8" height="8" viewBox="0 0 8 8">
+                <path d={direction === "up" ? "M 1 5.5 L 4 2.5 L 7 5.5" : "M 1 2.5 L 4 5.5 L 7 2.5"} />
+              </svg>
+            </span>
+          </li>
+        )}
+        {headings.map((heading, index) => (
+          <li key={heading.id}>
+            <Link href={`#${encodeURIComponent(heading.id)}`} className={styles.item}
+              style={{ paddingInlineStart: 24 + heading.depth * 12 }}
+              aria-current={heading.id === currentId ? "location" : undefined}
+              data-active={index >= startIndex && index <= endIndex}
+              onClick={(event) => {
+                if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
+                  resumeFollowing();
+                }
+                onSelect?.(event, heading.id);
+              }}>
+              {heading.text}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
-        <nav
-          ref={navRef}
-          aria-label="Table of contents"
-          tabIndex={0}
-          onWheel={pauseFollowing}
-          onTouchMove={pauseFollowing}
-          onPointerDown={pauseFollowing}
-          onKeyDown={(event) => {
-            if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab"].includes(event.key)) {
-              pauseFollowing();
-            }
-          }}
-          className="no-scrollbar max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain pr-2"
-        >
-          <div ref={containerRef} className="relative pl-6">
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-[var(--card-border)]" />
-            {indicatorStyle && (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 w-0.5 bg-[var(--accent)] transition-[top,height] duration-200 motion-reduce:transition-none"
-                style={indicatorStyle}
-              />
-            )}
-            <ul className="space-y-1">
-              {headings.map((heading) => {
-                const isActive = heading.id === activeId;
+export function ArticleToc({ variant }: { variant: "desktop" | "mobile" }) {
+  const state = useContext(TocContext);
+  if (!state) throw new Error("ArticleToc must be inside ArticleTocProvider");
+  return variant === "desktop" ? <DesktopToc state={state} /> : <MobileToc state={state} />;
+}
 
-                return (
-                  <li
-                    key={heading.id}
-                    ref={(node) => {
-                      itemRefs.current[heading.id] = node;
-                    }}
-                    className="relative"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => scrollToHeading(heading.id)}
-                      aria-current={isActive ? "location" : undefined}
-                      className={[
-                        "group flex w-full items-start rounded-md py-1.5 text-left text-sm leading-5 transition-colors",
-                        heading.level === secondLevel
-                          ? "pl-4 font-normal"
-                          : "font-medium",
-                        isActive
-                          ? "text-[var(--foreground)]"
-                          : "text-[var(--muted)] hover:text-[var(--foreground)]",
-                      ].join(" ")}
-                    >
-                      <span className="min-w-0 flex-1 break-words">{heading.text}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </nav>
-      </div>
+function DesktopToc({ state }: { state: TocContextValue }) {
+  if (!state.ready) {
+    return <aside className={`article-toc-desktop ${styles.desktop}`} aria-hidden="true">
+      <p className={styles.title}><FiList size={15} />本文目录</p>
+    </aside>;
+  }
+  if (!state.headings.length) return null;
+  return (
+    <aside className={`article-toc-desktop ${styles.desktop}`} aria-label="文章导航">
+      <p className={styles.title}><FiList size={15} aria-hidden="true" />本文目录</p>
+      <TocItems state={state} />
     </aside>
+  );
+}
+
+function MobileToc({ state }: { state: TocContextValue }) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
+  useEffect(() => {
+    if (!open) return;
+    let frame = 0;
+    const measurePanel = () => {
+      frame = 0;
+      const container = containerRef.current;
+      if (!container) return;
+      const available = Math.max(0, window.innerHeight - container.getBoundingClientRect().bottom - 16);
+      container.style.setProperty("--toc-panel-height", `${available}px`);
+    };
+    const schedulePanel = () => {
+      if (!frame) frame = requestAnimationFrame(measurePanel);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    window.addEventListener("scroll", schedulePanel, { passive: true });
+    window.addEventListener("resize", schedulePanel);
+    schedulePanel();
+    const media = window.matchMedia("(min-width: 1200px)");
+    const onBreakpoint = () => { if (media.matches) setOpen(false); };
+    media.addEventListener("change", onBreakpoint);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("scroll", schedulePanel);
+      window.removeEventListener("resize", schedulePanel);
+      cancelAnimationFrame(frame);
+      media.removeEventListener("change", onBreakpoint);
+    };
+  }, [open]);
+
+  if (!state.ready) {
+    return <div className={`article-toc-mobile ${styles.mobile}`} aria-hidden="true">
+      <div className={styles.trigger}><FiList size={15} />本文目录</div>
+    </div>;
+  }
+  if (!state.headings.length) return null;
+  const current = state.headings[state.startIndex];
+  const onSelect = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    setOpen(false);
+    requestAnimationFrame(() => {
+      const heading = document.getElementById(id);
+      if (!heading) return;
+      if (!heading.hasAttribute("tabindex")) heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    });
+  };
+  return (
+    <div ref={containerRef} className={`article-toc-mobile ${styles.mobile}`}
+      onBlur={(event) => {
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}>
+      <button ref={triggerRef} type="button" className={styles.trigger}
+        aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(!open)}>
+        <FiList size={15} aria-hidden="true" />
+        <span className={styles.triggerLabel}>本文目录</span>
+        <span className={styles.currentTitle}>{current?.text}</span>
+        <FiChevronDown size={15} aria-hidden="true" className={open ? styles.expandedIcon : undefined} />
+      </button>
+      {open && <div id={panelId} className={styles.panel}><TocItems state={state} onSelect={onSelect} /></div>}
+    </div>
   );
 }

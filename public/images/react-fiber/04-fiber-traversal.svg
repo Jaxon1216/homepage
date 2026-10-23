@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1188" height="777.0" viewBox="0 0 1188 777.0">
+<title>Fiber 怎么走：先向下，再回溯，遇到兄弟转过去</title>
+<desc>左侧七节点树，树边无箭头，实际执行路径左右偏移；Row A 到 Row B 独立 sibling 箭头表示兄弟切换。右侧四段有序轨迹，底部解释 complete 和 bailout。</desc>
+<rect data-role="canvas" x="0" y="0" width="1188" height="777.0" fill="#fbfcfd"/>
+<text data-role="title" x="36" y="51.0" font-family="Noto Sans SC" font-size="30" fill="#1f2329" font-weight="bold" text-anchor="start">Fiber 怎么走：先向下，再回溯，遇到兄弟转过去</text>
+<text data-role="label" x="36" y="87.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">beginWork 与 completeWork 组成一次深度优先遍历</text>
+<polyline data-role="connector" points="36,150.0 72,150.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="66.0,144.0 72,150.0 66.0,156.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="81.0" y="156" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="normal" text-anchor="start">beginWork 下探</text>
+<polyline data-role="connector" points="342.0,150.0 378.0,150.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="372.0,144.0 378.0,150.0 372.0,156.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<text data-role="label" x="387.0" y="156" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="normal" text-anchor="start">completeWork 回溯</text>
+<text data-role="label" x="720" y="156" font-family="Noto Sans SC" font-size="24" fill="#1f2329" font-weight="bold" text-anchor="start">实际执行顺序</text>
+<polyline data-role="neutral-tree-relation" points="342.0,264.0 342.0,295.5 189.0,295.5 189.0,327.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="neutral-tree-relation" points="342.0,264.0 342.0,295.5 495.0,295.5 495.0,327.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="neutral-tree-relation" points="189.0,381.0 189.0,412.5 189.0,412.5 189.0,444.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="neutral-tree-relation" points="495.0,381.0 495.0,412.5 495.0,412.5 495.0,444.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="neutral-tree-relation" points="189.0,498.0 189.0,529.5 189.0,529.5 189.0,561.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="neutral-tree-relation" points="495.0,498.0 495.0,529.5 495.0,529.5 495.0,561.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<polyline data-role="begin-descent" points="333.0,264.0 333.0,286.5 180.0,286.5 180.0,327.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="174.0,321.0 180.0,327.0 186.0,321.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="complete-ascent" points="504.0,327.0 504.0,304.5 351.0,304.5 351.0,264.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="345.0,270.0 351.0,264.0 357.0,270.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="begin-descent" points="180.0,381.0 180.0,403.5 180.0,403.5 180.0,444.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="174.0,438.0 180.0,444.0 186.0,438.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="complete-ascent" points="198.0,444.0 198.0,421.5 198.0,421.5 198.0,381.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="192.0,387.0 198.0,381.0 204.0,387.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="begin-descent" points="486.0,381.0 486.0,403.5 486.0,403.5 486.0,444.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="480.0,438.0 486.0,444.0 492.0,438.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="complete-ascent" points="504.0,444.0 504.0,421.5 504.0,421.5 504.0,381.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="498.0,387.0 504.0,381.0 510.0,387.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="begin-descent" points="180.0,498.0 180.0,520.5 180.0,520.5 180.0,561.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="174.0,555.0 180.0,561.0 186.0,555.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="complete-ascent" points="198.0,561.0 198.0,538.5 198.0,538.5 198.0,498.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="192.0,504.0 198.0,498.0 204.0,504.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="begin-descent" points="486.0,498.0 486.0,520.5 486.0,520.5 486.0,561.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="480.0,555.0 486.0,561.0 492.0,555.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="complete-ascent" points="504.0,561.0 504.0,538.5 504.0,538.5 504.0,498.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="498.0,504.0 504.0,498.0 510.0,504.0" fill="none" stroke="#7b67c9" stroke-width="2.0"/>
+<polyline data-role="sibling-begin" points="261.0,354.0 423.0,354.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<polyline data-role="line-arrow" points="417.0,348.0 423.0,354.0 417.0,360.0" fill="none" stroke="#5b7fcb" stroke-width="2.0"/>
+<text data-role="label" x="342.0" y="345.0" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="middle">sibling</text>
+<text data-role="label" x="342.0" y="379.2" font-family="Noto Sans SC" font-size="16" fill="#5b7fcb" font-weight="normal" text-anchor="middle">转入兄弟</text>
+<rect data-role="fiber-tree-node" x="270.0" y="210.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="342.0" y="243.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">List</text>
+<rect data-role="fiber-tree-node" x="117.0" y="327.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="189.0" y="360.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">Row A</text>
+<rect data-role="fiber-tree-node" x="423.0" y="327.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="495.0" y="360.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">Row B</text>
+<rect data-role="fiber-tree-node" x="117.0" y="444.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="189.0" y="477.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">li A</text>
+<rect data-role="fiber-tree-node" x="423.0" y="444.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="495.0" y="477.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">li B</text>
+<rect data-role="fiber-tree-node" x="117.0" y="561.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="189.0" y="594.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">input A</text>
+<rect data-role="fiber-tree-node" x="423.0" y="561.0" width="144" height="54" rx="6.0" fill="#ffffff" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="label" x="495.0" y="594.0" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="bold" text-anchor="middle">input B</text>
+<text data-role="ordered-trace-heading" x="720" y="219.0" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="bold" text-anchor="start">① 向下 beginWork</text>
+<text data-role="ordered-trace" x="720" y="247.8" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">List → Row A → li A → input A</text>
+<text data-role="ordered-trace-heading" x="720" y="328.8" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="start">② 无 child，开始 completeWork</text>
+<text data-role="ordered-trace" x="720" y="357.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">input A → li A → Row A</text>
+<text data-role="ordered-trace" x="720" y="384.6" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">Row A 有兄弟，转向 Row B</text>
+<text data-role="ordered-trace-heading" x="720" y="438.6" font-family="Noto Sans SC" font-size="18" fill="#5b7fcb" font-weight="bold" text-anchor="start">③ 进入兄弟，再向下 beginWork</text>
+<text data-role="ordered-trace" x="720" y="467.40000000000003" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">Row B → li B → input B</text>
+<text data-role="ordered-trace-heading" x="720" y="548.4" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="bold" text-anchor="start">④ completeWork 一路回父</text>
+<text data-role="ordered-trace" x="720" y="577.1999999999999" font-family="Noto Sans SC" font-size="18" fill="#1f2329" font-weight="normal" text-anchor="start">input B → li B → Row B → List</text>
+<polyline data-role="footer-rule" points="36,669.0 1152,669.0" fill="none" stroke="#dadde3" stroke-width="2.0"/>
+<text data-role="complete-summary" x="36" y="699.6" font-family="Noto Sans SC" font-size="18" fill="#7b67c9" font-weight="normal" text-anchor="start">completeWork：汇总 flags 等信息，并为宿主节点做准备。</text>
+<text data-role="bailout-note" x="36" y="730.2" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">示意一次完整遍历；实际 render 可以 bailout，不必每个节点都重新计算。</text>
+<text data-role="control-rule" x="36" y="759.0" font-family="Noto Sans SC" font-size="18" fill="#6b7280" font-weight="normal" text-anchor="start">不能再向下 → 完成当前节点 → 有兄弟进入兄弟；无兄弟则回父继续完成。</text>
+</svg>

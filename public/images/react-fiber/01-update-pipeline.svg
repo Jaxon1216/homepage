@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1278" height="696" viewBox="0 0 1278 696">
+<title>一次状态更新：render 与 commit</title>
+<desc>更新从触发、调度、render、commit 到浏览器显示；render 准备新结果时旧页面仍可见，commit 同步修改当前 DOM 并切换 current。</desc>
+<rect data-role="canvas" x="0" y="0" width="1278" height="696" rx="0" fill="#fbfcfd" stroke="none" stroke-width="2"/>
+<text data-role="label" x="36" y="66" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="start" fill="#1f2329">一次更新，两个阶段</text>
+<text data-role="label" x="36" y="102" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">一次已有列表更新：先计算新结果，再提交到当前页面</text>
+<circle data-role="phase-dot" cx="136.98000000000002" cy="156.0" r="5.76" fill="#5b7fcb" stroke="none" stroke-width="2"/>
+<text data-role="label" x="136.98000000000002" y="137.1" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">B 点击确认</text>
+<text data-role="label" x="136.98000000000002" y="188.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">setDraft(&#x27;已确认&#x27;)</text>
+<polyline data-role="connector" points="148.68,156.0 360.72,156.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="354.24,149.52 360.72,156.0 354.24,162.48" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<circle data-role="phase-dot" cx="374.22" cy="156.0" r="5.76" fill="#5b7fcb" stroke="none" stroke-width="2"/>
+<text data-role="label" x="374.22" y="137.1" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">加入更新 / 调度</text>
+<text data-role="label" x="374.22" y="188.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">决定何时开始工作</text>
+<polyline data-role="connector" points="385.92,156.0 629.1,156.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="622.62,149.52 629.1,156.0 622.62,162.48" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<circle data-role="phase-dot" cx="642.6" cy="156.0" r="5.76" fill="#7b67c9" stroke="none" stroke-width="2"/>
+<text data-role="label" x="642.6" y="137.1" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">render</text>
+<text data-role="label" x="642.6" y="188.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">计算新结果</text>
+<polyline data-role="connector" points="654.3000000000001,156.0 921.4200000000001,156.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="914.94,149.52 921.4200000000001,156.0 914.94,162.48" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<circle data-role="phase-dot" cx="934.9200000000001" cy="156.0" r="5.76" fill="#4e9d6d" stroke="none" stroke-width="2"/>
+<text data-role="label" x="934.9200000000001" y="137.1" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">commit</text>
+<text data-role="label" x="934.9200000000001" y="188.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">同步提交变化</text>
+<polyline data-role="connector" points="946.6200000000001,156.0 1155.1200000000001,156.0" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1148.64,149.52 1155.1200000000001,156.0 1148.64,162.48" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<circle data-role="phase-dot" cx="1168.6200000000001" cy="156.0" r="5.76" fill="#5b7fcb" stroke="none" stroke-width="2"/>
+<text data-role="label" x="1168.6200000000001" y="137.1" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">浏览器显示</text>
+<text data-role="label" x="1168.6200000000001" y="188.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">显示已确认</text>
+<rect data-role="render-workspace" x="510.48" y="228.0" width="264.24" height="189.0" rx="8" fill="#f3eeff" stroke="none" stroke-width="2"/>
+<rect data-role="commit-workspace" x="805.32" y="228.0" width="259.20000000000005" height="189.0" rx="8" fill="#eaf7ee" stroke="none" stroke-width="2"/>
+<text data-role="label" x="528.48" y="260.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">准备新结果</text>
+<text data-role="label" x="823.32" y="260.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#4e9d6d">提交当前页面</text>
+<circle data-role="fiber-node" cx="642.6" cy="301.8" r="9.36" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<circle data-role="fiber-node" cx="576.54" cy="336.0" r="9.36" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<circle data-role="fiber-node" cx="708.6600000000001" cy="336.0" r="9.36" fill="#ffffff" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="connector" points="642.6,311.16 642.6,319.8 576.54,319.8 576.54,326.64" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="570.06,320.15999999999997 576.54,326.64 583.02,320.15999999999997" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="connector" points="585.9,336.0 699.3000000000001,336.0" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="692.82,329.52 699.3000000000001,336.0 692.82,342.48" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="528.48" y="377.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#7b67c9">可中断时：允许暂停 / 重做</text>
+<text data-role="label" x="528.48" y="405.3" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">当前页面尚未被替换</text>
+<circle data-role="commit-operation" cx="828.72" cy="293.7" r="3.06" fill="#4e9d6d" stroke="none" stroke-width="2"/>
+<text data-role="label" x="844.9200000000001" y="300.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">修改当前 DOM</text>
+<circle data-role="commit-operation" cx="828.72" cy="334.2" r="3.06" fill="#4e9d6d" stroke="none" stroke-width="2"/>
+<text data-role="label" x="844.9200000000001" y="340.5" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">切换 current</text>
+<circle data-role="commit-operation" cx="828.72" cy="374.7" r="3.06" fill="#4e9d6d" stroke="none" stroke-width="2"/>
+<text data-role="label" x="844.9200000000001" y="381.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">运行 layout 阶段逻辑</text>
+<polyline data-role="interrupt-boundary" points="790.0200000000001,220.8 790.0200000000001,424.2" fill="none" stroke="#c94c4c" stroke-width="2" stroke-dasharray="6 5"/>
+<text data-role="label" x="36" y="260.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">render 只准备结果</text>
+<text data-role="label" x="36" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">commit 才提交到页面</text>
+<text data-role="label" x="36" y="341.4" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">能否中断取决于渲染方式</text>
+<text data-role="label" x="36" y="373.79999999999995" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#c94c4c">commit 同步执行</text>
+<rect data-role="visible-old-page" x="36" y="476.4" width="738.72" height="183.6" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2"/>
+<rect data-role="visible-new-page" x="805.32" y="476.4" width="436.67999999999995" height="183.6" rx="8" fill="#ffffff" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="54" y="508.79999999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#4e5969">render 期间：旧页面仍可见</text>
+<text data-role="label" x="823.32" y="508.79999999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#4e9d6d">提交之后：新页面</text>
+<rect data-role="page-row" x="54" y="526.8" width="702.72" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="66.6" y="545.88" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">A / 原备注</text>
+<rect data-role="page-row" x="54" y="559.1999999999999" width="702.72" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="66.6" y="578.28" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">B / 原备注</text>
+<rect data-role="page-row" x="54" y="591.5999999999999" width="702.72" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="66.6" y="610.68" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">C / 原备注</text>
+<rect data-role="page-row" x="54" y="624.0" width="702.72" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="66.6" y="643.08" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">D / 原备注</text>
+<rect data-role="page-row" x="823.32" y="526.8" width="400.67999999999995" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="835.9200000000001" y="545.88" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">A / 原备注</text>
+<rect data-role="page-row" x="823.32" y="559.1999999999999" width="400.67999999999995" height="26.099999999999998" rx="4" fill="#eaf7ee" stroke="none" stroke-width="2"/>
+<text data-role="label" x="835.9200000000001" y="578.28" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">B / 已确认</text>
+<rect data-role="page-row" x="823.32" y="591.5999999999999" width="400.67999999999995" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="835.9200000000001" y="610.68" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">C / 原备注</text>
+<rect data-role="page-row" x="823.32" y="624.0" width="400.67999999999995" height="26.099999999999998" rx="4" fill="#eef3ff" stroke="none" stroke-width="2"/>
+<text data-role="label" x="835.9200000000001" y="643.08" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#1f2329">D / 原备注</text>
+<polyline data-role="connector" points="778.32,568.1999999999999 799.0200000000001,568.1999999999999" fill="none" stroke="#4e9d6d" stroke-width="2" stroke-dasharray="6 5"/>
+<polyline data-role="line-arrow" points="792.5400000000001,561.7199999999999 799.0200000000001,568.1999999999999 792.5400000000001,574.68" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="connector" points="934.9200000000001,421.5 934.9200000000001,470.09999999999997" fill="none" stroke="#4e9d6d" stroke-width="2" stroke-dasharray="6 5"/>
+<polyline data-role="line-arrow" points="928.44,463.61999999999995 934.9200000000001,470.09999999999997 941.4000000000001,463.61999999999995" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="retain-visible-page" points="642.6,421.5 642.6,470.09999999999997" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="6 5"/>
+</svg>

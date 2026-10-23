@@ -27,9 +27,24 @@ function Div(props: ComponentPropsWithoutRef<"div">) {
   return <div {...props} />;
 }
 
+function Table(props: ComponentPropsWithoutRef<"table">) {
+  return (
+    <div
+      className="table-wrapper"
+      role="region"
+      aria-label="表格，可左右滚动"
+      tabIndex={0}
+    >
+      <table {...props} />
+    </div>
+  );
+}
+
 export const mdxComponents = {
   pre: Pre,
   figure: Figure,
   div: Div,
   img: ZoomableImage,
+  table: Table,
+  ArticleImage: ZoomableImage,
 };

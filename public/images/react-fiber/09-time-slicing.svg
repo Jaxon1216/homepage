@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1511" height="957" viewBox="0 0 1511 957">
+<title>协作式时间切片与不可抢占的工作</title>
+<desc>低优先级 render 在工作单元边界让出主线程；紧急更新可以同步 render 并 commit；后续低优先级工作可能继续仍有效部分，也可能放弃旧 WIP 后重做。可见页面只显示最近提交的版本。长函数与同步 commit 不能在中途被 React 抢占。</desc>
+<rect data-role="canvas" x="0" y="0" width="1511" height="957" rx="8" fill="#fbfcfd" stroke="none" stroke-width="2"/>
+<text data-role="label" x="36" y="66" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="start" fill="#1f2329">时间切片：在工作边界让出主线程</text>
+<text data-role="label" x="36" y="102" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">同一条主线程；时间从左到右，块宽仅示意</text>
+<polyline data-role="main-thread-time-axis" points="36,136.2 1475,136.2" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1468.7,129.89999999999998 1475,136.2 1468.7,142.5" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="1475" y="123.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="end" fill="#4e5969">时间 →</text>
+<text data-role="label" x="36" y="177.6" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">低优先级并发 render</text>
+<rect data-role="work-block" x="36.0" y="210" width="84.96" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="78.47999999999999" y="256.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">工作 1</text>
+<polyline data-role="unit-boundary" points="127.25999999999999,204.6 127.25999999999999,296.4" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<rect data-role="work-block" x="133.56" y="210" width="84.96" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="176.04" y="256.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">工作 2</text>
+<polyline data-role="unit-boundary" points="224.82,204.6 224.82,296.4" fill="none" stroke="#7b67c9" stroke-width="2" stroke-dasharray="5 5"/>
+<rect data-role="work-block" x="231.11999999999998" y="210" width="84.96" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="273.59999999999997" y="256.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">工作 3</text>
+<text data-role="label" x="36" y="319.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">工作单元边界可检查是否让出</text>
+<polyline data-role="connector" points="318.78,250.5 407.88,250.5" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="401.58,244.2 407.88,250.5 401.58,256.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="364.67999999999995" y="201.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">让出</text>
+<rect data-role="work-block" x="413.28" y="210" width="144" height="81.0" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="485.28" y="243.3" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#5b7fcb">处理输入</text>
+<text data-role="label" x="485.28" y="270.3" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#5b7fcb">浏览器可绘制</text>
+<polyline data-role="connector" points="559.0799999999999,250.5 583.38,250.5" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="577.08,244.2 583.38,250.5 577.08,256.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="587.88" y="177.6" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#5b7fcb">紧急更新（可同步）</text>
+<rect data-role="work-block" x="587.88" y="210" width="96.48000000000002" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="636.12" y="256.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">render</text>
+<rect data-role="urgent-sync-commit" x="684.36" y="210" width="172.8" height="81.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="770.76" y="256.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">commit / layout</text>
+<text data-role="label" x="587.88" y="319.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e9d6d">commit 连续同步执行</text>
+<polyline data-role="connector" points="859.8600000000001,250.5 887.7600000000001,250.5 913.8600000000001,250.5" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="907.5600000000002,244.2 913.8600000000001,250.5 907.5600000000002,256.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="connector" points="887.7600000000001,250.5 887.7600000000001,430.5 913.8600000000001,430.5" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="907.5600000000002,424.2 913.8600000000001,430.5 907.5600000000002,436.8" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="918.3600000000001" y="195.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#7b67c9">工作仍有效</text>
+<rect data-role="valid-work-continuation" x="918.3600000000001" y="210" width="236.88" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1036.8000000000002" y="243.3" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">继续仍有效工作</text>
+<text data-role="label" x="1036.8000000000002" y="270.3" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#7b67c9">后续低优先级 render</text>
+<text data-role="label" x="918.3600000000001" y="375.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#c94c4c">工作已失效</text>
+<rect data-role="discarded-wip" x="918.3600000000001" y="390" width="85.32000000000001" height="81.0" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="961.0200000000001" y="423.3" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#dadde3">旧 WIP</text>
+<text data-role="label" x="961.0200000000001" y="450.3" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#dadde3">放弃</text>
+<text data-role="cancel-mark" x="995.5800000000002" y="409.8" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="middle" fill="#c94c4c">×</text>
+<polyline data-role="connector" points="1005.4800000000001,430.5 1030.6800000000003,430.5" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1024.3800000000003,424.2 1030.6800000000003,430.5 1024.3800000000003,436.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="restarted-render" x="1036.0800000000002" y="390" width="119.16" height="81.0" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="1095.66" y="436.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">重新 render</text>
+<polyline data-role="connector" points="1157.0400000000002,250.5 1185.8400000000001,250.5 1185.8400000000001,340.5 1211.9400000000003,340.5" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1205.6400000000003,334.2 1211.9400000000003,340.5 1205.6400000000003,346.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="connector" points="1157.0400000000002,430.5 1185.8400000000001,430.5 1185.8400000000001,340.5 1211.9400000000003,340.5" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1205.6400000000003,334.2 1211.9400000000003,340.5 1205.6400000000003,346.8" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<rect data-role="final-sync-commit" x="1216.4400000000003" y="300.0" width="96.48000000000002" height="81.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1264.6800000000003" y="333.3" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">commit</text>
+<text data-role="label" x="1264.6800000000003" y="360.3" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e9d6d">完整结果</text>
+<text data-role="label" x="918.3600000000001" y="498.0" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#c94c4c">被放弃的半成品没有提交，也不会显示</text>
+<text data-role="label" x="36" y="541.2" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#4e9d6d">可见页面：始终是最近一次提交</text>
+<rect data-role="visible-committed-version" x="36" y="561.0" width="821.1600000000001" height="79.2" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="48.6" y="591.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">已提交 P0</text>
+<text data-role="label" x="48.6" y="618.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">render 期间继续可见</text>
+<rect data-role="visible-committed-version" x="857.1600000000001" y="561.0" width="455.7600000000002" height="79.2" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="869.7600000000001" y="591.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">紧急提交 P1</text>
+<text data-role="label" x="869.7600000000001" y="618.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">此时页面已包含紧急输入</text>
+<rect data-role="visible-committed-version" x="1312.9200000000003" y="561.0" width="162.0799999999997" height="79.2" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1325.5200000000002" y="591.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">完整 P2</text>
+<text data-role="label" x="1325.5200000000002" y="618.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">含低优先级结果</text>
+<polyline data-role="urgent-publication" points="857.1600000000001,327.0 857.1600000000001,556.5" fill="none" stroke="#4e9d6d" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="850.8600000000001,550.2 857.1600000000001,556.5 863.46,550.2" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="final-publication" points="1312.9200000000003,381.0 1312.9200000000003,556.5" fill="none" stroke="#4e9d6d" stroke-width="2" stroke-dasharray="5 5"/>
+<polyline data-role="line-arrow" points="1306.6200000000003,550.2 1312.9200000000003,556.5 1319.2200000000003,550.2" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="36" y="705.0" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#c94c4c">对照：这些连续工作不能被 React 从中间抢占</text>
+<rect data-role="nonpreemptible-function" x="36" y="744.6" width="767.1600000000001" height="81.0" rx="8" fill="#fdebec" stroke="#c94c4c" stroke-width="2"/>
+<text data-role="label" x="419.58000000000004" y="791.4" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#c94c4c">组件函数 / while 长循环：函数执行中没有 React 检查点</text>
+<polyline data-role="function-return-boundary" points="818.46,741.0 818.46,829.2" fill="none" stroke="#c94c4c" stroke-width="2" stroke-dasharray="5 5"/>
+<text data-role="label" x="803.1600000000001" y="856.2" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="end" fill="#c94c4c">返回后才可检查</text>
+<rect data-role="nonpreemptible-layout" x="833.7600000000001" y="744.6" width="641.2399999999999" height="81.0" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1154.38" y="791.4" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">commit / layout：同步执行到结束</text>
+<text data-role="label" x="36" y="901.2" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">不固定 5ms，不保证下一帧，也不是多线程。</text>
+<text data-role="label" x="36" y="933.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">任务之间的后续调度可使用 MessageChannel；它只是某些环境中的实现方式。</text>
+</svg>

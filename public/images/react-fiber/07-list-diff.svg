@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1408" height="1040" viewBox="0 0 1408 1040">
+<title>列表 Diff 分步图：ABCD 到 BDAE</title>
+<desc>首项 A/B 不匹配后，React 为旧剩余子 Fiber 建 Map。按新顺序匹配 B、D、A、E，通过 lastPlacedIndex 判定 A 需移动，E 需新建，C 删除；render 记录标记，commit 修改真实 DOM。</desc>
+<rect data-role="canvas" x="0" y="0" width="1408" height="1040" rx="8" fill="#fbfcfd" stroke="none" stroke-width="2"/>
+<text data-role="label" x="36" y="66" font-family="Noto Sans SC" font-size="30" font-weight="700" text-anchor="start" fill="#1f2329">列表 Diff：先匹配并标记，再修改 DOM</text>
+<text data-role="label" x="36" y="102" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">同 type Row，key 使用稳定 ID：ABCD → BDAE</text>
+<text data-role="label" x="36" y="152.39999999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">① A 与 B 不匹配，顺序扫描结束</text>
+<text data-role="label" x="36" y="202.79999999999995" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#7b67c9">current 子 Fiber</text>
+<text data-role="label" x="36" y="442.2" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#5b7fcb">新 React 元素</text>
+<rect data-role="sequence-item" x="36.0" y="213.59999999999997" width="57.6" height="57.6" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="64.8" y="252.19199999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">A</text>
+<text data-role="label" x="64.8" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">0</text>
+<rect data-role="sequence-item" x="113.4" y="213.59999999999997" width="57.6" height="57.6" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="142.20000000000002" y="252.19199999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">B</text>
+<text data-role="label" x="142.20000000000002" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">1</text>
+<rect data-role="sequence-item" x="190.8" y="213.59999999999997" width="57.6" height="57.6" rx="8" fill="#fdebec" stroke="#c94c4c" stroke-width="2"/>
+<text data-role="label" x="219.60000000000002" y="252.19199999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#c94c4c">C</text>
+<text data-role="label" x="219.60000000000002" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">2</text>
+<rect data-role="sequence-item" x="268.20000000000005" y="213.59999999999997" width="57.6" height="57.6" rx="8" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="297.00000000000006" y="252.19199999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">D</text>
+<text data-role="label" x="297.00000000000006" y="292.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">3</text>
+<rect data-role="sequence-item" x="36.0" y="357.59999999999997" width="57.6" height="57.6" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="64.8" y="396.19199999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">B</text>
+<rect data-role="sequence-item" x="113.4" y="357.59999999999997" width="57.6" height="57.6" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="142.20000000000002" y="396.19199999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">D</text>
+<rect data-role="sequence-item" x="190.8" y="357.59999999999997" width="57.6" height="57.6" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="219.60000000000002" y="396.19199999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">A</text>
+<rect data-role="sequence-item" x="268.20000000000005" y="357.59999999999997" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="297.00000000000006" y="396.19199999999995" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">E</text>
+<polyline data-role="identity-match" points="64.8,298.2 64.8,307.2 219.60000000000002,307.2 219.60000000000002,353.09999999999997" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="213.3,346.79999999999995 219.60000000000002,353.09999999999997 225.90000000000003,346.79999999999995" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="identity-match" points="142.20000000000002,298.2 142.20000000000002,318.9 64.8,318.9 64.8,353.09999999999997" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="line-arrow" points="58.5,346.79999999999995 64.8,353.09999999999997 71.1,346.79999999999995" fill="none" stroke="#7b67c9" stroke-width="2"/>
+<polyline data-role="identity-match" points="297.00000000000006,298.2 297.00000000000006,330.59999999999997 142.20000000000002,330.59999999999997 142.20000000000002,353.09999999999997" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="135.9,346.79999999999995 142.20000000000002,353.09999999999997 148.50000000000003,346.79999999999995" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="451.8" y="152.39999999999998" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">② 建立旧剩余 Map</text>
+<rect data-role="remaining-map" x="451.8" y="213.59999999999997" width="919.8000000000002" height="97.2" rx="8" fill="#ffffff" stroke="#dadde3" stroke-width="2"/>
+<text data-role="label" x="580.2750000000001" y="249.59999999999997" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">A</text>
+<text data-role="label" x="580.2750000000001" y="281.99999999999994" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex 0</text>
+<text data-role="label" x="801.2250000000001" y="249.59999999999997" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">B</text>
+<text data-role="label" x="801.2250000000001" y="281.99999999999994" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex 1</text>
+<text data-role="label" x="1022.1750000000002" y="249.59999999999997" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#c94c4c">C</text>
+<text data-role="label" x="1022.1750000000002" y="281.99999999999994" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex 2</text>
+<text data-role="label" x="1243.1250000000002" y="249.59999999999997" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">D</text>
+<text data-role="label" x="1243.1250000000002" y="281.99999999999994" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex 3</text>
+<text data-role="label" x="451.8" y="352.19999999999993" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">以 key 查旧 Fiber，再检查 type。</text>
+<text data-role="label" x="451.8" y="388.19999999999993" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#c94c4c">key=C 一直未被新列表使用。</text>
+<text data-role="label" x="36" y="476.4" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#7b67c9">③ 按新顺序匹配：lastPlacedIndex 初始为 0</text>
+<circle data-role="step-marker" cx="184.05" cy="541.2" r="21.599999999999998" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="184.05" y="549.3000000000001" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">B</text>
+<text data-role="label" x="184.05" y="582.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex: 1</text>
+<text data-role="label" x="184.05" y="613.2" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">1 ≥ 0</text>
+<text data-role="label" x="184.05" y="645.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">last: 0 → 1</text>
+<text data-role="label" x="184.05" y="678.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">复用，不标移动</text>
+<polyline data-role="connector" points="333.90000000000003,609.6 377.1,609.6" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="370.8,603.3000000000001 377.1,609.6 370.8,615.9" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="algorithm-track-divider" points="357.3,519.6 357.3,660.0" fill="none" stroke="#dadde3" stroke-width="2"/>
+<circle data-role="step-marker" cx="530.55" cy="541.2" r="21.599999999999998" fill="#f3eeff" stroke="#7b67c9" stroke-width="2"/>
+<text data-role="label" x="530.55" y="549.3000000000001" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">D</text>
+<text data-role="label" x="530.55" y="582.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex: 3</text>
+<text data-role="label" x="530.55" y="613.2" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#7b67c9">3 ≥ 1</text>
+<text data-role="label" x="530.55" y="645.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">last: 1 → 3</text>
+<text data-role="label" x="530.55" y="678.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">复用，不标移动</text>
+<polyline data-role="connector" points="680.4,609.6 723.6,609.6" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="717.3000000000001,603.3000000000001 723.6,609.6 717.3000000000001,615.9" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="algorithm-track-divider" points="703.8,519.6 703.8,660.0" fill="none" stroke="#dadde3" stroke-width="2"/>
+<circle data-role="step-marker" cx="877.05" cy="541.2" r="21.599999999999998" fill="#fdebec" stroke="#c94c4c" stroke-width="2"/>
+<text data-role="label" x="877.05" y="549.3000000000001" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#c94c4c">A</text>
+<text data-role="label" x="877.05" y="582.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex: 0</text>
+<text data-role="label" x="877.05" y="613.2" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#c94c4c">0 &lt; 3</text>
+<text data-role="label" x="877.05" y="645.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">last: 3 → 3</text>
+<text data-role="label" x="877.05" y="678.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#c94c4c">Placement：移动</text>
+<polyline data-role="connector" points="1026.8999999999999,609.6 1070.1,609.6" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1063.8,603.3000000000001 1070.1,609.6 1063.8,615.9" fill="none" stroke="#5b7fcb" stroke-width="2"/>
+<polyline data-role="algorithm-track-divider" points="1050.3,519.6 1050.3,660.0" fill="none" stroke="#dadde3" stroke-width="2"/>
+<circle data-role="step-marker" cx="1223.55" cy="541.2" r="21.599999999999998" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1223.55" y="549.3000000000001" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">E</text>
+<text data-role="label" x="1223.55" y="582.6" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="middle" fill="#4e5969">oldIndex: 无</text>
+<text data-role="label" x="1223.55" y="613.2" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">无旧节点</text>
+<text data-role="label" x="1223.55" y="645.6" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#7b67c9">last: 3 → 3</text>
+<text data-role="label" x="1223.55" y="678.0" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="middle" fill="#4e9d6d">Placement：新建</text>
+<text data-role="label" x="36" y="721.1999999999999" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#c94c4c">C 未使用 → 父 Fiber.deletions 记录删除</text>
+<text data-role="label" x="1372" y="721.1999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="end" fill="#4e5969">render 到此只标记；当前 DOM 仍为 ABCD</text>
+<polyline data-role="render-commit-boundary" points="36,746.4 1372,746.4" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="36" y="778.8" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="start" fill="#4e9d6d">commit：真实 DOM 才开始变化</text>
+<text data-role="label" x="36.0" y="841.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">① 原 DOM</text>
+<rect data-role="real-dom-item" x="54.0" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="82.8" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">A</text>
+<rect data-role="real-dom-item" x="121.5" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="150.3" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">B</text>
+<rect data-role="real-dom-item" x="189.0" y="863.4" width="57.6" height="57.6" rx="8" fill="#fdebec" stroke="#c94c4c" stroke-width="2"/>
+<text data-role="label" x="217.8" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#c94c4c">C</text>
+<rect data-role="real-dom-item" x="256.5" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="285.3" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">D</text>
+<polyline data-role="connector" points="333.90000000000003,892.1999999999999 377.1,892.1999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="370.8,885.9 377.1,892.1999999999999 370.8,898.4999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="382.5" y="841.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">② 删除 C</text>
+<rect data-role="real-dom-item" x="434.25" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="463.05" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">A</text>
+<rect data-role="real-dom-item" x="501.75" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="530.55" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">B</text>
+<rect data-role="real-dom-item" x="569.25" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="598.05" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">D</text>
+<polyline data-role="connector" points="680.4,892.1999999999999 723.6,892.1999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="717.3000000000001,885.9 723.6,892.1999999999999 717.3000000000001,898.4999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="729.0" y="841.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">③ 把 A 移到 D 后</text>
+<rect data-role="real-dom-item" x="780.75" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="809.55" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">B</text>
+<rect data-role="real-dom-item" x="848.25" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="877.05" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">D</text>
+<rect data-role="real-dom-item" x="915.75" y="863.4" width="57.6" height="57.6" rx="8" fill="#eef3ff" stroke="#5b7fcb" stroke-width="2"/>
+<text data-role="label" x="944.55" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#5b7fcb">A</text>
+<polyline data-role="connector" points="1026.8999999999999,892.1999999999999 1070.1,892.1999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<polyline data-role="line-arrow" points="1063.8,885.9 1070.1,892.1999999999999 1063.8,898.4999999999999" fill="none" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1075.5" y="841.8" font-family="Noto Sans SC" font-size="18" font-weight="700" text-anchor="start" fill="#4e9d6d">④ 插入 E</text>
+<rect data-role="real-dom-item" x="1093.5" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1122.3" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">B</text>
+<rect data-role="real-dom-item" x="1161.0" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1189.8" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">D</text>
+<rect data-role="real-dom-item" x="1228.5" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1257.3" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">A</text>
+<rect data-role="real-dom-item" x="1296.0" y="863.4" width="57.6" height="57.6" rx="8" fill="#eaf7ee" stroke="#4e9d6d" stroke-width="2"/>
+<text data-role="label" x="1324.8" y="901.992" font-family="Noto Sans SC" font-size="24" font-weight="700" text-anchor="middle" fill="#4e9d6d">E</text>
+<text data-role="label" x="36" y="967.8" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">B / D“保留”指不标移动；删除和移动其他节点后，它们的索引仍会变化。</text>
+<text data-role="label" x="36" y="1000.1999999999999" font-family="Noto Sans SC" font-size="18" font-weight="400" text-anchor="start" fill="#4e5969">这是本例的提交展开，不承诺理论上的最少操作次数。</text>
+</svg>
