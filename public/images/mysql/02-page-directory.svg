@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="665" viewBox="0 0 1000 665" role="img" aria-labelledby="title desc">
+<title id="title">页目录：先找组，再找行</title>
+<desc id="desc">查询 id 等于 6。页目录槽 A 指向组末记录 4，槽 B 指向组末记录 8，二分目录确定 4 小于 6 小于等于 8，然后从 4 的下一条记录 5 开始顺链走到 6。仅展示页的中间片段。</desc>
+<defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker></defs>
+<rect x="0" y="0" width="1000" height="665" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">页目录：先找组，再找行</text>
+<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">在一页里找 id = 6：先缩小到一组，再沿记录链查找。</text>
+<rect x="40" y="124" width="920" height="437" rx="18" fill="#F3F6FA" stroke="#E2E8F0" stroke-width="1.5"/>
+<text x="67" y="161" fill="#172B42" font-size="22" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">页目录（片段）</text>
+<text x="325" y="161" fill="#172B42" font-size="22" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">记录按主键串联（非物理相邻）</text>
+<rect x="62" y="185" width="181" height="336" rx="12" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="80" y="212" fill="#936000" font-size="19" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">① 二分目录槽</text>
+<rect x="78" y="236" width="149" height="54" rx="6" fill="#FFF1CC" stroke="#936000" stroke-width="1.5"/>
+<text x="152" y="270" fill="#172B42" font-size="22" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">槽 A → 4</text>
+<rect x="78" y="412" width="149" height="54" rx="6" fill="#FFF1CC" stroke="#936000" stroke-width="1.5"/>
+<text x="152" y="446" fill="#172B42" font-size="22" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">槽 B → 8</text>
+<text x="152" y="336" fill="#936000" font-size="22" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">4 &lt; 6 ≤ 8</text>
+<text x="152" y="367" fill="#53677C" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">目标在第二组</text>
+<text x="325" y="203" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">第一组</text>
+<text x="325" y="380" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">第二组</text>
+<polyline points="227,263 274,263 274,216 820,216 820,235" fill="none" stroke="#936000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 6" marker-end="url(#arrow-amber)"/>
+<polyline points="227,439 274,439 274,515 820,515 820,467" fill="none" stroke="#936000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 6" marker-end="url(#arrow-amber)"/>
+<polyline points="820,291 820,333 385,333 385,412" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="603" y="323" fill="#145DA8" font-size="20" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">② 从 4 的下一条开始</text>
+<rect x="325" y="236" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="385" y="271" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 1</text>
+<polyline points="445,263 467,263" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gray)"/>
+<rect x="470" y="236" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="530" y="271" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 2</text>
+<polyline points="590,263 612,263" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gray)"/>
+<rect x="615" y="236" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="675" y="271" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 3</text>
+<polyline points="735,263 757,263" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gray)"/>
+<rect x="760" y="236" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="820" y="271" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 4</text>
+<rect x="325" y="413" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="385" y="448" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 5</text>
+<polyline points="445,440 467,440" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<rect x="470" y="413" width="120" height="54" rx="7" fill="#E7F0FC" stroke="#145DA8" stroke-width="2.5"/>
+<text x="530" y="448" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 6</text>
+<polyline points="590,440 612,440" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gray)"/>
+<rect x="615" y="413" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="675" y="448" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 7</text>
+<polyline points="735,440 757,440" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-gray)"/>
+<rect x="760" y="413" width="120" height="54" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="820" y="448" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id = 8</text>
+<text x="530" y="497" fill="#145DA8" font-size="21" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">③ 5 → 6，找到记录</text>
+<text x="40" y="600" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">目录槽指向各组末尾的记录；箭头表示引用关系，不是磁盘地址连续。</text>
+<text x="40" y="634" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">仅画页中间的两个普通组；省略 infimum、supremum、首尾槽及其余记录。</text>
+</svg>

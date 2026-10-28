@@ -1,0 +1,22 @@
+{
+  "table": "products",
+  "lookupId": 6,
+  "secondaryColumn": "category",
+  "secondaryValue": "office",
+  "leafGroups": [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]],
+  "directoryGroups": [[1, 2, 3, 4], [5, 6, 7, 8]],
+  "products": [
+    {"id": 1, "name": "Notebook", "category": "stationery", "price": "12.50", "stock": 100},
+    {"id": 2, "name": "Desk lamp", "category": "office", "price": "89.00", "stock": 20},
+    {"id": 3, "name": "Pen", "category": "stationery", "price": "3.00", "stock": 200},
+    {"id": 4, "name": "Mug", "category": "home", "price": "25.00", "stock": 60},
+    {"id": 5, "name": "Mouse", "category": "electronics", "price": "59.00", "stock": 40},
+    {"id": 6, "name": "Keyboard", "category": "office", "price": "199.00", "stock": 15},
+    {"id": 7, "name": "Cable", "category": "electronics", "price": "19.90", "stock": 80},
+    {"id": 8, "name": "Towel", "category": "home", "price": "15.00", "stock": 50},
+    {"id": 9, "name": "Eraser", "category": "stationery", "price": "2.00", "stock": 150},
+    {"id": 10, "name": "Monitor", "category": "office", "price": "899.00", "stock": 8},
+    {"id": 11, "name": "Charger", "category": "electronics", "price": "79.00", "stock": 30},
+    {"id": 12, "name": "Basket", "category": "home", "price": "35.00", "stock": 25}
+  ]
+}
