@@ -14,12 +14,10 @@ export interface ArticleTocState {
   headings: TocHeading[];
   currentId: string;
   startIndex: number;
-  endIndex: number;
-  direction: "up" | "down";
 }
 
 const EMPTY_STATE: ArticleTocState = {
-  ready: false, headings: [], currentId: "", startIndex: 0, endIndex: 0, direction: "down",
+  ready: false, headings: [], currentId: "", startIndex: 0,
 };
 
 export function useArticleToc(contentRef: RefObject<HTMLElement | null>, slug: string) {
@@ -36,8 +34,6 @@ export function useArticleToc(contentRef: RefObject<HTMLElement | null>, slug: s
     let signature = "";
     let headings: TocHeading[] = [];
     let elements: HTMLElement[] = [];
-    let previousY = window.scrollY;
-    let direction: ArticleTocState["direction"] = "down";
     initialHashRef.current = { hash: window.location.hash, handled: false };
 
     const collectHeadings = () => {
@@ -67,11 +63,6 @@ export function useArticleToc(contentRef: RefObject<HTMLElement | null>, slug: s
       frame = 0;
       if (disposed) return;
       if (needsHeadings) collectHeadings();
-      const delta = window.scrollY - previousY;
-      if (Math.abs(delta) > 2) {
-        direction = delta > 0 ? "down" : "up";
-        previousY = window.scrollY;
-      }
       const offset = parseFloat(getComputedStyle(content).getPropertyValue("--article-scroll-offset")) || ARTICLE_HEADING_OFFSET;
       const tops = elements.map((item) => item.getBoundingClientRect().top);
       const articleRect = content.getBoundingClientRect();
@@ -79,16 +70,11 @@ export function useArticleToc(contentRef: RefObject<HTMLElement | null>, slug: s
       // when comments or the footer leave more space below the reading area.
       const atArticleEnd = articleRect.top < offset && articleRect.bottom <= window.innerHeight;
       const startIndex = Math.max(0, getActiveHeadingIndex(tops, offset, atArticleEnd));
-      let endIndex = startIndex;
-      for (let i = startIndex; i < tops.length; i++) {
-        if (tops[i] < window.innerHeight - 16) endIndex = i;
-      }
       const currentId = headings[startIndex]?.id ?? "";
       setState((previous) => {
         if (previous.ready && previous.headings === headings && previous.currentId === currentId &&
-          previous.startIndex === startIndex && previous.endIndex === endIndex &&
-          previous.direction === direction) return previous;
-        return { ready: true, headings, currentId, startIndex, endIndex, direction };
+          previous.startIndex === startIndex) return previous;
+        return { ready: true, headings, currentId, startIndex };
       });
     };
     const schedule = () => {

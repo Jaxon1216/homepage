@@ -20,11 +20,15 @@ export function getTocScrollTop(
   itemHeight: number,
   scrollHeight: number
 ): number {
+  // Keep the directory still while any part of the current item is visible.
+  if (itemTop + itemHeight > scrollTop && itemTop < scrollTop + viewportHeight) {
+    return scrollTop;
+  }
   const padding = Math.min(40, viewportHeight * 0.1);
   let target = scrollTop;
-  if (itemHeight > viewportHeight - padding * 2 || itemTop < scrollTop + padding) {
+  if (itemHeight > viewportHeight - padding * 2 || itemTop + itemHeight <= scrollTop) {
     target = itemTop - padding;
-  } else if (itemTop + itemHeight > scrollTop + viewportHeight - padding) {
+  } else if (itemTop >= scrollTop + viewportHeight) {
     target = itemTop + itemHeight - viewportHeight + padding;
   }
   return Math.max(0, Math.min(target, scrollHeight - viewportHeight));

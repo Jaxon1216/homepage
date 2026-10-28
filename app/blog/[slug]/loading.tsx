@@ -1,24 +1,16 @@
 export default function BlogPostLoading() {
   return (
     <div className="blog-reading-shell animate-pulse" aria-busy="true" aria-label="Loading article">
-      <div className="blog-reading-heading">
-        <div className="h-4 w-28 rounded bg-[var(--card)] mb-8" />
+      <div className="blog-reading-layout" aria-hidden="true">
+        <div className="blog-reading-heading">
+          <div className="h-4 w-28 rounded bg-[var(--card)] mb-5" />
 
-        <div className="mb-8">
-          <div className="h-9 w-3/4 rounded bg-[var(--card)] mb-4" />
-          <div className="flex gap-4">
-            <div className="h-4 w-24 rounded bg-[var(--card)]" />
-            <div className="h-4 w-20 rounded bg-[var(--card)]" />
-          </div>
-          <div className="flex gap-2 mt-3">
-            <div className="h-5 w-14 rounded bg-[var(--card)]" />
-            <div className="h-5 w-18 rounded bg-[var(--card)]" />
-            <div className="h-5 w-12 rounded bg-[var(--card)]" />
+          <div className="blog-reading-header">
+            <div className="h-20 sm:h-12 w-4/5 mx-auto rounded bg-[var(--card)]" />
+            <div className="h-5 w-48 mx-auto mt-3 rounded bg-[var(--card)]" />
           </div>
         </div>
-      </div>
 
-      <div className="blog-reading-layout" aria-hidden="true">
         <div className="article-toc-mobile">
           <div className="h-11 w-full rounded-lg border border-[var(--card-border)] bg-[var(--card)]" />
         </div>

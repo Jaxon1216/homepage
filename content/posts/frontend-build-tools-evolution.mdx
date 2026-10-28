@@ -125,9 +125,9 @@ webpack 官方的一句话定位是：把**有依赖关系的模块**（`.js`、
 
 这里的 `.coffee` 是 **CoffeeScript 源文件**，CoffeeScript 是一种会编译成 JavaScript 的语言，并非咖啡相关资源；`.jade` 是旧版 Jade 模板（后来更名为 Pug）的文件后缀。它们只是说明 webpack 可以借助相应 loader 接入不同类型的源码，今天的入门实验无需安装它们；[CoffeeScript 官方文档](https://coffeescript.org/)也用 `coffee -c` 将 `.coffee` 编译为 `.js`。
 
-它最核心的理念是**「万物皆模块」**——不只是 JS，CSS、图片、字体都能通过 loader 变成模块纳入依赖图。这一章先用一次真实打包把 `src` / `dist` / 开发服务器讲清楚，再把 webpack 从头到尾拆开：整体流程、依赖图、loader、资源处理、chunk 生成，最后看它打出来的运行时到底长什么样，以及工程上怎么优化。
+它最核心的理念是「**万物皆模块**」——不只是 JS，CSS、图片、字体都能通过 loader 变成模块纳入依赖图。这一章先用一次真实打包把 `src` / `dist` / 开发服务器讲清楚，再把 webpack 从头到尾拆开：整体流程、依赖图、loader、资源处理、chunk 生成，最后看它打出来的运行时到底长什么样，以及工程上怎么优化。
 
-![webpack 从 index.js 入口沿箭头收集 JavaScript、模板、Sass 和图片依赖，再生成 JavaScript、CSS 与图片资源](/images/webpack-module-overview.svg)
+![webpack 从 index.js 入口沿箭头收集 JavaScript、模板、Sass 和图片依赖，再生成 JavaScript、CSS 与图片资源](/images/webpack-module-overview.svg "webpack 模块依赖与构建产物")
 
 图中的非 JS 类型是示意；它们如何进入依赖图、最终产出什么资源，取决于 loader 或 webpack 内置的模块类型配置。
 
@@ -135,25 +135,25 @@ webpack 官方的一句话定位是：把**有依赖关系的模块**（`.js`、
 
 正式拆解之前，先用一条主线把后面所有名词串起来，避免陷进细节后 chunk / dependency / asset 分不清。理解它们最好的角度是**按"时间节点"（生命周期）来看**——同一个东西在不同阶段有不同形态：
 
-```mermaid
-flowchart LR
+```mermaid title="源码构建、产物输出与浏览器运行"
+flowchart TB
   subgraph BUILD["① 构建期 build time"]
-    direction TB
-    SRC["源码 main.js"] --> L["loader 转换"]
-    L --> DEP["依赖图 module + dependency"]
-    DEP --> CHUNK["chunk 打包单元"]
-    CHUNK --> ASSET["asset 产物文件"]
+    direction LR
+    SRC["源码<br/>main.js"] --> L["loader<br/>转换"]
+    L --> DEP["依赖图<br/>module +<br/>dependency"]
+    DEP --> CHUNK["chunk<br/>打包单元"]
+    CHUNK --> ASSET["asset<br/>产物文件"]
   end
-  subgraph OUT["② 产物落地"]
-    direction TB
-    DIST["构建输出：serve 默认内存提供，build 落盘"]
+  subgraph OUT["② 产物输出"]
+    direction LR
+    DIST["构建输出<br/>serve 默认内存提供；build 落盘"]
   end
   subgraph RUN["③ 运行期 runtime"]
-    direction TB
-    DEPLOY["部署到服务器 / CDN"] --> BROWSER["浏览器下载并执行 asset"]
+    direction LR
+    DEPLOY["部署<br/>服务器 / CDN"] --> BROWSER["浏览器下载<br/>并执行 asset"]
   end
-  ASSET --> DIST
-  DIST --> DEPLOY
+  BUILD -->|"输出 asset"| OUT
+  OUT -->|"发布构建产物"| RUN
 ```
 
 把这条主线拆成三个**时间节点**，概念就清楚了：
@@ -163,6 +163,8 @@ flowchart LR
 3. **运行期（runtime）**：`dist/` 里的 asset 被部署到服务器或 CDN，用户访问时浏览器把它们下载下来执行。**浏览器拿到的，就是 build 出来的 asset。**
 
 对应几个核心名词，记住这张对照表：
+
+表：webpack 构建核心概念与所处阶段
 
 | 名词 | 是什么 | 属于哪个阶段 / 能否看到 |
 | --- | --- | --- |
@@ -187,6 +189,8 @@ flowchart LR
 
 常见脚手架长这样：
 
+表：常见项目目录在构建中的作用
+
 | 路径 | 谁在用 | 会不会被 webpack 当模块分析 |
 | --- | --- | --- |
 | `src/` | 你写的源码（JS / 样式 / 图片） | 会。从入口出发，被 `import` / `require` 到的才会进依赖图 |
@@ -200,8 +204,8 @@ flowchart LR
 
 默认入口往往是 `src/main.js` 或 `src/index.tsx`。webpack 从这一个文件出发，递归收集所有依赖：`main.js` → `a.js` → `b.js`，CSS、图片只要被入口直接或间接引用，也会长到这棵树上。没挂上的文件——即使躺在 `src/` 里——打包时等于不存在。
 
-```mermaid
-flowchart TB
+```mermaid title="webpack 从入口递归收集依赖"
+flowchart LR
   E["入口 src/main.js"] --> A["a.js"]
   E --> CSS["main.css"]
   A --> B["b.js"]
@@ -220,6 +224,8 @@ flowchart TB
 > 👉 **动手验证**：在最小 webpack 项目里从入口 `import` 一个 JS、一份 CSS、一张图，再故意在 `src/` 里放一个谁也不引用的 `orphan.js`。`npm run build` 后：`dist/` 里应有那三个资源，**不应**出现 `orphan.js`。
 
 如果是第一次体验构建，可以先不追配置细节，按「改一处源码 → 预测产物 → 运行构建 → 对照结果」做四轮观察：
+
+表：最小 webpack 项目的四轮构建观察
 
 | 动作 | 构建后看哪里 | 要弄明白什么 |
 | --- | --- | --- |
@@ -249,7 +255,7 @@ flowchart TB
 
 如果每次改一行都 `build` 再打开 `dist/index.html`，开发会慢得没法做。所以开发阶段跑的是 `npm run dev` / `webpack serve`：启动一个本地 HTTP 服务（默认常是 `localhost:8080`，也可以改），**打包结果放在内存里，不写 `dist/`**。
 
-![开发服务器接收浏览器请求，从内存打包结果返回资源；src 源码变化触发重新打包并通知浏览器更新](/images/webpack-dev-server-loop.svg)
+![开发服务器接收浏览器请求，从内存打包结果返回资源；src 源码变化触发重新打包并通知浏览器更新](/images/webpack-dev-server-loop.svg "webpack 开发服务器的更新循环")
 
 请求链很短：浏览器要 HTML → 再按页面里的引用要 JS / CSS → 全部由 dev server 从内存结果里返回。webpack 盯着 `src/`，文件一变就重新打包、刷新页面，形成「修改 → 打包 → 刷新」闭环。内存比落盘 IO 快，这是开发体验的一部分。
 
@@ -262,7 +268,7 @@ flowchart TB
 
 ### 热更新：为什么改了文件有时不用整页刷新
 
-上面说的「改完即刷新」是最容易观察到的开发体验，但**监听文件并重新编译**与 **HMR（Hot Module Replacement，热模块替换）**不是同一件事。前者负责生成新代码；后者尝试在页面还运行着的时候替换受影响的模块。大致过程是：
+上面说的「改完即刷新」是最容易观察到的开发体验，但**监听文件并重新编译**与 **HMR**（Hot Module Replacement，热模块替换）不是同一件事。前者负责生成新代码；后者尝试在页面还运行着的时候替换受影响的模块。大致过程是：
 
 1. webpack 监听到文件变化，基于上一次结果重新编译，生成更新清单和更新代码。开发服务器通常把这些文件保存在内存中。
 2. dev server 通过与浏览器的连接（通常是 WebSocket）通知客户端：有新版本了。
@@ -281,7 +287,7 @@ flowchart TB
 2. **构建（build）**：从 `entry`（入口文件，如 `src/index.tsx`）出发，递归解析每个模块的依赖，构建出完整的**依赖图**（谁引用了谁的一张关系网）。
 3. **生成（seal & emit）**：把模块按规则打包成 `chunk`（内部单元）→ 渲染成 `asset`（真实文件）→ 写入 `output` 目录（如 `dist/`）。`seal` 是"封装/定型"、`emit` 是"输出到磁盘"。
 
-![webpack 构建全流程：初始化配置与 Compiler，编译期匹配 loader、解析 AST 并递归记录依赖，随后组织 chunk、生成带哈希的 asset 并输出](/images/webpack-build-pipeline.svg)
+![webpack 构建全流程：初始化配置与 Compiler，编译期匹配 loader、解析 AST 并递归记录依赖，随后组织 chunk、生成带哈希的 asset 并输出](/images/webpack-build-pipeline.svg "webpack 从初始化到输出的构建流程")
 
 图中的两个局部对应后文 3.2～3.3 节：先按规则找出 loader 并转换单个模块，**再由 webpack 解析转换结果的 AST、记录依赖**。loader 自己也可能使用 AST 做语法转换，但那是它内部的另一轮解析。
 
@@ -293,15 +299,23 @@ flowchart TB
 
 **hook 就是 webpack 在某个时刻发出的事件。** [Compiler Hooks 官方清单](https://webpack.js.org/api/compiler-hooks/#hooks)很长，不适合逐个背；先按一次构建的时间顺序记住下面几个：
 
-```mermaid
+```mermaid title="Compiler 一轮构建的关键钩子"
 flowchart TB
-  A["beforeRun / watchRun：开始一轮构建"] --> B["compile：准备创建 Compilation"]
-  B --> C["thisCompilation：拿到本轮构建对象"]
-  C --> D["make：从入口构建模块"]
-  D --> E["processAssets：整理输出资源"]
-  E --> F["emit：准备写出文件"]
-  F --> G["done：本轮完成"]
+  subgraph COMPILE["① 编译阶段"]
+    direction LR
+    A["beforeRun /<br/>watchRun<br/>开始一轮构建"] --> B["compile<br/>准备创建<br/>Compilation"]
+    B --> C["thisCompilation<br/>拿到本轮构建对象"]
+    C --> D["make<br/>从入口构建模块"]
+  end
+  subgraph OUTPUT["② 产物处理与输出"]
+    direction LR
+    E["processAssets<br/>整理输出资源"] --> F["emit<br/>准备写出文件"]
+    F --> G["done<br/>本轮完成"]
+  end
+  COMPILE -->|"make 完成后<br/>进入 processAssets"| OUTPUT
 ```
+
+表：常见构建钩子的用途与归属
 
 | 先认识的 hook | 拿它做什么 | 属于谁 |
 | --- | --- | --- |
@@ -330,6 +344,8 @@ class MyPlugin {
 
 登记回调有三种写法，关键区别是 webpack **需不需要等待你的回调完成**：
 
+表：插件回调的三种注册方式
+
 | 方法 | 回调形态 | 什么时候用 |
 | --- | --- | --- |
 | `tap` | 普通同步函数，函数返回就算做完 | 打日志、读已有统计等立即结束的工作 |
@@ -338,17 +354,17 @@ class MyPlugin {
 
 文档里写的 `SyncHook` / `AsyncSeriesHook` 是**hook 自身的类型**，不是让你无条件选择的函数名。`compile` 是 `SyncHook`，只能 `tap`；`emit` 是 `AsyncSeriesHook`，可以 `tap`（回调同步结束），也可以 `tapPromise`（等异步任务结束）。例如只打印 `compilation.getAssets().length` 时用 `tap`；若要异步写一份报告，用 `tapPromise('MyPlugin', async () => { await writeFile(...) })`。这里判断的是**是否需要等待异步操作**，不是「代码里有没有 I/O」四个字。
 
-```mermaid
+```mermaid title="插件注册与构建对象的生命周期"
 sequenceDiagram
   participant Init as 初始化
-  participant C as Compiler（watch 中复用）
+  participant C as Compiler<br/>watch 中复用
   participant P as plugin.apply
-  participant Comp as Compilation（每次构建一个）
+  participant Comp as Compilation<br/>每轮新建
   Init->>C: 创建 Compiler
   C->>P: 调用一次 apply，只负责 tap
   C->>Comp: 开始一次构建
   Comp->>P: 触发 emit 等钩子（可多次）
-  Note over C,Comp: watch / HMR：Compiler 不重建，Compilation 新建
+  Note over C,Comp: watch / HMR<br/>Compiler 复用<br/>Compilation 每轮新建
 ```
 
 > webpack 5 更推荐在 `compilation.hooks.processAssets` 上改产物，而不是 `compiler.hooks.emit`。`emit` 还能跑，官方已标成偏旧的时机（[Compilation Hooks](https://webpack.js.org/api/compilation-hooks/)）。上面这份最小插件继续用 `emit`，只因为它最好读；新插件优先 `processAssets`。
@@ -359,7 +375,7 @@ sequenceDiagram
 
 直接读具体代码：`index.js` 里 `import './a.js'`，webpack 就记录「`index.js` 依赖 `a.js`」；接着打开 `a.js`，继续查它导入了谁。`Compilation` 保存这一轮找到的模块、依赖关系和输出资源。图里的箭头都表示**源码里的导入关系**：
 
-```mermaid
+```mermaid title="模块之间的导入关系"
 flowchart LR
   I["index.js"] -->|"import './a.js'"| A["a.js"]
   I -->|"import './b.js'"| B["b.js"]
@@ -390,12 +406,12 @@ webpack 顺着这些记录递归查找，得到完整的依赖图。CSS 等非 J
 
 先把 loader 插在流程的哪一格钉死，后面的「必须返回 JS」「Module parse failed」才说得通。
 
-```mermaid
+```mermaid title="模块构建中的 loader 与 AST 处理"
 flowchart LR
-  R["① 读出文件原文"] --> L["② 跑匹配到的 loader 链"]
-  L --> A["③ 对结果做 AST 解析"]
-  A --> D["④ 记录 import / require"]
-  D --> S["⑤ 存下转换后的模块"]
+  R["① 读取文件<br/>原始内容"] --> L["② 执行匹配的<br/>loader 链"]
+  L --> A["③ 解析转换结果<br/>生成 AST"]
+  A --> D["④ 记录依赖<br/>import / require"]
+  D --> S["⑤ 保存<br/>转换后的模块"]
 ```
 
 loader 的执行窗口是 **②**：文件已经读到内存，但 webpack **还没**开始语法分析。它通常接收字符串，也可以通过 `raw: true` 接收 `Buffer`；输出同样可以是字符串或 `Buffer`，最终内容要符合 ③ 所用模块解析器的要求。所以：
@@ -426,11 +442,11 @@ module.exports = {
 
 用图表示更直观（注意箭头方向：**内容从右边的源文件出发，依次经过每个 loader，最后从左边出来**）：
 
-```mermaid
+```mermaid title="loader 链的处理顺序"
 flowchart RL
-  SRC["源文件 style.less"] -->|"less-loader"| L1["CSS 字符串"]
-  L1 -->|"css-loader"| L2["导出 CSS 内容与依赖的 JS module"]
-  L2 -->|"style-loader"| OUT["最终 JS module"]
+  SRC["源文件<br/>style.less"] -->|"less-loader"| L1["CSS 字符串"]
+  L1 -->|"css-loader"| L2["JS module<br/>导出 CSS 内容<br/>与依赖"]
+  L2 -->|"style-loader"| OUT["最终<br/>JS module"]
 ```
 
 一步步看这条链子上"内容"是怎么变的：
@@ -495,6 +511,8 @@ module.exports = {
 
 `type` 字段就是在这两种结果之间做选择，几个取值的区别：
 
+表：webpack 资源模块类型与旧 loader 对照
+
 | type 取值 | 行为 | 对应老写法 |
 | --- | --- | --- |
 | `asset` | 按 `maxSize` 阈值**自动二选一**（小图内联、大图单独文件） | `url-loader` + limit |
@@ -515,8 +533,8 @@ module.exports = {
 
 一个 chunk 通常渲染成一个 asset（也可能附带 source map 等额外 asset）。而当两个入口都用到同一份公共代码时，正确的处理方式**不是**让它们"共享一个文件"，而是**把公共代码抽成一个独立的 chunk，输出成独立 asset，再由多个入口/异步路径分别引用它**。看这个例子：
 
-```mermaid
-flowchart TB
+```mermaid title="入口、独立 chunk 与公共 chunk"
+flowchart LR
   EA["entry a"] --> CA["chunk a 输出 index-a.js"]
   EB["entry b"] --> CB["chunk b 输出 index-b.js"]
   EA -.用到.-> SHARED["common chunk 输出 common.js"]
@@ -563,7 +581,7 @@ flowchart TB
 2. **缓存结果**：同一份模块在当前运行时中通常只初始化一次，后续引用复用结果。
 3. **加载异步 chunk**：遇到动态 `import()`，加载尚未到达的代码，注册其中的模块，再兑现 Promise；加载失败则拒绝 Promise。
 
-```mermaid
+```mermaid title="动态导入的异步 chunk 加载过程"
 sequenceDiagram
   participant App as 页面代码
   participant Runtime as webpack runtime
@@ -590,7 +608,7 @@ sequenceDiagram
 
 假设 `pageA` 和 `pageB` 都 `import 'lodash'`：
 
-```mermaid
+```mermaid title="抽取公共依赖前后的产物对比"
 flowchart LR
   subgraph before ["不拆"]
     A1["pageA.js 含 lodash"]
@@ -629,6 +647,8 @@ module.exports = {
 ```
 
 怎么读图，比怎么挂插件重要：
+
+表：bundle 体积统计口径
 
 | 开关 | 看的是什么 |
 | --- | --- |
@@ -688,7 +708,7 @@ button.addEventListener('click', async () => {
 
 先说和压缩的分工：**压缩处理一个模块内部**（空白、短变量名、确定走不到的分支）；**Tree Shaking 处理模块之间**（`myMath` 导出了 `add` / `sub`，入口只 `import` 了 `add`，`sub` 不该出现在产物里）。生产构建里两者接在一起：webpack 先标记，压缩器再删。
 
-```mermaid
+```mermaid title="Tree Shaking 标记与无用代码删除"
 flowchart LR
   ESM["ESM 静态 import / export"] --> Mark["usedExports 标成 unused"]
   Mark --> Terser["压缩器做 DCE，真正删掉"]
@@ -730,11 +750,11 @@ CSS 的抽离与压缩是两个步骤：抽离生成独立文件，压缩减少�
 
 `.map` 通常是 JSON，常见字段有 `sources`（源码文件名）、`mappings`（位置映射的编码数据），还可能有 `sourcesContent`（**原始源码文本**）。后者是安全边界：即使 JS 被压缩，只要公开提供包含 `sourcesContent` 的 map，别人就可能直接读到原始源码。它不是「map 会自动泄漏」，而是「把含源码的 map 发布到了可公开下载的位置」。[MDN 的 source map 说明](https://developer.mozilla.org/en-US/docs/Glossary/Source_map)和 [webpack 的 devtool 文档](https://webpack.js.org/configuration/devtool/)都描述了这一点。
 
-```mermaid
+```mermaid title="source map 从产物位置映射到源码"
 flowchart LR
-  RUN["浏览器执行 main.bundle.js"] --> ERR["错误位置：bundle.js 第 1 行第 5820 列"]
-  ERR --> MAP["读取 main.bundle.js.map 的映射"]
-  MAP --> SRC["显示源码位置：message.js 第 12 行第 5 列"]
+  RUN["浏览器执行<br/>main.bundle.js"] --> ERR["产物错误位置<br/>bundle.js：1:5820"]
+  ERR --> MAP["读取映射文件<br/>main.bundle.js.map"]
+  MAP --> SRC["定位源码<br/>message.js：12:5"]
 ```
 
 开发模式常用某种 source map，**不一定**生成独立 `.map` 文件，以便把错误定位回源码。生产环境要单独做决定：
@@ -810,24 +830,24 @@ Vite 经典的架构（2.x–7.x）是**两个引擎各管一段**：
 
 > ⚠️ **这套"双引擎"是 Vite 7 及以前的经典架构，但现在已经变了。** 2026 年 3 月发布的 [Vite 8](https://vite.dev/blog/announcing-vite8) 用统一的 Rust 内核 **Rolldown** 同时接管了开发和生产，不再是"dev 用 esbuild / prod 用 Rollup"两套引擎。本节先讲经典双引擎（它更能说清 Vite 的设计思想），这里保留版本差异，工具发展与公司动态不在课程主线展开。
 
-```mermaid
+```mermaid title="Vite 2～7 的开发与生产流程"
 flowchart TB
   subgraph DEV["开发环境 dev"]
-    direction TB
-    E1["esbuild 依赖预构建"] --> S1["原生 ESM Dev Server"]
-    S1 --> H1["HMR / 按需编译"]
+    direction LR
+    E1["esbuild<br/>依赖预构建"] --> S1["原生 ESM<br/>Dev Server"]
+    S1 --> H1["HMR<br/>按需编译"]
   end
   subgraph PROD["生产环境 build"]
-    direction TB
-    R1["Rollup 打包"] --> R2["Tree Shaking、代码分割、压缩"]
+    direction LR
+    R1["Rollup<br/>打包"] --> R2["Tree Shaking<br/>代码分割与压缩"]
   end
+  DEV ~~~ PROD
 ```
 
 为什么这样能快？关键在于**启动时间和模块数量解耦了**。webpack 要先打包全部模块，Vite 的 dev server 只处理浏览器当前真正请求到的那几十个模块。用甘特图对比启动时序最直观：
 
-```mermaid
+```mermaid title="webpack 与 Vite 冷启动流程示意"
 gantt
-  title webpack vs Vite 冷启动时序对比（示意）
   dateFormat X
   axisFormat %s
 

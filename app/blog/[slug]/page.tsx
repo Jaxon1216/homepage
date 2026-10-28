@@ -6,6 +6,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import { rehypeMermaid } from "@/lib/rehype-mermaid";
+import { rehypeArticleCaptions } from "@/lib/rehype-article-captions";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
 import { mdxComponents } from "@/components/mdx";
 import { PostContent } from "./PostContent";
@@ -54,6 +55,7 @@ export default async function BlogPostPage({ params }: Props) {
                   keepBackground: false,
                 },
               ],
+              rehypeArticleCaptions,
             ],
           },
         }}

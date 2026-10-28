@@ -17,12 +17,12 @@ function Figure(
   return <figure {...props} />;
 }
 
-function Div(props: ComponentPropsWithoutRef<"div">) {
+function Div(props: ComponentPropsWithoutRef<"div"> & { "data-caption"?: string }) {
   if (
     props.className === "__mermaid__" &&
     typeof props.children === "string"
   ) {
-    return <Mermaid chart={props.children} />;
+    return <Mermaid chart={props.children} caption={props["data-caption"]} />;
   }
   return <div {...props} />;
 }

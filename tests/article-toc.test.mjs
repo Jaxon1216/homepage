@@ -20,10 +20,17 @@ test('文章开头和到达正文末尾时能定位首尾章节', () => {
   assert.equal(helpers.getActiveHeadingIndex([200, 500], 96, false), 0);
   assert.equal(helpers.getActiveHeadingIndex([-200, 300], 96, true), 1);
 });
-test('当前目录项在安全区内时不滚动，超出上下边缘时留下余量', () => {
+test('当前目录项仍部分可见时不跟随，不追逐靠近边缘的微小变化', () => {
   assert.equal(helpers.getTocScrollTop(100, 400, 200, 32, 1000), 100);
+  assert.equal(helpers.getTocScrollTop(100, 400, 80, 32, 1000), 100);
+  assert.equal(helpers.getTocScrollTop(100, 400, 490, 32, 1000), 100);
+  assert.equal(helpers.getTocScrollTop(100, 400, 0, 600, 1000), 100);
+});
+test('当前目录项完全离开视口后才跟随，并留少量余量', () => {
   assert.equal(helpers.getTocScrollTop(100, 400, 600, 32, 1000), 272);
   assert.equal(helpers.getTocScrollTop(300, 400, 200, 32, 1000), 160);
+  assert.equal(helpers.getTocScrollTop(100, 400, 500, 32, 1000), 172);
+  assert.equal(helpers.getTocScrollTop(100, 400, 68, 32, 1000), 28);
 });
 test('目录首尾滚动不越界，超高目录项对齐顶部', () => {
   assert.equal(helpers.getTocScrollTop(100, 400, 0, 32, 1000), 0);

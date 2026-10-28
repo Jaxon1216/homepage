@@ -11,11 +11,18 @@ interface HastNode {
   properties?: Record<string, unknown>;
   children?: HastNode[];
   value?: string;
+  data?: { meta?: string };
 }
 
 function extractText(node: HastNode): string {
   if (node.type === "text") return node.value ?? "";
   return node.children?.map(extractText).join("") ?? "";
+}
+
+function captionFromMeta(meta?: string): string | undefined {
+  const match = meta?.match(/(?:^|\s)title\s*=\s*(?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)')/);
+  const title = (match?.[1] ?? match?.[2])?.replace(/\\(["'\\])/g, "$1").trim();
+  return title || undefined;
 }
 
 function walk(node: HastNode) {
@@ -30,10 +37,14 @@ function walk(node: HastNode) {
         Array.isArray(code.properties?.className) &&
         (code.properties.className as string[]).includes("language-mermaid")
       ) {
+        const caption = captionFromMeta(code.data?.meta);
         node.children[i] = {
           type: "element",
           tagName: "div",
-          properties: { className: ["__mermaid__"] },
+          properties: {
+            className: ["__mermaid__"],
+            ...(caption ? { "data-caption": caption } : {}),
+          },
           children: [{ type: "text", value: extractText(code) }],
         };
         continue;

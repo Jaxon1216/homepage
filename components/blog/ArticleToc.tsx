@@ -25,106 +25,100 @@ export function ArticleTocProvider({ contentRef, slug, children }: {
   return <TocContext.Provider value={value}>{children}</TocContext.Provider>;
 }
 
-interface TrackPosition { x: number; top: number; bottom: number; start: number; end: number }
-interface TrackGeometry { d: string; height: number; viewportHeight: number; positions: TrackPosition[] }
+interface IndicatorPosition { top: number; height: number }
+type FollowMode = "auto" | "manual" | "navigation";
 
 function TocItems({ state, onSelect }: {
   state: TocContextValue;
   onSelect?: (event: MouseEvent<HTMLAnchorElement>, id: string) => void;
 }) {
-  const { headings, currentId, startIndex, endIndex, direction, reducedMotion } = state;
+  const { headings, currentId, reducedMotion } = state;
   const viewportRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLUListElement>(null);
-  const positionedRef = useRef(false);
-  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clipId = useId();
-  const [geometry, setGeometry] = useState<TrackGeometry | null>(null);
-  const [followPaused, setFollowPaused] = useState(false);
-
-  useEffect(() => () => {
-    if (pauseTimer.current) clearTimeout(pauseTimer.current);
-  }, []);
+  const followTargetRef = useRef<{ id: string; top: number } | null>(null);
+  const [indicator, setIndicator] = useState<IndicatorPosition | null>(null);
+  const [followMode, setFollowMode] = useState<FollowMode>("auto");
 
   const pauseFollowing = () => {
-    setFollowPaused(true);
-    if (pauseTimer.current) clearTimeout(pauseTimer.current);
-    pauseTimer.current = setTimeout(() => setFollowPaused(false), 1800);
-  };
-
-  const resumeFollowing = () => {
-    if (pauseTimer.current) clearTimeout(pauseTimer.current);
-    setFollowPaused(false);
+    const viewport = viewportRef.current;
+    // Stop an in-flight automatic scroll before handing control to the reader.
+    viewport?.scrollTo({ top: viewport.scrollTop, behavior: "instant" });
+    followTargetRef.current = null;
+    setFollowMode("manual");
   };
 
   useEffect(() => {
+    if (followMode !== "manual") return;
+    const resumeOnDocumentScroll = (event: Event) => {
+      if (event.target === document || event.target === window) setFollowMode("auto");
+    };
+    window.addEventListener("scroll", resumeOnDocumentScroll, { passive: true });
+    return () => window.removeEventListener("scroll", resumeOnDocumentScroll);
+  }, [followMode]);
+
+  useEffect(() => {
+    if (followMode !== "navigation") return;
+    // The clicked link already has a visible place in the directory. Wait for
+    // anchor scrolling to settle rather than following intermediate sections.
+    let previousY = window.scrollY;
+    let stableFrames = 0;
+    let frame = 0;
+    const check = () => {
+      const y = window.scrollY;
+      stableFrames = y === previousY ? stableFrames + 1 : 0;
+      previousY = y;
+      if (stableFrames >= 3) setFollowMode("auto");
+      else frame = requestAnimationFrame(check);
+    };
+    frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
+  }, [followMode]);
+
+  useEffect(() => {
     const content = contentRef.current;
-    if (!content) return;
+    const viewport = viewportRef.current;
+    if (!content || !viewport) return;
     let frame = 0;
     const measure = () => {
       frame = 0;
-      if (!content.clientHeight || !content.clientWidth) return;
+      if (!viewport.clientHeight || !viewport.clientWidth) return;
+      const item = content.querySelector<HTMLAnchorElement>('[aria-current="location"]');
+      if (!item) return;
+      const rect = item.getBoundingClientRect();
       const bounds = content.getBoundingClientRect();
-      const links = Array.from(content.querySelectorAll<HTMLAnchorElement>("a"));
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      const positions: TrackPosition[] = [];
-      let d = "";
-      links.forEach((link, index) => {
-        const rect = link.getBoundingClientRect();
-        const style = getComputedStyle(link);
-        const x = 8.5 + headings[index].depth * 12;
-        const top = rect.top - bounds.top + parseFloat(style.paddingTop);
-        const bottom = rect.bottom - bounds.top - parseFloat(style.paddingBottom);
-        if (index === 0) d = `M ${x} ${top}`;
-        else {
-          const previous = positions[index - 1];
-          d += ` C ${previous.x} ${previous.bottom + 6} ${x} ${top - 6} ${x} ${top}`;
-        }
-        path.setAttribute("d", d);
-        const start = path.getTotalLength();
-        d += ` L ${x} ${bottom}`;
-        path.setAttribute("d", d);
-        positions.push({ x, top, bottom, start, end: path.getTotalLength() });
-      });
-      const viewportHeight = viewportRef.current?.clientHeight ?? 0;
-      setGeometry((previous) => previous?.d === d && previous.height === bounds.height &&
-        previous.viewportHeight === viewportHeight
-        ? previous : { d, height: bounds.height, viewportHeight, positions });
+      const style = getComputedStyle(item);
+      const paddingTop = parseFloat(style.paddingTop);
+      const paddingBottom = parseFloat(style.paddingBottom);
+      const position = {
+        top: rect.top - bounds.top + paddingTop,
+        height: rect.height - paddingTop - paddingBottom,
+      };
+      setIndicator((previous) => previous?.top === position.top && previous.height === position.height
+        ? previous : position);
+
+      if (followMode !== "auto") return;
+      const viewportBounds = viewport.getBoundingClientRect();
+      const itemTop = viewport.scrollTop + rect.top - viewportBounds.top - viewport.clientTop;
+      const top = getTocScrollTop(
+        viewport.scrollTop, viewport.clientHeight, itemTop, rect.height, viewport.scrollHeight
+      );
+      const previousTarget = followTargetRef.current;
+      if (Math.abs(top - viewport.scrollTop) > 1 &&
+        (previousTarget?.id !== currentId || Math.abs(previousTarget.top - top) > 1)) {
+        followTargetRef.current = { id: currentId, top };
+        viewport.scrollTo({ top, behavior: reducedMotion ? "instant" : "smooth" });
+      }
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(measure); };
     const observer = new ResizeObserver(schedule);
     observer.observe(content);
-    if (viewportRef.current) observer.observe(viewportRef.current);
-    content.querySelectorAll("a").forEach((item) => observer.observe(item));
+    observer.observe(viewport);
+    const item = content.querySelector('[aria-current="location"]');
+    if (item) observer.observe(item);
     schedule();
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
-  }, [headings]);
+  }, [headings, currentId, followMode, reducedMotion]);
 
-  useEffect(() => {
-    if (followPaused) return;
-    const frame = requestAnimationFrame(() => {
-      const viewport = viewportRef.current;
-      const content = contentRef.current;
-      if (!viewport || !content || !viewport.clientHeight) return;
-      const item = content.querySelectorAll("a")[direction === "up" ? startIndex : endIndex];
-      if (!item) return;
-      const bounds = viewport.getBoundingClientRect();
-      const rect = item.getBoundingClientRect();
-      const itemTop = viewport.scrollTop + rect.top - bounds.top - viewport.clientTop;
-      const top = getTocScrollTop(
-        viewport.scrollTop, viewport.clientHeight, itemTop,
-        rect.height, viewport.scrollHeight
-      );
-      if (Math.abs(top - viewport.scrollTop) > 1) {
-        viewport.scrollTo({ top, behavior: positionedRef.current && !reducedMotion ? "smooth" : "instant" });
-      }
-      positionedRef.current = true;
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [headings, startIndex, endIndex, direction, geometry, reducedMotion, followPaused]);
-
-  const first = geometry?.positions[startIndex];
-  const last = geometry?.positions[endIndex];
-  const arrowDistance = direction === "up" ? first?.start : last?.end;
   return (
     <nav ref={viewportRef} aria-label="本文目录" className={styles.viewport}
       tabIndex={0}
@@ -137,32 +131,19 @@ function TocItems({ state, onSelect }: {
         }
       }}>
       <ul ref={contentRef} className={styles.items}>
-        {geometry && first && last && (
-          <li aria-hidden="true" className={styles.track}>
-            <svg width="32" height={geometry.height} className={styles.trackSvg}>
-              <defs><clipPath id={clipId}>
-                <rect x="0" y={first.top} width="32" height={last.bottom - first.top} />
-              </clipPath></defs>
-              <path d={geometry.d} className={styles.trackBase} />
-              <path d={geometry.d} clipPath={`url(#${clipId})`} className={styles.trackActive} />
-            </svg>
-            <span className={styles.arrow} data-direction={direction}
-              style={{ offsetPath: `path("${geometry.d}")`, offsetDistance: `${arrowDistance ?? 0}px` }}>
-              <svg width="8" height="8" viewBox="0 0 8 8">
-                <path d={direction === "up" ? "M 1 5.5 L 4 2.5 L 7 5.5" : "M 1 2.5 L 4 5.5 L 7 2.5"} />
-              </svg>
-            </span>
-          </li>
+        {indicator && (
+          <li aria-hidden="true" className={styles.indicator}
+            style={{ transform: `translateY(${indicator.top}px)`, height: indicator.height }} />
         )}
-        {headings.map((heading, index) => (
+        {headings.map((heading) => (
           <li key={heading.id}>
             <Link href={`#${encodeURIComponent(heading.id)}`} className={styles.item}
-              style={{ paddingInlineStart: 24 + heading.depth * 12 }}
+              style={{ paddingInlineStart: 16 + heading.depth * 12 }}
               aria-current={heading.id === currentId ? "location" : undefined}
-              data-active={index >= startIndex && index <= endIndex}
               onClick={(event) => {
                 if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) {
-                  resumeFollowing();
+                  followTargetRef.current = null;
+                  setFollowMode("navigation");
                 }
                 onSelect?.(event, heading.id);
               }}>
@@ -228,7 +209,7 @@ function MobileToc({ state }: { state: TocContextValue }) {
     window.addEventListener("scroll", schedulePanel, { passive: true });
     window.addEventListener("resize", schedulePanel);
     schedulePanel();
-    const media = window.matchMedia("(min-width: 1200px)");
+    const media = window.matchMedia("(min-width: 1280px)");
     const onBreakpoint = () => { if (media.matches) setOpen(false); };
     media.addEventListener("change", onBreakpoint);
     return () => {
