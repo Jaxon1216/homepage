@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="744" viewBox="0 0 1000 744" role="img" aria-labelledby="title desc">
+<title id="title">查询进入 MySQL 后，谁负责什么</title>
+<desc id="desc">前端通过 HTTP 请求后端；后端通过数据库驱动和连接发送 SQL。MySQL Server 层负责连接认证、解析准备、优化与执行；执行器调用 InnoDB 接口访问记录，结果经后端返回前端。</desc>
+<defs><marker id="arrow-line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker><marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#B13F28" stroke-width="1.7"/></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#303C45" stroke-width="1.7"/></marker></defs>
+<rect x="0" y="0" width="1000" height="744" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">查询进入 MySQL 后，谁负责什么</text>
+<text x="40" y="87" fill="#53677C" font-size="22" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Server 层理解和执行 SQL；存储引擎负责数据组织与访问。</text>
+<rect x="40" y="125" width="165" height="88" rx="12" fill="#F3F6FA" stroke="#AABACA" stroke-width="1.5"/>
+<text x="122" y="159" fill="#172B42" font-size="25" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">前端</text>
+<text x="122" y="190" fill="#53677C" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">发送查询请求</text>
+<rect x="40" y="290" width="165" height="113" rx="12" fill="#F3F6FA" stroke="#AABACA" stroke-width="1.5"/>
+<text x="122" y="326" fill="#172B42" font-size="25" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">后端</text>
+<text x="122" y="358" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">构造 SQL</text>
+<text x="122" y="385" fill="#53677C" font-size="17" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">通过驱动使用连接</text>
+<polyline points="100,216 100,286" fill="none" stroke="#145DA8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="150,286 150,216" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="77" y="256" fill="#145DA8" font-size="15" font-weight="400" text-anchor="end" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">HTTP</text>
+<rect x="345" y="125" width="615" height="543" rx="18" fill="#FAFBFD" stroke="#145DA8" stroke-width="2"/>
+<text x="370" y="160" fill="#145DA8" font-size="27" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">MySQL</text>
+<rect x="370" y="180" width="565" height="250" rx="12" fill="#E7F0FC" stroke="none" stroke-width="1.5"/>
+<text x="395" y="217" fill="#172B42" font-size="25" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Server 层</text>
+<rect x="395" y="238" width="245" height="61" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="517" y="276" fill="#172B42" font-size="22" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">连接与认证</text>
+<rect x="665" y="238" width="245" height="61" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="787" y="276" fill="#172B42" font-size="22" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">解析与准备</text>
+<rect x="395" y="334" width="245" height="61" rx="7" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="517" y="372" fill="#172B42" font-size="21" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">优化器：选择计划</text>
+<rect x="665" y="334" width="245" height="61" rx="7" fill="#FFFFFF" stroke="#145DA8" stroke-width="1.5"/>
+<text x="787" y="372" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">执行器：按计划执行</text>
+<polyline points="641,268 662,268" fill="none" stroke="#145DA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="787,301 787,315 517,315 517,331" fill="none" stroke="#145DA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="642,364 662,364" fill="none" stroke="#145DA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="208,321 285,321 285,268 392,268" fill="none" stroke="#145DA8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="279" y="246" fill="#145DA8" font-size="21" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">SQL</text>
+<polyline points="370,414 252,414 252,372 208,372" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="287" y="442" fill="#53677C" font-size="19" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">查询结果</text>
+<rect x="370" y="505" width="565" height="139" rx="12" fill="#F1F6E9" stroke="#AABF90" stroke-width="1.5"/>
+<text x="395" y="542" fill="#172B42" font-size="25" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">InnoDB 存储引擎</text>
+<text x="395" y="581" fill="#172B42" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Buffer Pool（缓冲池）</text>
+<text x="395" y="617" fill="#172B42" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">数据页、索引与记录的访问</text>
+<polyline points="765,398 765,502" fill="none" stroke="#145DA8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="865,502 865,398" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="751" y="469" fill="#145DA8" font-size="17" font-weight="400" text-anchor="end" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">调用引擎接口</text>
+<text x="875" y="469" fill="#53677C" font-size="17" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">返回记录</text>
+<text x="40" y="709" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">职责与调用关系示意；后端可复用连接，执行器也可能多次调用引擎取记录。</text>
+</svg>

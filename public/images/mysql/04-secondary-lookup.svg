@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
-<title id="title">回表：拿到主键，再找行记录</title>
-<desc id="desc">category 二级索引包含 office 与主键 2、6、10。示意展开主键 6 的一次回表，在聚簇索引中找到 Keyboard、价格 199.00、库存 15。其他匹配记录同样需要取得查询所需列。</desc>
-<defs><marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker></defs>
+<title id="title">回表：先取得主键，再找订单记录</title>
+<desc id="desc">user_id二级索引中，值3对应主键5、6、8。展开id6的一次回表，聚簇索引叶子行包含user_id3、amount70.00和status paid；另外两条匹配记录也需要所需列。</desc>
+<defs><marker id="arrow-line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker><marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#B13F28" stroke-width="1.7"/></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#303C45" stroke-width="1.7"/></marker></defs>
 <rect x="0" y="0" width="1000" height="650" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
-<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">回表：拿到主键，再找行记录</text>
-<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">假设走 category 索引：找 office 商品，并取得 name、price。</text>
-<rect x="40" y="119" width="340" height="36" rx="18" fill="#F3F6FA" stroke="none" stroke-width="1.5"/><text x="210" y="144" fill="#53677C" font-size="18" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">① 找到二级索引中的条目</text>
+<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">回表：先取得主键，再找订单记录</text>
+<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">假设走 user_id 索引：查 user_id = 3 的订单，取得 amount、status。</text>
+<rect x="40" y="119" width="340" height="36" rx="18" fill="#F3F6FA" stroke="none" stroke-width="1.5"/><text x="210" y="144" fill="#53677C" font-size="18" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">① 二级索引中的匹配记录</text>
 <rect x="40" y="172" width="350" height="284" rx="12" fill="#F3F6FA" stroke="#AABACA" stroke-width="1.5"/>
-<text x="64" y="207" fill="#172B42" font-size="19" font-weight="600" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">category</text>
+<text x="64" y="207" fill="#172B42" font-size="20" font-weight="600" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id</text>
 <text x="285" y="207" fill="#172B42" font-size="19" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">主键 id</text>
 <rect x="57" y="226" width="316" height="51" rx="6" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
-<text x="76" y="259" fill="#172B42" font-size="23" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">office</text>
-<text x="309" y="259" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
+<text x="107" y="260" fill="#172B42" font-size="25" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<text x="309" y="260" fill="#172B42" font-size="25" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">5</text>
 <rect x="57" y="291" width="316" height="51" rx="6" fill="#E7F0FC" stroke="#145DA8" stroke-width="2"/>
-<text x="76" y="324" fill="#145DA8" font-size="23" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">office</text>
-<text x="309" y="324" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">6</text>
+<text x="107" y="325" fill="#145DA8" font-size="25" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<text x="309" y="325" fill="#145DA8" font-size="25" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">6</text>
 <rect x="57" y="356" width="316" height="51" rx="6" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
-<text x="76" y="389" fill="#172B42" font-size="23" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">office</text>
-<text x="309" y="389" fill="#172B42" font-size="23" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">10</text>
-<text x="215" y="485" fill="#53677C" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">条目 = 索引列值 + 主键值</text>
+<text x="107" y="390" fill="#172B42" font-size="25" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<text x="309" y="390" fill="#172B42" font-size="25" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">8</text>
+<text x="215" y="485" fill="#53677C" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">索引列 user_id + 主键 id</text>
 <rect x="550" y="119" width="400" height="36" rx="18" fill="#E7F0FC" stroke="none" stroke-width="1.5"/><text x="750" y="144" fill="#145DA8" font-size="18" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">② 拿主键再次查聚簇索引</text>
 <polyline points="391,317 490,317 490,216 548,216" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
 <text x="441" y="347" fill="#145DA8" font-size="20" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id = 6</text>
 <rect x="554" y="174" width="396" height="85" rx="12" fill="#F3F6FA" stroke="#145DA8" stroke-width="1.5"/>
 <text x="752" y="207" fill="#172B42" font-size="21" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">主键树的上层</text>
-<text x="752" y="239" fill="#145DA8" font-size="24" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1       5       9</text>
+<text x="752" y="239" fill="#145DA8" font-size="24" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1       4       7</text>
 <polyline points="752,261 752,306" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
 <rect x="554" y="310" width="396" height="186" rx="12" fill="#E7F0FC" stroke="#145DA8" stroke-width="2"/>
 <text x="576" y="347" fill="#145DA8" font-size="23" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页中的 id = 6</text>
-<text x="576" y="389" fill="#172B42" font-size="21" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">name   Keyboard</text>
-<text x="576" y="427" fill="#172B42" font-size="21" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">price  199.00</text>
-<text x="576" y="465" fill="#172B42" font-size="21" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">stock  15</text>
-<text x="40" y="542" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">这张图只展开 id = 6 的一次回表；另外两条匹配记录也要取得所需列。</text>
-<text x="40" y="578" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">二级索引里保存的是主键值，不是行的磁盘地址。</text>
-<text x="40" y="614" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">如果所需列都能从这个二级索引取得，通常可避免这一步回表。</text>
+<text x="576" y="389" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id  3</text>
+<text x="576" y="427" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount   70.00</text>
+<text x="576" y="465" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status   paid</text>
+<text x="40" y="542" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">图中展开 id = 6 的一次回表；id = 5、8 也要取得查询所需列。</text>
+<text x="40" y="578" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">这条查询没有筛选付款状态，未付款的订单 8 也在匹配范围内。</text>
+<text x="40" y="614" fill="#53677C" font-size="18" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">二级索引保存主键值，不是行的磁盘地址；所需列被覆盖时可省去取额外列的回表。</text>
 </svg>
