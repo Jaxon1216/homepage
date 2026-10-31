@@ -1051,3 +1051,97 @@ code[data-theme] > span {
   background: var(--card);
   scroll-margin-top: 5.5rem;
 }
+
+/* Interview questions are opt-in, keeping ordinary disclosure elements untouched. */
+.blog-reading-prose .interview-group {
+  position: relative;
+  margin-block: 2em;
+  padding: 0.5rem 0 0.5rem 8.75rem;
+  border-inline-start: 3px solid var(--article-accent);
+}
+
+.blog-reading-prose .interview-group > p:first-child {
+  position: absolute;
+  inset-block-start: 1.15rem;
+  inset-inline-start: 1.25rem;
+  margin: 0;
+  color: var(--article-accent);
+  font-family: var(--article-heading-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+}
+
+.blog-reading-prose .interview-group > p:first-child::after {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--article-muted);
+  content: "Q&A";
+  font: italic 19px Georgia, serif;
+  letter-spacing: 0;
+}
+
+.blog-reading-prose .interview-group details {
+  min-width: 0;
+}
+
+.blog-reading-prose .interview-group details + details {
+  border-top: 1px solid var(--article-subtle-rule);
+}
+
+.blog-reading-prose .interview-group summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--article-heading-font);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.blog-reading-prose .interview-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.blog-reading-prose .interview-group summary::after {
+  flex: none;
+  color: var(--article-accent);
+  content: "+";
+  font: 400 20px/1.3 Georgia, serif;
+}
+
+.blog-reading-prose .interview-group details[open] > summary::after {
+  content: "−";
+}
+
+.blog-reading-prose .interview-group summary:hover {
+  color: var(--article-accent);
+}
+
+.blog-reading-prose .interview-group summary:focus-visible {
+  outline: 2px solid var(--article-accent);
+  outline-offset: 3px;
+}
+
+.blog-reading-prose .interview-group details > :not(summary) {
+  font-size: 0.95em;
+}
+
+@media (max-width: 600px) {
+  .blog-reading-prose .interview-group {
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+
+  .blog-reading-prose .interview-group > p:first-child {
+    position: static;
+  }
+
+  .blog-reading-prose .interview-group > p:first-child::after {
+    display: inline;
+    margin-inline-start: 0.6rem;
+  }
+
+}

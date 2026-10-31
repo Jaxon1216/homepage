@@ -52,6 +52,8 @@ WHERE id = 6;                     -- 2. 只保留编号为 6 的订单
 
 但是，只要相关表发生修改，涉及这张表的查询缓存就需要失效。经常更新的表，可能刚存好结果就要清掉，缓存本身也需要维护。MySQL 8.0 已经移除了这个功能，所以本文的执行链路里没有它。[旧查询缓存说明](https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/query-cache.html)
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -79,6 +81,8 @@ MySQL 8.0 已经移除旧查询缓存，因此这里不再包含“先查查询�
 - 存储引擎可以按表选择；同一条 SQL 可以由 Server 层统一处理，再访问使用不同引擎的表。
 
 </details>
+
+</div>
 
 # 二、SQL 怎样表达查询要求
 
@@ -217,6 +221,8 @@ MySQL 允许 `ORDER BY`、`GROUP BY`、`HAVING` 引用 SELECT 别名，同层 WH
 
 本题要找的是“到店但没有交易”。如果直接 INNER JOIN，没有交易的到店记录在连接时就消失了，所以这里先用 LEFT JOIN 留住它们，再用 WHERE 筛选。
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -296,6 +302,8 @@ InnoDB 不维护对所有事务都通用的精确总行数；无条件 `COUNT(*)
 
 </details>
 
+</div>
+
 建表用 `CREATE TABLE`，加行用 `INSERT`，改行用 `UPDATE`，删行用 `DELETE`；本文的查询使用 `SELECT`。
 
 # 三、InnoDB 怎样通过索引找到记录
@@ -311,6 +319,8 @@ InnoDB 不维护对所有事务都通用的精确总行数；无条件 `COUNT(*)
 | 外键约束 | 支持 | 不支持 |
 | 表数据组织 | 由聚簇索引组织 | 数据与索引文件分离 |
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -325,6 +335,8 @@ InnoDB 不维护对所有事务都通用的精确总行数；无条件 `COUNT(*)
 InnoDB 是 MySQL 8.4 的默认引擎，通常更适合需要并发写入和可靠性的通用业务，不能笼统地说“MyISAM 查询总是更快”。[InnoDB 能力](https://dev.mysql.com/doc/refman/8.4/en/innodb-introduction.html) · [MyISAM 能力](https://dev.mysql.com/doc/refman/8.4/en/myisam-storage-engine.html)
 
 </details>
+
+</div>
 
 ## 先看表，再看树
 
@@ -371,6 +383,8 @@ InnoDB 把记录放在一个个**页**里。一个页里有多行数据，还要
 
 图里的下界是为了方便看懂导航。实际 InnoDB 的最左项有特殊最小标记，父层的导航键也不保证始终等于子页当前最小值。记住“按键值选择子页”就可以了。
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -385,6 +399,8 @@ InnoDB 把记录放在一个个**页**里。一个页里有多行数据，还要
 因此，没有显式声明主键不等于没有聚簇索引。复合主键也仍然是一套聚簇键，不会因此产生多个聚簇索引。[聚簇索引选择规则](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 
 </details>
+
+</div>
 
 ## 为什么用 B+ 树，三层能放多少行
 
@@ -401,6 +417,8 @@ InnoDB 把记录放在一个个**页**里。一个页里有多行数据，还要
 加一层，就能多覆盖很多页。不过这几个数都是假设，不是说 MySQL 的三层树固定存一亿行。主键越长、行越大，一页能放的内容就越少，还得扣掉页头、页目录等空间。
 
 再看其他结构：二叉树的分支少，数据多时通常需要更多层；B 树的内部节点也存用户记录，会占用导航项的空间；普通哈希结构擅长等值查找，但不能像有序树这样沿着键值顺序做范围扫描。[B-tree 与 Hash 索引](https://dev.mysql.com/doc/refman/8.4/en/index-btree-hash.html)
+
+<div class="interview-group">
 
 **面试串联**
 
@@ -428,6 +446,8 @@ B+ 树是一棵**多路、平衡、有序**的搜索树，适合按页访问数�
 例如本文假设 `f = 1000`、`L = 100`，三层约为 `1000 × 1000 × 100 = 1 亿` 条。真实估算需要扣除页头、记录头和页目录等开销，并考虑页利用率。这个容量估算也不能推导出固定的磁盘 I/O 次数。
 
 </details>
+
+</div>
 
 ## 范围查询怎样继续往后读
 
@@ -529,6 +549,8 @@ ORDER BY id;       -- 4. 按订单编号升序排列
 
 有索引，也不意味着优化器一定使用它。比如表里真的只有 8 条记录，直接扫描可能也很便宜。第二篇再用 EXPLAIN 看实际选择；这里先把两种查法分清。
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -555,6 +577,8 @@ ORDER BY id;       -- 4. 按订单编号升序排列
 
 </details>
 
+</div>
+
 ## 索引也要维护，再来看自增 ID 和 UUID
 
 索引不是建完就不管了。插入一行，聚簇索引和相关二级索引都要加记录；修改索引列、删除数据，也要维护对应的索引。索引越多，要占的空间和写入工作通常也越多。
@@ -570,6 +594,8 @@ ORDER BY id;       -- 4. 按订单编号升序排列
 所以在不需要分布式生成 ID 等额外条件时，自增整数是常见选择。需要 UUID 时，要一起考虑生成方式、编码长度和有序程度；紧凑存储的有序 UUID，不能和随机长字符串一概而论。
 
 自增也不是永远没有页分裂，页满了仍要分配新页，高并发下还可能有尾页热点。[主键长度的影响](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html) · [顺序与随机插入](https://dev.mysql.com/doc/refman/8.4/en/innodb-physical-structure.html)
+
+<div class="interview-group">
 
 **面试串联**
 
@@ -608,6 +634,8 @@ InnoDB 的主键会组织聚簇索引，并进入相关二级索引，因此通�
 
 </details>
 
+</div>
+
 ## Buffer Pool：页可能已经在内存里
 
 看到这里，你可能会算：三层树，找一条记录是不是要读三次磁盘？
@@ -624,6 +652,8 @@ InnoDB 的主键会组织聚簇索引，并进入相关二级索引，因此通�
 
 树高告诉我们从根到叶子经过几层页，不能直接当成实际磁盘读取次数。
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -634,6 +664,8 @@ InnoDB 的主键会组织聚簇索引，并进入相关二级索引，因此通�
 三层树的单条定位路径通常经过三层页，但不能直接等同于三次磁盘读取：已缓存的页可以从内存读取，范围查询、回表等也可能继续访问其他页。[Buffer Pool](https://dev.mysql.com/doc/refman/8.4/en/innodb-buffer-pool.html)
 
 </details>
+
+</div>
 
 # 四、找到页以后，怎样找到那条记录
 
@@ -740,6 +772,8 @@ infimum → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → supremum
 
 另外，上一节说的是**叶子页与叶子页之间双向连接**，这里说的是**同一页里的记录单向连接**，这两个也别混了。
 
+<div class="interview-group">
+
 **面试串联**
 
 <details>
@@ -754,6 +788,8 @@ infimum → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → supremum
 页目录没有为每条记录建立一个槽；也不是找到组末后再倒着遍历。`n_owned` 是组末记录负责的记录数，其他普通记录的 0 不表示没有数据。内部索引页也使用页目录。
 
 </details>
+
+</div>
 
 回头看第一节那条 `WHERE id = 6`，过程就连起来了：
 
