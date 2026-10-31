@@ -108,49 +108,56 @@ function navigationPage(x, y, keys) {
 
 function storageTreeOverview() {
   const c = [
-    text(40, 88, '主键索引：上层保存导航键与子页引用，叶子页保存行记录。', { size: 21, color: colors.muted }),
-    text(365, 152, '根页', { size: 23, weight: 600, anchor: 'end' }),
+    text(40, 88, '每个节点都是页；只展开 A 页的 8 条订单，其他页内容省略。', { size: 21, color: colors.muted }),
+    text(365, 151, '根页', { size: 23, weight: 600, anchor: 'end' }),
     navigationPage(390, 118, model.overviewRootKeys),
-    text(80, 296, '中间页', { size: 22, weight: 600 }),
-    navigationPage(80, 315, model.leafGroups.map((ids) => ids[0])),
-    rect(575, 315, 150, 52, { radius: 0 }),
-    rect(810, 315, 150, 52, { radius: 0 }),
-    text(650, 349, '……', { size: 26, anchor: 'middle' }),
-    text(885, 349, '……', { size: 26, anchor: 'middle' }),
-    text(770, 401, '其余子树省略', { size: 18, anchor: 'middle', color: colors.muted }),
-    text(40, 499, '叶子页', { size: 22, weight: 600 }),
-    line([[480, 172], [260, 313]], { color: colors.black, arrow: true }),
-    line([[600, 172], [650, 313]], { color: colors.black, arrow: true }),
-    line([[720, 172], [885, 313]], { color: colors.black, arrow: true }),
+    navigationPage(80, 300, model.navigationKeys),
+    text(80, 284, '中间页', { size: 22, weight: 600 }),
+    rect(575, 300, 150, 52, { radius: 0 }), rect(810, 300, 150, 52, { radius: 0 }),
+    text(650, 334, '……', { size: 26, anchor: 'middle' }),
+    text(885, 334, '……', { size: 26, anchor: 'middle' }),
+    line([[480, 172], [260, 298]], { color: colors.blue, width: 3, arrow: true }),
+    line([[600, 172], [650, 298]], { color: colors.line, arrow: true }),
+    line([[720, 172], [885, 298]], { color: colors.line, arrow: true }),
+    text(281, 230, '6 < 25', { size: 20, color: colors.blue, weight: 600 }),
+    line([[170, 354], [330, 483]], { color: colors.blue, width: 3, arrow: true }),
+    line([[290, 354], [635, 483]], { color: colors.line, arrow: true }),
+    line([[410, 354], [875, 483]], { color: colors.line, arrow: true }),
+    text(40, 406, '6 < 9，进入 A 页', { size: 20, color: colors.blue, weight: 600 }),
+    text(40, 465, '叶子页 A：订单 1～8', { size: 23, weight: 700, color: colors.blue }),
+    rect(30, 475, 410, 344, { fill: colors.white, stroke: colors.blue, strokeWidth: 2, radius: 4 }),
   ];
-  const widths = [40, 76, 84, 80];
-  model.leafGroups.forEach((ids, i) => {
-    const x = 40 + i * 330;
-    c.push(line([[170 + i * 120, 369], [x + 140, 518]], { color: colors.black, arrow: true }));
-    let cursor = x;
-    ['id', 'user_id', 'amount', 'status'].forEach((name, j) => {
-      c.push(rect(cursor, 520, widths[j], 36, { fill: j === 0 ? '#FFE59C' : '#EEF6E8', stroke: '#89927E', radius: 0 }),
-        text(cursor + widths[j] / 2, 544, name, { size: 16, anchor: 'middle', weight: 600, mono: true }));
-      cursor += widths[j];
-    });
-    ids.forEach((id, rowIndex) => {
-      const row = order(id), y = 556 + rowIndex * 42;
-      let left = x;
-      [row.id, row.user_id, row.amount, row.status].forEach((value, j) => {
-        c.push(rect(left, y, widths[j], 42, { fill: j === 0 ? '#FFD258' : '#DCECCB', stroke: '#89927E', radius: 0 }),
-          text(left + widths[j] / 2, y + 28, value, { size: 19, anchor: 'middle', mono: true, weight: j === 0 ? 600 : 400 }));
-        left += widths[j];
-      });
+  const widths = [50, 95, 110, 135];
+  const header = ['id', 'user_id', 'amount', 'status'];
+  let left = 40;
+  header.forEach((value, j) => {
+    c.push(rect(left, 485, widths[j], 36, { fill: j === 0 ? '#FFE59C' : '#EEF6E8', radius: 0 }),
+      text(left + widths[j] / 2, 510, value, { size: 18, mono: true, anchor: 'middle', weight: 600 }));
+    left += widths[j];
+  });
+  model.orders.forEach((row, i) => {
+    let x = 40;
+    const y = 521 + i * 36, active = row.id === model.lookupId;
+    [row.id, row.user_id, row.amount, row.status].forEach((value, j) => {
+      c.push(rect(x, y, widths[j], 36, { fill: active ? colors.blueLight : j === 0 ? '#FFD258' : '#DCECCB', stroke: active ? colors.blue : colors.line, radius: 0 }),
+        text(x + widths[j] / 2, y + 25, value, { size: 19, mono: true, anchor: 'middle', weight: active ? 700 : 400 }));
+      x += widths[j];
     });
   });
-  c.push(
-    line([[68, 684], [68, 718], [350, 718], [350, 578], [368, 578]], { color: colors.black, arrow: true }),
-    line([[398, 684], [398, 745], [680, 745], [680, 578], [698, 578]], { color: colors.black, arrow: true }),
-    text(40, 785, '叶子页按主键顺序双向连接；图中为简洁只画向右的链接。', { size: 19, color: colors.muted }),
-    text(40, 818, '三级结构示意，仅展开订单 1～8；根页的 10、20 表示省略分支的范围下界。', { size: 18, color: colors.muted }),
-    text(40, 848, '节点对应页，导航键用简化下界表示；真实的 8 条短记录通常仍在一个叶子页内。', { size: 18, color: colors.muted }),
-  );
-  return svg('InnoDB 把表数据组织成一棵主键 B+ 树', '三级主键索引总览，黄色格表示导航主键或叶子记录主键，白色格表示子页引用，绿色格表示行的其他字段。根页导航项1、10、20引用中间页，只展开第一个中间页的1、4、7三个分支，叶子页显示订单1至8的id、user_id、amount和status。其余子树省略。叶子页实际双向连接，图中仅画向右链接。', 878, c);
+  [550, 790].forEach((x, i) => c.push(
+    rect(x, 485, 170, 324, { fill: colors.panel, radius: 0 }),
+    text(x + 85, 527, '叶子页 ' + String.fromCharCode(66 + i), { size: 23, anchor: 'middle', weight: 600 }),
+    text(x + 85, 580, i === 0 ? '9 ≤ id < 17' : '17 ≤ id < 25', { size: 19, anchor: 'middle', mono: true }),
+    text(x + 85, 648, '……', { size: 30, anchor: 'middle' }),
+    text(x + 85, 690, '内容省略', { size: 19, anchor: 'middle', color: colors.muted }),
+  ));
+  c.push(line([[442, 754], [548, 754]], { color: colors.black, both: true }),
+    line([[722, 754], [788, 754]], { color: colors.black, both: true }),
+    text(494, 725, '页间双向链接', { size: 16, anchor: 'middle', color: colors.muted }),
+    text(40, 859, '页与页：按主键顺序双向连接；A 页内部怎样查找，见后面的页目录图。', { size: 20, color: colors.muted }),
+    text(40, 901, '三层是大表结构示意；如果整张表真的只有这 8 行，通常一页就能放下。', { size: 19, color: colors.muted }),
+    text(40, 936, '导航键使用简化下界，省略最左项的特殊标记；其他分支不表示本例额外的 SQL 输入。', { size: 18, color: colors.muted }));
+  return svg('主键 B+ 树：先找到 A 页，再找订单 6', '根页下界1、25、49，中间页下界1、9、17。查询6沿蓝线进入叶子页A，A页包含完整的八条示例订单，B、C和其他分支内容省略。叶子页之间双向连接。', 970, c);
 }
 
 function tableAndPage() {
@@ -184,130 +191,142 @@ function tableAndPage() {
   return svg('表、行与数据页', 'orders 表的行包含 id、user_id、amount、status。InnoDB 按页组织记录，每页还有管理信息与页目录。', 553, c);
 }
 
-// Four fields follow the supplied reference: n_owned / next pointer / primary key / row payload.
-function directoryRecord(x, y, id, nOwned) {
-  const w = [40, 40, 48, 137], fills = [colors.pink, colors.white, colors.green, colors.record];
-  let cursor = x;
-  const parts = [];
-  w.forEach((width, i) => {
-    parts.push(rect(cursor, y, width, 50, { fill: fills[i], stroke: '#7E888C', radius: 0, strokeWidth: 1.2 }));
-    cursor += width;
+function recordChain() {
+  const c = [
+    text(40, 88, '先看一条记录，再看它怎样通过 next 连到下一条。', { size: 21, color: colors.muted }),
+    rect(40, 125, 400, 150, { fill: '#FBECEF', stroke: '#D4ADB4', radius: 0 }),
+    rect(440, 125, 520, 150, { fill: '#EDF5E5', stroke: '#AABF90', radius: 0 }),
+    text(240, 166, '记录头：InnoDB 的管理信息', { size: 23, weight: 700, anchor: 'middle' }),
+    text(70, 210, 'next → 记录 7 的位置', { size: 23 }),
+    text(70, 249, 'n_owned = 0（分组时再解释）', { size: 21 }),
+    text(700, 166, '订单 6 的业务数据', { size: 23, weight: 700, anchor: 'middle' }),
+    text(470, 210, 'id = 6，user_id = 3', { size: 23, mono: true }),
+    text(470, 249, 'amount = 70.00，status = paid', { size: 23, mono: true }),
+    text(40, 331, '同一个 A 页：按主键顺序单向连接', { size: 24, weight: 700 }),
+  ];
+  const nodes = [
+    { label: 'infimum', x: 40, width: 120 },
+    ...model.orders.map((row, i) => ({ label: String(row.id), x: 180 + i * 80, width: 60, active: row.id === model.lookupId })),
+    { label: 'supremum', x: 820, width: 140 },
+  ];
+  nodes.forEach((node, i) => {
+    c.push(rect(node.x, 365, node.width, 80, { fill: node.active ? colors.blueLight : i === 0 || i === nodes.length - 1 ? colors.amberLight : colors.white, stroke: node.active ? colors.blue : colors.line, strokeWidth: node.active ? 2.5 : 1.5, radius: 5 }),
+      text(node.x + node.width / 2, 413, node.label, { size: i === 0 || i === nodes.length - 1 ? 21 : 26, anchor: 'middle', weight: 600 }));
+    if (i < nodes.length - 1) c.push(line([[node.x + node.width + 2, 405], [nodes[i + 1].x - 2, 405]], { color: node.active ? colors.blue : colors.line, arrow: true }));
   });
-  parts.push(text(x + 20, y + 33, nOwned, { size: 23, anchor: 'middle' }),
-    '<circle cx="' + (x + 60) + '" cy="' + (y + 25) + '" r="6" fill="' + colors.black + '"/>',
-    text(x + 104, y + 33, id, { size: 23, anchor: 'middle', weight: 600 }),
-    text(x + 196, y + 33, '行记录', { size: 23, anchor: 'middle' }));
-  return parts.join('');
+  c.push(text(100, 479, '头部哑节点', { size: 21, anchor: 'middle', color: colors.amber }),
+    text(890, 479, '尾部哨兵', { size: 21, anchor: 'middle', color: colors.amber }),
+    text(40, 561, '空页时：', { size: 23, weight: 600 }),
+    rect(290, 525, 180, 65, { fill: colors.amberLight }),
+    text(380, 566, 'infimum', { size: 24, anchor: 'middle' }),
+    line([[473, 557], [647, 557]], { color: colors.line, width: 2.5, arrow: true }),
+    rect(650, 525, 180, 65, { fill: colors.amberLight }),
+    text(740, 566, 'supremum', { size: 24, anchor: 'middle' }),
+    text(40, 644, 'infimum 可类比链表里的 dummy node；首尾都是系统记录，不保存订单业务数据。', { size: 20, color: colors.muted }),
+    text(40, 681, '这里只展开 next、n_owned，省略记录的其他信息；方块位置表示逻辑顺序。', { size: 19, color: colors.muted }));
+  return svg('记录头、记录链与头部哑节点', '订单6由记录头和业务字段组成，next引用记录7的位置。A页记录链从头部哑节点infimum，经过订单1至8，到尾部哨兵supremum。空页仍保留infimum到supremum的连接；dummy node是类比，infimum正式含义是页内最小边界系统记录。', 715, c);
 }
 
-function sentinel(x, y, name, last = false) {
-  return rect(x, y, 40, 50, { fill: colors.pink, stroke: '#7E888C', radius: 0 })
-    + rect(x + 40, y, 40, 50, { fill: colors.white, stroke: '#7E888C', radius: 0 })
-    + rect(x + 80, y, 230, 50, { fill: '#F4F5A4', stroke: '#7E888C', radius: 0 })
-    + text(x + 20, y + 33, '1', { size: 23, anchor: 'middle' })
-    + (last ? text(x + 60, y + 31, '∅', { size: 24, anchor: 'middle' })
-      : '<circle cx="' + (x + 60) + '" cy="' + (y + 25) + '" r="6" fill="' + colors.black + '"/>')
-    + text(x + 195, y + 32, name, { size: 21, anchor: 'middle', weight: 600 });
+function pageSearch() {
+  const c = [
+    text(40, 88, '同一个叶子页 A：先查目录，再沿单向记录链找 id = 6。', { size: 21, color: colors.muted }),
+    text(40, 161, '页目录', { size: 23, weight: 600 }),
+  ];
+  ['infimum', '4', '8', 'supremum'].forEach((value, i) => {
+    const x = 220 + i * 140;
+    c.push(rect(x, 125, 110, 55, { fill: i === 1 || i === 2 ? colors.blueLight : colors.panel }),
+      text(x + 55, 161, value, { size: 22, anchor: 'middle', weight: 600 }),
+      text(x + 55, 114, '槽 ' + i, { size: 17, anchor: 'middle', color: colors.muted }));
+  });
+  c.push(text(40, 425, '① 比较槽指向的主键：4 < 6 ≤ 8，确定在第二组', { size: 22, color: colors.blue, weight: 600 }),
+    rect(40, 275, 435, 110, { fill: colors.panel, stroke: 'none' }),
+    rect(480, 275, 445, 110, { fill: '#EFF5E7', stroke: 'none' }));
+  model.orders.forEach((row, i) => {
+    const x = 70 + i * 110, active = row.id === model.lookupId;
+    c.push(rect(x, 310, 70, 50, { fill: active ? colors.blueLight : colors.white, stroke: active ? colors.blue : colors.line, strokeWidth: active ? 3 : 1.5, radius: 4 }),
+      text(x + 35, 343, row.id, { size: 25, anchor: 'middle', weight: active ? 700 : 400 }));
+    if (i < model.orders.length - 1) c.push(line([[x + 72, 335], [x + 108, 335]], { color: i === 3 || i === 4 ? colors.blue : colors.line, width: i === 3 || i === 4 ? 3 : 2, arrow: true }));
+  });
+  c.push(
+    line([[415, 182], [415, 253], [435, 253], [435, 308]], { color: colors.red, dashed: true, arrow: true }),
+    line([[555, 182], [555, 260], [875, 260], [875, 308]], { color: colors.red, dashed: true, arrow: true }),
+    text(258, 300, '第一组：1～4', { size: 18, anchor: 'middle', color: colors.muted }),
+    text(700, 300, '第二组：5～8', { size: 18, anchor: 'middle', color: colors.muted }),
+    text(40, 465, '② 从前一个边界 4 开始，沿 next 找到 5、6；不是从 8 倒着找。', { size: 22, color: colors.blue, weight: 600 }),
+    text(40, 510, '槽中实际保存位置，上面用所指记录的名称或主键标注；系统记录的本体省略。', { size: 19, color: colors.muted }),
+    text(40, 548, '红虚线：槽 → 组末记录；横向箭头：记录通过 next 单向连接。', { size: 19, color: colors.muted }));
+  return svg('A 页里怎样找到记录 6', '目录槽指向infimum、4、8、supremum。二分查目录确定4小于6且6小于等于8，从前一组末尾4沿单向记录链访问5、6。槽中实际保存位置。', 580, c);
 }
 
 function pageDirectory() {
   const c = [
-    text(40, 88, '目录槽指向组末记录；next 字段把记录按主键顺序串起来。', { size: 21, color: colors.muted }),
-    rect(22, 115, 956, 937, { fill: colors.white, stroke: '#747E84', radius: 0, strokeWidth: 2 }),
-    text(111, 157, '页目录', { size: 26, weight: 700, anchor: 'middle' }),
-    rect(48, 177, 126, 842, { fill: colors.green, stroke: '#809758', radius: 24, strokeWidth: 1.5 }),
-    rect(250, 177, 665, 92, { fill: colors.cream, stroke: '#9C9E93', radius: 20 }),
-    rect(250, 301, 665, 258, { fill: colors.cream, stroke: '#9C9E93', radius: 20 }),
-    rect(250, 622, 665, 258, { fill: colors.cream, stroke: '#9C9E93', radius: 20 }),
-    rect(250, 940, 665, 92, { fill: colors.cream, stroke: '#9C9E93', radius: 20 }),
-    text(934, 229, '组 1', { size: 17, anchor: 'middle' }),
-    text(934, 434, '组 2', { size: 17, anchor: 'middle' }),
-    text(934, 755, '组 3', { size: 17, anchor: 'middle' }),
-    text(934, 991, '组 4', { size: 17, anchor: 'middle' }),
+    text(40, 88, '还是 A 页：红虚线指向组末，黑线表示下一条记录。', { size: 21, color: colors.muted }),
+    rect(25, 116, 950, 770, { radius: 0, stroke: colors.black }),
+    text(50, 153, '页目录', { size: 23, weight: 600 }),
+    text(420, 135, '记录头（节选）', { size: 18, anchor: 'middle', color: colors.muted }),
+    text(665, 135, '业务字段（用户记录）', { size: 18, anchor: 'middle', color: colors.muted }),
+    line([[340, 143], [500, 143]], { color: colors.line }),
+    line([[500, 143], [830, 143]], { color: colors.line }),
+    text(880, 390, '第 1 组', { size: 18, color: colors.muted }),
+    text(880, 630, '第 2 组', { size: 18, color: colors.muted }),
+    rect(45, 175, 155, 665, { fill: '#EFF5E7', radius: 12 }),
+    rect(310, 258, 550, 235, { fill: colors.panel, stroke: 'none' }),
+    rect(310, 498, 550, 235, { fill: '#EFF5E7', stroke: 'none' }),
   ];
-  const slots = [225, 435, 756, 985];
-  slots.forEach((y, i) => {
-    c.push(text(111, y - 24, '槽 ' + i, { size: 22, anchor: 'middle', weight: 600 }),
-      rect(88, y - 13, 46, 46, { fill: colors.white, stroke: '#7E888C', radius: 0 }),
-      '<circle cx="111" cy="' + (y + 10) + '" r="6" fill="' + colors.black + '"/>');
+  const fields = [80, 80, 80, 250];
+  let hx = 340;
+  ['n_owned', 'next', 'id', '其他行数据'].forEach((name, i) => {
+    c.push(text(hx + fields[i] / 2, 174, name, { size: i === 0 ? 17 : 20, anchor: 'middle', weight: 600 }));
+    hx += fields[i];
   });
-  c.push(sentinel(450, 199, '最小记录 infimum'));
-  model.directoryGroups.forEach((ids, groupIndex) => {
-    const firstY = 336 + groupIndex * 321;
-    ids.forEach((id, i) => c.push(directoryRecord(i % 2 ? 620 : 295, firstY + Math.floor(i / 2) * 122, id, i === ids.length - 1 ? ids.length : 0)));
+  const records = [
+    { id: 'infimum', owned: 1, y: 200, system: true },
+    ...model.orders.map((row, i) => ({ id: row.id, owned: model.directoryGroups.some((ids) => ids.at(-1) === row.id) ? 4 : 0, y: (i < 4 ? 270 : 510) + (i % 4) * 55 })),
+    { id: 'supremum', owned: 1, y: 750, system: true },
+  ];
+  records.forEach((record, i) => {
+    const active = record.id === model.lookupId;
+    let x = 340;
+    fields.forEach((width, j) => {
+      c.push(rect(x, record.y, width, 46, { fill: active ? colors.blueLight : [colors.pink, colors.white, colors.green, colors.record][j], stroke: active ? colors.blue : colors.line, strokeWidth: active ? 2.5 : 1, radius: 0 }));
+      x += width;
+    });
+    c.push(text(380, record.y + 31, record.owned, { size: 23, anchor: 'middle' }),
+      text(540, record.y + 31, record.system ? '—' : record.id, { size: 23, anchor: 'middle', weight: active ? 700 : 400 }),
+      text(705, record.y + (record.system ? 20 : 31), record.system ? record.id : '订单 ' + record.id + ' 的字段', { size: record.system ? 20 : 22, anchor: 'middle', weight: active ? 700 : 400 }));
+    if (record.system) c.push(text(705, record.y + 39, record.id === 'infimum' ? '头部哑节点（系统记录）' : '尾部哨兵（系统记录）', { size: 15, anchor: 'middle', color: colors.muted }));
+    if (i < records.length - 1) {
+      c.push('<circle cx="460" cy="' + (record.y + 23) + '" r="5" fill="' + colors.black + '"/>',
+        line([[460, record.y + 30], [460, records[i + 1].y - 2]], { color: colors.black, arrow: true }));
+    } else c.push(text(460, record.y + 31, '∅', { size: 23, anchor: 'middle' }));
   });
-  c.push(sentinel(450, 960, '最大记录 supremum', true));
-  // next-record links: emerge from the pointer cell; the records are not necessarily physically adjacent.
-  [
-    [[510, 224], [510, 285], [315, 285], [315, 334]],
-    [[355, 361], [355, 410], [593, 410], [593, 361], [618, 361]],
-    [[680, 361], [680, 423], [315, 423], [315, 456]],
-    [[355, 483], [355, 535], [593, 535], [593, 483], [618, 483]],
-    [[680, 483], [680, 590], [315, 590], [315, 655]],
-    [[355, 682], [355, 731], [593, 731], [593, 682], [618, 682]],
-    [[680, 682], [680, 744], [315, 744], [315, 777]],
-    [[355, 804], [355, 856], [593, 856], [593, 804], [618, 804]],
-    [[680, 804], [680, 907], [470, 907], [470, 958]],
-  ].forEach((points) => c.push(line(points, { color: colors.black, width: 2, arrow: true })));
-  // Slot offsets point to owner records (the last record of each group).
-  [
-    [[118, 235], [211, 235], [211, 163], [625, 163], [625, 197]],
-    [[118, 445], [225, 445], [724, 445], [724, 456]],
-    [[118, 766], [225, 766], [724, 766], [724, 777]],
-    [[118, 995], [211, 995], [211, 925], [625, 925], [625, 958]],
-  ].forEach((points) => c.push(line(points, { color: colors.red, width: 2.5, dashed: true, arrow: true })));
-  c.push(
-    rect(40, 1080, 26, 26, { fill: colors.pink, stroke: '#7E888C', radius: 0 }),
-    text(78, 1101, 'n_owned：本条记录拥有的组内记录数', { size: 20 }),
-    rect(490, 1080, 26, 26, { fill: colors.green, stroke: '#7E888C', radius: 0 }),
-    text(528, 1101, '主键 id', { size: 20 }),
-    rect(700, 1080, 26, 26, { fill: colors.record, stroke: '#7E888C', radius: 0 }),
-    text(738, 1101, '其他行数据', { size: 20 }),
-    line([[40, 1140], [95, 1140]], { color: colors.red, dashed: true, arrow: true }),
-    text(110, 1147, '目录槽 → 组末记录', { size: 20 }),
-    line([[490, 1140], [545, 1140]], { color: colors.black, arrow: true }),
-    text(560, 1147, 'next 指针 → 下一条记录', { size: 20 }),
-    text(40, 1190, '8 条用户记录与 2 条系统记录；按连接关系排布，不表示实际页内物理偏移。', { size: 18, color: colors.muted }),
-  );
-  return svg('数据页：页目录、分组与记录链', '参考用户提供的页目录图重绘。绿色目录区包含四个槽，分别指向 infimum、主键4、主键8和supremum。每条用户记录分为n_owned、next指针、主键id、行数据四格。两组用户记录分别为1至4、5至8，组末记录的n_owned为4，其余为0；首尾系统记录各自拥有1条。黑线表示下一条记录，红色虚线表示槽指向的组末记录。', 1220, c);
-}
-
-function recordRow(x, y, width, id, selected) {
-  const row = order(id);
-  return rect(x, y, width, 46, { fill: selected ? colors.blueLight : colors.white, stroke: selected ? colors.blue : colors.soft, radius: 4, strokeWidth: selected ? 2 : 1 })
-    + text(x + 20, y + 31, row.id, { size: 23, weight: selected ? 700 : 400, mono: true })
-    + text(x + 100, y + 31, row.amount, { size: 23, weight: selected ? 600 : 400, mono: true });
-}
-
-function leafPage(x, y, ids, active, heading) {
-  return rect(x, y, 260, 249, { fill: colors.panel, stroke: active ? colors.blue : colors.line, strokeWidth: active ? 2.5 : 1.5 })
-    + text(x + 18, y + 34, heading, { size: 22, weight: 600, color: active ? colors.blue : colors.ink })
-    + text(x + 28, y + 68, 'id', { size: 19, color: colors.muted, mono: true })
-    + text(x + 110, y + 68, 'amount', { size: 19, color: colors.muted, mono: true })
-    + ids.map((id, i) => recordRow(x + 10, y + 84 + i * 49, 240, id, active && id === model.lookupId)).join('');
+  [records[0], records[4], records[8], records[9]].forEach((record, i) => {
+    const y = record.y + 23;
+    c.push(rect(65, y - 20, 115, 40, { fill: colors.white, radius: 4 }),
+      text(122, y + 7, '槽 ' + i, { size: 22, anchor: 'middle' }),
+      line([[182, y], [338, y]], { color: colors.red, dashed: true, arrow: true }));
+  });
+  c.push(text(40, 928, '记录 4、8 的 n_owned = 4：各自负责 4 条记录；其余用户记录为 0。', { size: 21 }),
+    text(40, 966, '首尾系统记录在本图中各自一组，n_owned = 1；普通组为 4～8 条，首尾允许例外。', { size: 19, color: colors.muted }),
+    text(40, 1004, '图按逻辑顺序排布，不表示字节位置；next 连接的是同一页内的记录，方向为单向。', { size: 19, color: colors.muted }));
+  return svg('A 页的目录槽、分组与记录头', 'A页包含订单1至8。四个目录槽分别指向infimum、4、8、supremum，对应n_owned为1、4、4、1。infimum可类比头部哑节点，supremum为尾部哨兵，都是系统记录。记录头和用户业务字段分开标注。记录沿next单向连接，6高亮。图按逻辑顺序绘制，不表示真实物理偏移。', 1040, c);
 }
 
 function primaryTree() {
   const c = [
-    text(40, 88, '查询 id = ' + model.lookupId + '：上层指路，叶子页保存行记录。', { size: 21, color: colors.muted }),
-    label(350, 112, '非叶子页：导航键 + 子页引用', 340),
-    rect(235, 168, 530, 91, { fill: colors.panel }),
+    text(40, 88, 'id = 6：根页 → 左侧中间页 → 叶子页 A。', { size: 22, color: colors.muted }),
+    label(45, 130, '根页', 120), navigationPage(290, 122, model.overviewRootKeys),
+    line([[380, 176], [380, 220]], { color: colors.blue, width: 3, arrow: true }),
+    text(520, 208, '6 < 25', { size: 22, color: colors.blue }),
+    label(45, 240, '中间页', 120), navigationPage(290, 232, model.navigationKeys),
+    line([[380, 286], [380, 330]], { color: colors.blue, width: 3, arrow: true }),
+    text(520, 318, '6 < 9', { size: 22, color: colors.blue }),
+    rect(290, 345, 560, 110, { fill: colors.blueLight, stroke: colors.blue, strokeWidth: 2 }),
+    text(315, 384, '叶子页 A：订单 1～8', { size: 25, color: colors.blue, weight: 700 }),
+    text(315, 427, 'id 6  ·  user_id 3  ·  amount 70.00  ·  paid', { size: 22, mono: true }),
+    text(40, 507, '这里只画选中的路径；完整分支、页间双向链接和 A 页内容见总览图。', { size: 20, color: colors.muted }),
   ];
-  const rootCenters = [325, 500, 675];
-  model.leafGroups.forEach((ids, i) => {
-    const x = 245 + i * 175, active = ids.includes(model.lookupId);
-    c.push(rect(x, 178, 160, 71, { fill: active ? colors.blueLight : colors.white, stroke: active ? colors.blue : colors.soft, radius: 7, strokeWidth: active ? 2 : 1 }));
-    c.push(text(x + 80, 208, '下界 ' + ids[0], { size: 22, anchor: 'middle', weight: 600, color: active ? colors.blue : colors.ink }));
-    c.push(text(x + 80, 235, '指向页 ' + String.fromCharCode(65 + i), { size: 17, anchor: 'middle', color: colors.muted }));
-    c.push(line([[rootCenters[i], 259], [rootCenters[i], 292], [170 + i * 330, 292], [170 + i * 330, 335]], { color: active ? colors.blue : colors.line, width: active ? 3 : 2, arrow: true }));
-    c.push(leafPage(40 + i * 330, 338, ids, active, '叶子页 ' + String.fromCharCode(65 + i)));
-  });
-  c.push(text(525, 316, '4 ≤ 6 < 7，进入页 B', { size: 19, color: colors.blue, weight: 600 }),
-    line([[302, 557], [367, 557]], { both: true }), line([[632, 557], [697, 557]], { both: true }),
-    text(500, 622, '叶子页按主键顺序双向连接；此处只显示 id、amount 两列。', { size: 20, anchor: 'middle', color: colors.muted }),
-    text(40, 663, '为展示分支，把 8 行人为画成 3 个叶子页；真实小表通常只需一个叶子页。', { size: 18, color: colors.muted }),
-    text(40, 693, '导航键为简化下界，省略最左项最小标志、内部格式及页外存储。', { size: 18, color: colors.muted }));
-  return svg('B+ 树：从导航页走到记录所在页', '根页用简化下界1、4、7引用三个叶子页，分别显示订单1至3、4至6、7至8。查找id6时进入页B，取得金额70.00的订单记录。叶子页双向连接。', 725, c);
+  return svg('查询订单 6 的主键索引路径', '与总览图相同的三层树：根页1、25、49，中间页1、9、17，目标位于包含1至8的A页。', 545, c);
 }
 
 function secondaryLookup() {
@@ -331,11 +350,11 @@ function secondaryLookup() {
     line([[391, 317], [490, 317], [490, 216], [548, 216]], { color: colors.blue, width: 3, arrow: true }),
     text(441, 347, 'id = ' + lookup.id, { size: 20, anchor: 'middle', color: colors.blue, weight: 600, mono: true }),
     rect(554, 174, 396, 85, { fill: colors.panel, stroke: colors.blue }),
-    text(752, 207, '主键树的上层', { size: 21, anchor: 'middle', weight: 600 }),
-    text(752, 239, '1       4       7', { size: 24, anchor: 'middle', mono: true, color: colors.blue }),
+    text(752, 207, '根页 → 中间页', { size: 21, anchor: 'middle', weight: 600 }),
+    text(752, 239, '1 / 25 / 49 → 1 / 9 / 17', { size: 20, anchor: 'middle', mono: true, color: colors.blue }),
     line([[752, 261], [752, 306]], { color: colors.blue, width: 3, arrow: true }),
     rect(554, 310, 396, 186, { fill: colors.blueLight, stroke: colors.blue, strokeWidth: 2 }),
-    text(576, 347, '叶子页中的 id = ' + lookup.id, { size: 23, weight: 700, color: colors.blue }),
+    text(576, 347, 'A 页中的 id = ' + lookup.id, { size: 23, weight: 700, color: colors.blue }),
     text(576, 389, 'user_id  ' + lookup.user_id, { size: 22, mono: true }),
     text(576, 427, 'amount   ' + lookup.amount, { size: 22, mono: true }),
     text(576, 465, 'status   ' + lookup.status, { size: 22, mono: true }),
@@ -345,14 +364,68 @@ function secondaryLookup() {
   return svg('回表：先取得主键，再找订单记录', 'user_id二级索引中，值3对应主键5、6、8。展开id6的一次回表，聚簇索引叶子行包含user_id3、amount70.00和status paid；另外两条匹配记录也需要所需列。', 650, c);
 }
 
-if (model.table !== 'orders' || model.orders.length !== 8
-  || model.leafGroups.length !== 3 || model.leafGroups.some((ids) => ids.length > 3)
-  || model.directoryGroups.length !== 2 || model.directoryGroups.some((ids) => ids.length !== 4)) {
-  throw new Error('The teaching layouts require orders, 8 records, 3 leaf groups (up to 3 rows) and 2 directory groups of 4.');
+function bufferPool() {
+  const c = [
+    text(40, 88, '应用发送 SQL；InnoDB 访问某个页时，先看它是否已经在内存中。', { size: 21, color: colors.muted }),
+    rect(260, 120, 620, 65, { fill: colors.blue, stroke: 'none' }),
+    text(570, 162, '应用（后端服务）', { size: 28, color: colors.white, weight: 700, anchor: 'middle' }),
+    line([[480, 188], [480, 241]], { color: colors.blue, width: 3, arrow: true }),
+    line([[650, 241], [650, 188]], { color: colors.line, width: 3, arrow: true }),
+    text(460, 221, 'SQL', { size: 20, anchor: 'end', color: colors.blue }),
+    text(670, 221, '查询结果', { size: 20, color: colors.muted }),
+    rect(160, 245, 800, 360, { fill: '#FAFBFD', stroke: colors.blue, strokeWidth: 2, radius: 18 }),
+    text(185, 290, 'MySQL 进程', { size: 24, weight: 700, color: colors.blue }),
+    rect(365, 263, 570, 45, { fill: colors.blueLight, stroke: 'none', radius: 6 }),
+    text(650, 293, 'Server 执行器 → 调用 InnoDB 访问页', { size: 21, anchor: 'middle' }),
+    line([[550, 310], [550, 323]], { color: colors.blue, arrow: true }),
+    rect(185, 325, 750, 255, { fill: '#F1F6E9', stroke: '#AABF90', radius: 14 }),
+    text(210, 362, 'Buffer Pool：InnoDB 的内存缓冲区', { size: 24, weight: 700 }),
+  ];
+  const pages = [
+    { name: '根页', values: [model.overviewRootKeys.join(' / '), '导航键和子页引用'] },
+    { name: '中间页', values: [model.navigationKeys.join(' / '), '导航键和子页引用'] },
+    { name: '叶子页 A', values: ['订单 1～8', 'id 6 → 70.00', '其余字段省略'] },
+    { name: '叶子页 B', values: ['内容省略'] },
+  ];
+  pages.forEach((page, i) => {
+    const x = 205 + i * 180;
+    if (i === 3) {
+      c.push('<rect x="' + x + '" y="385" width="165" height="160" rx="8" fill="' + colors.white + '" stroke="' + colors.line + '" stroke-width="2" stroke-dasharray="7 6"/>',
+        text(x + 82, 419, page.name, { size: 23, anchor: 'middle', color: colors.muted }),
+        text(x + 82, 461, '尚未缓存', { size: 24, anchor: 'middle', weight: 700, color: colors.muted }),
+        text(x + 82, 501, '读入后的示意位置', { size: 16, anchor: 'middle', color: colors.muted }));
+    } else {
+      c.push(rect(x, 385, 165, 160, { fill: colors.white, stroke: colors.blue, radius: 8 }),
+        text(x + 82, 419, page.name, { size: 23, anchor: 'middle', weight: 700, color: colors.blue }));
+      page.values.forEach((value, j) => c.push(text(x + 82, 458 + j * 29, value, { size: j === 0 ? 21 : 18, anchor: 'middle', mono: j === 0 })));
+    }
+  });
+  c.push(
+    text(200, 642, '① 根页、中间页、A 页已缓存：本次找 id = 6，可以直接读内存。', { size: 21, color: colors.blue, weight: 600 }),
+    text(200, 683, '② 如果之后要访问 B 页：未缓存，先整页读入内存。', { size: 21, color: colors.blue }),
+    rect(185, 710, 750, 210, { fill: '#F3F6FA', stroke: colors.line, strokeWidth: 2, radius: 14 }),
+    text(210, 747, '磁盘：存放数据页、索引页等', { size: 24, weight: 700 }),
+  );
+  pages.forEach((page, i) => {
+    const x = 205 + i * 180;
+    c.push(rect(x, 765, 165, 125, { fill: colors.white, stroke: i === 3 ? colors.blue : colors.line, radius: 8, strokeWidth: i === 3 ? 2 : 1.5 }),
+      text(x + 82, 799, page.name, { size: 23, weight: 700, anchor: 'middle', color: i === 3 ? colors.blue : colors.ink }));
+    const values = i < 2 ? [page.values[0], '其余内容省略'] : page.values.slice(0, 2);
+    values.forEach((value, j) => c.push(text(x + 82, 839 + j * 30, value, { size: 20, anchor: 'middle', mono: j === 0 })));
+  });
+  c.push(line([[827, 762], [827, 548]], { color: colors.blue, width: 3, arrow: true }),
+    text(40, 968, '只示意读取过程。内存里的卡片是页的缓存，不是整条 SQL 的查询结果。', { size: 20, color: colors.muted }));
+  return svg('Buffer Pool：先找内存里的页', '应用通过SQL访问MySQL，Server执行器调用InnoDB。Buffer Pool位于MySQL进程内，假设根页、中间页和A页已缓存，查订单6可以读内存；B页尚未缓存，之后需要访问B时，从磁盘将B整页读入缓冲池。页名和导航键与正文主键树一致，B页内容省略。', 1000, c);
 }
-if (!order(model.lookupId) || !model.leafGroups.flat().every((id) => order(id))
-  || !model.directoryGroups.flat().every((id) => order(id))) {
-  throw new Error('Every illustrated id must exist in orders.');
+
+if (model.table !== 'orders' || model.orders.length !== 8
+  || model.directoryGroups.length !== 2 || model.directoryGroups.some((ids) => ids.length !== 4)
+  || model.overviewRootKeys.join(',') !== '1,25,49' || model.navigationKeys.join(',') !== '1,9,17') {
+  throw new Error('Layouts require 8 orders in page A, navigation 1/9/17 and 1/25/49, and two groups of four.');
+}
+if (!order(model.lookupId) || new Set(model.directoryGroups.flat()).size !== model.orders.length
+  || !model.directoryGroups.flat().every((id, i) => id === model.orders[i].id)) {
+  throw new Error('The directory must cover every illustrated order in primary-key order.');
 }
 
 await mkdir(outputDirectory, { recursive: true });
@@ -360,11 +433,17 @@ const diagrams = new Map([
   ['00-query-architecture.svg', queryArchitecture()],
   ['01-storage-tree-overview.svg', storageTreeOverview()],
   ['01-table-page.svg', tableAndPage()],
+  ['02-record-chain.svg', recordChain()],
+  ['02-page-search.svg', pageSearch()],
   ['02-page-directory.svg', pageDirectory()],
   ['03-primary-btree.svg', primaryTree()],
   ['04-secondary-lookup.svg', secondaryLookup()],
+  ['06-buffer-pool.svg', bufferPool()],
 ]);
 for (const [filename, content] of diagrams) {
   await writeFile(path.join(outputDirectory, filename), content);
   console.log('Generated public/images/mysql/' + filename);
 }
+
+await writeFile(path.join(outputDirectory, '05-join-venn.svg'), await readFile(path.join(directory, 'join-venn.svg')));
+console.log('Copied public/images/mysql/05-join-venn.svg');

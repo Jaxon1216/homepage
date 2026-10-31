@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000" role="img" aria-labelledby="title desc">
+<title id="title">Buffer Pool：先找内存里的页</title>
+<desc id="desc">应用通过SQL访问MySQL，Server执行器调用InnoDB。Buffer Pool位于MySQL进程内，假设根页、中间页和A页已缓存，查订单6可以读内存；B页尚未缓存，之后需要访问B时，从磁盘将B整页读入缓冲池。页名和导航键与正文主键树一致，B页内容省略。</desc>
+<defs><marker id="arrow-line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker><marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#B13F28" stroke-width="1.7"/></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#303C45" stroke-width="1.7"/></marker></defs>
+<rect x="0" y="0" width="1000" height="1000" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Buffer Pool：先找内存里的页</text>
+<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">应用发送 SQL；InnoDB 访问某个页时，先看它是否已经在内存中。</text>
+<rect x="260" y="120" width="620" height="65" rx="12" fill="#145DA8" stroke="none" stroke-width="1.5"/>
+<text x="570" y="162" fill="#FFFFFF" font-size="28" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">应用（后端服务）</text>
+<polyline points="480,188 480,241" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="650,241 650,188" fill="none" stroke="#AABACA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="460" y="221" fill="#145DA8" font-size="20" font-weight="400" text-anchor="end" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">SQL</text>
+<text x="670" y="221" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">查询结果</text>
+<rect x="160" y="245" width="800" height="360" rx="18" fill="#FAFBFD" stroke="#145DA8" stroke-width="2"/>
+<text x="185" y="290" fill="#145DA8" font-size="24" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">MySQL 进程</text>
+<rect x="365" y="263" width="570" height="45" rx="6" fill="#E7F0FC" stroke="none" stroke-width="1.5"/>
+<text x="650" y="293" fill="#172B42" font-size="21" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Server 执行器 → 调用 InnoDB 访问页</text>
+<polyline points="550,310 550,323" fill="none" stroke="#145DA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<rect x="185" y="325" width="750" height="255" rx="14" fill="#F1F6E9" stroke="#AABF90" stroke-width="1.5"/>
+<text x="210" y="362" fill="#172B42" font-size="24" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">Buffer Pool：InnoDB 的内存缓冲区</text>
+<rect x="205" y="385" width="165" height="160" rx="8" fill="#FFFFFF" stroke="#145DA8" stroke-width="1.5"/>
+<text x="287" y="419" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">根页</text>
+<text x="287" y="458" fill="#172B42" font-size="21" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1 / 25 / 49</text>
+<text x="287" y="487" fill="#172B42" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">导航键和子页引用</text>
+<rect x="385" y="385" width="165" height="160" rx="8" fill="#FFFFFF" stroke="#145DA8" stroke-width="1.5"/>
+<text x="467" y="419" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">中间页</text>
+<text x="467" y="458" fill="#172B42" font-size="21" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1 / 9 / 17</text>
+<text x="467" y="487" fill="#172B42" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">导航键和子页引用</text>
+<rect x="565" y="385" width="165" height="160" rx="8" fill="#FFFFFF" stroke="#145DA8" stroke-width="1.5"/>
+<text x="647" y="419" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 A</text>
+<text x="647" y="458" fill="#172B42" font-size="21" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">订单 1～8</text>
+<text x="647" y="487" fill="#172B42" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id 6 → 70.00</text>
+<text x="647" y="516" fill="#172B42" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">其余字段省略</text>
+<rect x="745" y="385" width="165" height="160" rx="8" fill="#FFFFFF" stroke="#AABACA" stroke-width="2" stroke-dasharray="7 6"/>
+<text x="827" y="419" fill="#53677C" font-size="23" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 B</text>
+<text x="827" y="461" fill="#53677C" font-size="24" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">尚未缓存</text>
+<text x="827" y="501" fill="#53677C" font-size="16" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">读入后的示意位置</text>
+<text x="200" y="642" fill="#145DA8" font-size="21" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">① 根页、中间页、A 页已缓存：本次找 id = 6，可以直接读内存。</text>
+<text x="200" y="683" fill="#145DA8" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">② 如果之后要访问 B 页：未缓存，先整页读入内存。</text>
+<rect x="185" y="710" width="750" height="210" rx="14" fill="#F3F6FA" stroke="#AABACA" stroke-width="2"/>
+<text x="210" y="747" fill="#172B42" font-size="24" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">磁盘：存放数据页、索引页等</text>
+<rect x="205" y="765" width="165" height="125" rx="8" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="287" y="799" fill="#172B42" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">根页</text>
+<text x="287" y="839" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1 / 25 / 49</text>
+<text x="287" y="869" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">其余内容省略</text>
+<rect x="385" y="765" width="165" height="125" rx="8" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="467" y="799" fill="#172B42" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">中间页</text>
+<text x="467" y="839" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1 / 9 / 17</text>
+<text x="467" y="869" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">其余内容省略</text>
+<rect x="565" y="765" width="165" height="125" rx="8" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="647" y="799" fill="#172B42" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 A</text>
+<text x="647" y="839" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">订单 1～8</text>
+<text x="647" y="869" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">id 6 → 70.00</text>
+<rect x="745" y="765" width="165" height="125" rx="8" fill="#FFFFFF" stroke="#145DA8" stroke-width="2"/>
+<text x="827" y="799" fill="#145DA8" font-size="23" font-weight="700" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 B</text>
+<text x="827" y="839" fill="#172B42" font-size="20" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">内容省略</text>
+<polyline points="827,762 827,548" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<text x="40" y="968" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">只示意读取过程。内存里的卡片是页的缓存，不是整条 SQL 的查询结果。</text>
+</svg>

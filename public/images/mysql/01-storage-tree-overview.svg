@@ -1,118 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="878" viewBox="0 0 1000 878" role="img" aria-labelledby="title desc">
-<title id="title">InnoDB 把表数据组织成一棵主键 B+ 树</title>
-<desc id="desc">三级主键索引总览，黄色格表示导航主键或叶子记录主键，白色格表示子页引用，绿色格表示行的其他字段。根页导航项1、10、20引用中间页，只展开第一个中间页的1、4、7三个分支，叶子页显示订单1至8的id、user_id、amount和status。其余子树省略。叶子页实际双向连接，图中仅画向右链接。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="970" viewBox="0 0 1000 970" role="img" aria-labelledby="title desc">
+<title id="title">主键 B+ 树：先找到 A 页，再找订单 6</title>
+<desc id="desc">根页下界1、25、49，中间页下界1、9、17。查询6沿蓝线进入叶子页A，A页包含完整的八条示例订单，B、C和其他分支内容省略。叶子页之间双向连接。</desc>
 <defs><marker id="arrow-line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#AABACA" stroke-width="1.7"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#145DA8" stroke-width="1.7"/></marker><marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#936000" stroke-width="1.7"/></marker><marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#B13F28" stroke-width="1.7"/></marker><marker id="arrow-black" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#303C45" stroke-width="1.7"/></marker></defs>
-<rect x="0" y="0" width="1000" height="878" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
-<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">InnoDB 把表数据组织成一棵主键 B+ 树</text>
-<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">主键索引：上层保存导航键与子页引用，叶子页保存行记录。</text>
-<text x="365" y="152" fill="#172B42" font-size="23" font-weight="600" text-anchor="end" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">根页</text>
-<rect x="390" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="450" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="420" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text><rect x="510" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="570" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="540" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">10</text><rect x="630" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="690" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="660" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">20</text>
-<text x="80" y="296" fill="#172B42" font-size="22" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">中间页</text>
-<rect x="80" y="315" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="140" y="315" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="110" y="349" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text><rect x="200" y="315" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="260" y="315" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="230" y="349" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">4</text><rect x="320" y="315" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="380" y="315" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="350" y="349" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">7</text>
-<rect x="575" y="315" width="150" height="52" rx="0" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
-<rect x="810" y="315" width="150" height="52" rx="0" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
-<text x="650" y="349" fill="#172B42" font-size="26" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
-<text x="885" y="349" fill="#172B42" font-size="26" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
-<text x="770" y="401" fill="#53677C" font-size="18" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">其余子树省略</text>
-<text x="40" y="499" fill="#172B42" font-size="22" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页</text>
-<polyline points="480,172 260,313" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<polyline points="600,172 650,313" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<polyline points="720,172 885,313" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<polyline points="170,369 180,518" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<rect x="40" y="520" width="40" height="36" rx="0" fill="#FFE59C" stroke="#89927E" stroke-width="1.5"/>
-<text x="60" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id</text>
-<rect x="80" y="520" width="76" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="118" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id</text>
-<rect x="156" y="520" width="84" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="198" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount</text>
-<rect x="240" y="520" width="80" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="280" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status</text>
-<rect x="40" y="556" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="60" y="584" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
-<rect x="80" y="556" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="118" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
-<rect x="156" y="556" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="198" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">120.00</text>
-<rect x="240" y="556" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="280" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<rect x="40" y="598" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="60" y="626" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
-<rect x="80" y="598" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="118" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
-<rect x="156" y="598" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="198" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">80.00</text>
-<rect x="240" y="598" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="280" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<rect x="40" y="640" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="60" y="668" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
-<rect x="80" y="640" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="118" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
-<rect x="156" y="640" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="198" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">160.00</text>
-<rect x="240" y="640" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="280" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<polyline points="290,369 510,518" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<rect x="370" y="520" width="40" height="36" rx="0" fill="#FFE59C" stroke="#89927E" stroke-width="1.5"/>
-<text x="390" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id</text>
-<rect x="410" y="520" width="76" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="448" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id</text>
-<rect x="486" y="520" width="84" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="528" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount</text>
-<rect x="570" y="520" width="80" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="610" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status</text>
-<rect x="370" y="556" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="390" y="584" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">4</text>
-<rect x="410" y="556" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="448" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
-<rect x="486" y="556" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="528" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">90.00</text>
-<rect x="570" y="556" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="610" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<rect x="370" y="598" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="390" y="626" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">5</text>
-<rect x="410" y="598" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="448" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
-<rect x="486" y="598" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="528" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">60.00</text>
-<rect x="570" y="598" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="610" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<rect x="370" y="640" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="390" y="668" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">6</text>
-<rect x="410" y="640" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="448" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
-<rect x="486" y="640" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="528" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">70.00</text>
-<rect x="570" y="640" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="610" y="668" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<polyline points="410,369 840,518" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<rect x="700" y="520" width="40" height="36" rx="0" fill="#FFE59C" stroke="#89927E" stroke-width="1.5"/>
-<text x="720" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id</text>
-<rect x="740" y="520" width="76" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="778" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id</text>
-<rect x="816" y="520" width="84" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="858" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount</text>
-<rect x="900" y="520" width="80" height="36" rx="0" fill="#EEF6E8" stroke="#89927E" stroke-width="1.5"/>
-<text x="940" y="544" fill="#172B42" font-size="16" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status</text>
-<rect x="700" y="556" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="720" y="584" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">7</text>
-<rect x="740" y="556" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="778" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">4</text>
-<rect x="816" y="556" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="858" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">300.00</text>
-<rect x="900" y="556" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="940" y="584" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
-<rect x="700" y="598" width="40" height="42" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/>
-<text x="720" y="626" fill="#172B42" font-size="19" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">8</text>
-<rect x="740" y="598" width="76" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="778" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
-<rect x="816" y="598" width="84" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="858" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">900.00</text>
-<rect x="900" y="598" width="80" height="42" rx="0" fill="#DCECCB" stroke="#89927E" stroke-width="1.5"/>
-<text x="940" y="626" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">unpaid</text>
-<polyline points="68,684 68,718 350,718 350,578 368,578" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<polyline points="398,684 398,745 680,745 680,578 698,578" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)"/>
-<text x="40" y="785" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页按主键顺序双向连接；图中为简洁只画向右的链接。</text>
-<text x="40" y="818" fill="#53677C" font-size="18" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">三级结构示意，仅展开订单 1～8；根页的 10、20 表示省略分支的范围下界。</text>
-<text x="40" y="848" fill="#53677C" font-size="18" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">节点对应页，导航键用简化下界表示；真实的 8 条短记录通常仍在一个叶子页内。</text>
+<rect x="0" y="0" width="1000" height="970" rx="0" fill="#FFFFFF" stroke="none" stroke-width="1.5"/>
+<text x="40" y="49" fill="#172B42" font-size="30" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">主键 B+ 树：先找到 A 页，再找订单 6</text>
+<text x="40" y="88" fill="#53677C" font-size="21" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">每个节点都是页；只展开 A 页的 8 条订单，其他页内容省略。</text>
+<text x="365" y="151" fill="#172B42" font-size="23" font-weight="600" text-anchor="end" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">根页</text>
+<rect x="390" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="450" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="420" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text><rect x="510" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="570" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="540" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">25</text><rect x="630" y="118" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="690" y="118" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="660" y="152" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">49</text>
+<rect x="80" y="300" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="140" y="300" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="110" y="334" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text><rect x="200" y="300" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="260" y="300" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="230" y="334" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">9</text><rect x="320" y="300" width="60" height="52" rx="0" fill="#FFD258" stroke="#89927E" stroke-width="1.5"/><rect x="380" y="300" width="60" height="52" rx="0" fill="#FFFFFF" stroke="#89927E" stroke-width="1.5"/><text x="350" y="334" fill="#172B42" font-size="24" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">17</text>
+<text x="80" y="284" fill="#172B42" font-size="22" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">中间页</text>
+<rect x="575" y="300" width="150" height="52" rx="0" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<rect x="810" y="300" width="150" height="52" rx="0" fill="#FFFFFF" stroke="#AABACA" stroke-width="1.5"/>
+<text x="650" y="334" fill="#172B42" font-size="26" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
+<text x="885" y="334" fill="#172B42" font-size="26" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
+<polyline points="480,172 260,298" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="600,172 650,298" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<polyline points="720,172 885,298" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="281" y="230" fill="#145DA8" font-size="20" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">6 &lt; 25</text>
+<polyline points="170,354 330,483" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+<polyline points="290,354 635,483" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<polyline points="410,354 875,483" fill="none" stroke="#AABACA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-line)"/>
+<text x="40" y="406" fill="#145DA8" font-size="20" font-weight="600" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">6 &lt; 9，进入 A 页</text>
+<text x="40" y="465" fill="#145DA8" font-size="23" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 A：订单 1～8</text>
+<rect x="30" y="475" width="410" height="344" rx="4" fill="#FFFFFF" stroke="#145DA8" stroke-width="2"/>
+<rect x="40" y="485" width="50" height="36" rx="0" fill="#FFE59C" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="510" fill="#172B42" font-size="18" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id</text>
+<rect x="90" y="485" width="95" height="36" rx="0" fill="#EEF6E8" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="510" fill="#172B42" font-size="18" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id</text>
+<rect x="185" y="485" width="110" height="36" rx="0" fill="#EEF6E8" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="510" fill="#172B42" font-size="18" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount</text>
+<rect x="295" y="485" width="135" height="36" rx="0" fill="#EEF6E8" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="510" fill="#172B42" font-size="18" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status</text>
+<rect x="40" y="521" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="546" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
+<rect x="90" y="521" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="546" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
+<rect x="185" y="521" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="546" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">120.00</text>
+<rect x="295" y="521" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="546" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="557" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="582" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
+<rect x="90" y="557" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="582" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1</text>
+<rect x="185" y="557" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="582" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">80.00</text>
+<rect x="295" y="557" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="582" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="593" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="618" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<rect x="90" y="593" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="618" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
+<rect x="185" y="593" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="618" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">160.00</text>
+<rect x="295" y="593" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="618" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="629" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="654" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">4</text>
+<rect x="90" y="629" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="654" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">2</text>
+<rect x="185" y="629" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="654" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">90.00</text>
+<rect x="295" y="629" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="654" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="665" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="690" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">5</text>
+<rect x="90" y="665" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="690" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<rect x="185" y="665" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="690" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">60.00</text>
+<rect x="295" y="665" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="690" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="701" width="50" height="36" rx="0" fill="#E7F0FC" stroke="#145DA8" stroke-width="1.5"/>
+<text x="65" y="726" fill="#172B42" font-size="19" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">6</text>
+<rect x="90" y="701" width="95" height="36" rx="0" fill="#E7F0FC" stroke="#145DA8" stroke-width="1.5"/>
+<text x="137.5" y="726" fill="#172B42" font-size="19" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<rect x="185" y="701" width="110" height="36" rx="0" fill="#E7F0FC" stroke="#145DA8" stroke-width="1.5"/>
+<text x="240" y="726" fill="#172B42" font-size="19" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">70.00</text>
+<rect x="295" y="701" width="135" height="36" rx="0" fill="#E7F0FC" stroke="#145DA8" stroke-width="1.5"/>
+<text x="362.5" y="726" fill="#172B42" font-size="19" font-weight="700" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="737" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="762" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">7</text>
+<rect x="90" y="737" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="762" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">4</text>
+<rect x="185" y="737" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="762" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">300.00</text>
+<rect x="295" y="737" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="762" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">paid</text>
+<rect x="40" y="773" width="50" height="36" rx="0" fill="#FFD258" stroke="#AABACA" stroke-width="1.5"/>
+<text x="65" y="798" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">8</text>
+<rect x="90" y="773" width="95" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="137.5" y="798" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">3</text>
+<rect x="185" y="773" width="110" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="240" y="798" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">900.00</text>
+<rect x="295" y="773" width="135" height="36" rx="0" fill="#DCECCB" stroke="#AABACA" stroke-width="1.5"/>
+<text x="362.5" y="798" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">unpaid</text>
+<rect x="550" y="485" width="170" height="324" rx="0" fill="#F3F6FA" stroke="#AABACA" stroke-width="1.5"/>
+<text x="635" y="527" fill="#172B42" font-size="23" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 B</text>
+<text x="635" y="580" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">9 ≤ id &lt; 17</text>
+<text x="635" y="648" fill="#172B42" font-size="30" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
+<text x="635" y="690" fill="#53677C" font-size="19" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">内容省略</text>
+<rect x="790" y="485" width="170" height="324" rx="0" fill="#F3F6FA" stroke="#AABACA" stroke-width="1.5"/>
+<text x="875" y="527" fill="#172B42" font-size="23" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页 C</text>
+<text x="875" y="580" fill="#172B42" font-size="19" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">17 ≤ id &lt; 25</text>
+<text x="875" y="648" fill="#172B42" font-size="30" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">……</text>
+<text x="875" y="690" fill="#53677C" font-size="19" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">内容省略</text>
+<polyline points="442,754 548,754" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)" marker-start="url(#arrow-black)"/>
+<polyline points="722,754 788,754" fill="none" stroke="#303C45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-black)" marker-start="url(#arrow-black)"/>
+<text x="494" y="725" fill="#53677C" font-size="16" font-weight="400" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">页间双向链接</text>
+<text x="40" y="859" fill="#53677C" font-size="20" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">页与页：按主键顺序双向连接；A 页内部怎样查找，见后面的页目录图。</text>
+<text x="40" y="901" fill="#53677C" font-size="19" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">三层是大表结构示意；如果整张表真的只有这 8 行，通常一页就能放下。</text>
+<text x="40" y="936" fill="#53677C" font-size="18" font-weight="400" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">导航键使用简化下界，省略最左项的特殊标记；其他分支不表示本例额外的 SQL 输入。</text>
 </svg>

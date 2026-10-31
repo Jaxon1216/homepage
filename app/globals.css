@@ -651,6 +651,27 @@ body:has(.blog-reading-shell) {
   background: transparent;
 }
 
+/* Opt-in annotations keep the three-rule table structure and normal row colors. */
+.blog-reading-prose td mark {
+  padding: 0.08em 0.25em;
+  color: inherit;
+  background: color-mix(in srgb, #d49a31 24%, transparent);
+}
+
+.blog-reading-prose tbody tr:has(mark[data-table-row="exclude"]) > td {
+  background: color-mix(in srgb, #d49a31 13%, transparent);
+}
+
+.blog-reading-prose tbody tr:has(mark[data-table-row="focus"]) > td {
+  background: color-mix(in srgb, var(--article-accent) 15%, transparent);
+  font-weight: 600;
+}
+
+.blog-reading-prose td mark[data-table-row] {
+  padding: 0;
+  background: transparent;
+}
+
 .blog-reading-prose code {
   padding: 0.08em 0.3em;
   border-color: var(--article-subtle-rule);

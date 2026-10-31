@@ -3,8 +3,8 @@
   "lookupId": 6,
   "secondaryColumn": "user_id",
   "secondaryValue": 3,
-  "overviewRootKeys": [1, 10, 20],
-  "leafGroups": [[1, 2, 3], [4, 5, 6], [7, 8]],
+  "overviewRootKeys": [1, 25, 49],
+  "navigationKeys": [1, 9, 17],
   "directoryGroups": [[1, 2, 3, 4], [5, 6, 7, 8]],
   "orders": [
     {"id": 1, "user_id": 1, "amount": "120.00", "status": "paid"},

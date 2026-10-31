@@ -24,11 +24,11 @@
 <polyline points="391,317 490,317 490,216 548,216" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
 <text x="441" y="347" fill="#145DA8" font-size="20" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">id = 6</text>
 <rect x="554" y="174" width="396" height="85" rx="12" fill="#F3F6FA" stroke="#145DA8" stroke-width="1.5"/>
-<text x="752" y="207" fill="#172B42" font-size="21" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">主键树的上层</text>
-<text x="752" y="239" fill="#145DA8" font-size="24" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1       4       7</text>
+<text x="752" y="207" fill="#172B42" font-size="21" font-weight="600" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">根页 → 中间页</text>
+<text x="752" y="239" fill="#145DA8" font-size="20" font-weight="400" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">1 / 25 / 49 → 1 / 9 / 17</text>
 <polyline points="752,261 752,306" fill="none" stroke="#145DA8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
 <rect x="554" y="310" width="396" height="186" rx="12" fill="#E7F0FC" stroke="#145DA8" stroke-width="2"/>
-<text x="576" y="347" fill="#145DA8" font-size="23" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">叶子页中的 id = 6</text>
+<text x="576" y="347" fill="#145DA8" font-size="23" font-weight="700" text-anchor="start" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif">A 页中的 id = 6</text>
 <text x="576" y="389" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">user_id  3</text>
 <text x="576" y="427" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">amount   70.00</text>
 <text x="576" y="465" fill="#172B42" font-size="22" font-weight="400" text-anchor="start" font-family="ui-monospace, SFMono-Regular, Consolas, monospace">status   paid</text>
