@@ -40,11 +40,10 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
   );
 }
 
-export const mdxComponents = {
+export const markdownComponents = {
   pre: Pre,
   figure: Figure,
   div: Div,
   img: ZoomableImage,
   table: Table,
-  ArticleImage: ZoomableImage,
 };

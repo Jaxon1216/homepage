@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/common/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { getAllPosts } from "@/lib/mdx";
+import { getAllPosts } from "@/lib/posts";
 import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 

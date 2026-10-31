@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiClock, FiTag } from "react-icons/fi";
-import type { PostMeta } from "@/lib/mdx";
+import type { PostMeta } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 
 interface BlogListProps {
@@ -71,7 +71,7 @@ export function BlogList({ posts, tags }: BlogListProps) {
           {filtered.length === 0 ? (
             <p className="text-center text-[var(--muted)] py-12">
               {posts.length === 0
-                ? "No posts yet. Add an .mdx file under content/posts/."
+                ? "No posts yet. Add an .md file under content/posts/."
                 : "No posts under this tag."}
             </p>
           ) : (

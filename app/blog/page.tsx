@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllPosts, getAllTags } from "@/lib/mdx";
+import { getAllPosts, getAllTags } from "@/lib/posts";
 import { BlogList } from "./BlogList";
 import { MottoBlock } from "@/components/common/MottoBlock";
 

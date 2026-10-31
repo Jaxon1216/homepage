@@ -3,18 +3,10 @@
  * Run after Mermaid extraction and pretty-code so code figures stay untouched.
  */
 
-interface MdxAttribute {
-  type: string;
-  name?: string;
-  value?: unknown;
-}
-
 interface HastNode {
   type: string;
   tagName?: string;
-  name?: string | null;
   properties?: Record<string, unknown>;
-  attributes?: MdxAttribute[];
   children?: HastNode[];
   value?: string;
 }
@@ -25,15 +17,11 @@ interface InlineSegment {
 }
 
 function tagName(node: HastNode): string | undefined {
-  return node.type === "element" ? node.tagName :
-    node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement"
-      ? node.name ?? undefined : undefined;
+  return node.type === "element" ? node.tagName : undefined;
 }
 
 function property(node: HastNode, name: string): unknown {
-  if (node.type === "element") return node.properties?.[name];
-  return node.attributes?.find((attribute) =>
-    attribute.type === "mdxJsxAttribute" && attribute.name === name)?.value;
+  return node.properties?.[name];
 }
 
 function text(node: HastNode): string {
@@ -51,7 +39,7 @@ function title(node: HastNode): string {
 
 function isImage(node: HastNode): boolean {
   const name = tagName(node);
-  return name === "img" || name === "ArticleImage";
+  return name === "img";
 }
 
 function isMermaid(node: HastNode): boolean {

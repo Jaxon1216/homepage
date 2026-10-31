@@ -126,13 +126,13 @@ const resumeVersions: ResumeVersion[] = [
         },
         {
           name: "个人主页",
-          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + MDX + Framer Motion",
+          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + Markdown + Framer Motion",
           points: [
             "**站点地址**：**https://jiangxu.net** | 2025.09 – 维护至今",
             "**应用架构**：基于 **Next.js App Router** 架构搭建，集成博客、简历、项目展示等模块。",
             "**首屏性能**：采用服务端组件与客户端组件混合渲染，博客页面使用 **SSG 静态生成**。",
-            "**内容系统**：实现 **MDX 博客系统**，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能。",
-            "**博客产出**：持续发布 **11 篇技术博客**，覆盖浏览器原理、React 工程实践、移动端 WebView 与 AI 编程工具等主题，并通过 MDX 统一管理内容与展示。",
+            "**内容系统**：实现 **Markdown 博客系统**，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能。",
+            "**博客产出**：持续发布 **11 篇技术博客**，覆盖浏览器原理、React 工程实践、移动端 WebView 与 AI 编程工具等主题，并通过 Markdown 统一管理内容与展示。",
           ],
         },
       ],
@@ -209,13 +209,13 @@ const resumeVersions: ResumeVersion[] = [
         },
         {
           name: "个人主页",
-          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + MDX + Framer Motion",
+          tech: "Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + Markdown + Framer Motion",
           points: [
             "站点：https://jiangxu.net | 2025.09 – 维护至今",
             "项目简介：用于记录学习与成长历程，锻炼工程化与性能优化能力",
             "基于 Next.js App Router 架构搭建，集成博客、简历、项目展示等模块",
             "采用服务端组件与客户端组件混合渲染，博客页面使用 SSG 静态生成，优化首屏加载性能",
-            "实现 MDX 博客系统，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能",
+            "实现 Markdown 博客系统，支持代码高亮、标签筛选、阅读时长统计、Giscus 评论等功能",
             "使用 Framer Motion 实现流畅的页面过渡与滚动驱动动画，通过动态导入按需加载重型组件",
             "支持深色/浅色主题切换，全站响应式适配多端设备",
           ],

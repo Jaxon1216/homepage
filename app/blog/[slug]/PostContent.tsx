@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowLeft } from "react-icons/fi";
 import { Noto_Serif_SC } from "next/font/google";
 import Link from "next/link";
-import type { PostMeta } from "@/lib/mdx";
+import type { PostMeta } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import { GiscusComments } from "@/components/blog/GiscusComments";
 import { ArticleToc, ArticleTocProvider } from "@/components/blog/ArticleToc";

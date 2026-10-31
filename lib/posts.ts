@@ -50,10 +50,10 @@ function resolveCover(data: Record<string, unknown>, content: string): string | 
 export function getAllPosts(): PostMeta[] {
   if (!fs.existsSync(postsDirectory)) return [];
 
-  const files = fs.readdirSync(postsDirectory).filter((f) => f.endsWith(".mdx"));
+  const files = fs.readdirSync(postsDirectory).filter((f) => f.endsWith(".md"));
 
   const posts = files.map((filename) => {
-    const slug = filename.replace(/\.mdx$/, "");
+    const slug = filename.replace(/\.md$/, "");
     const filePath = path.join(postsDirectory, filename);
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(fileContent);
@@ -77,7 +77,7 @@ export function getAllPosts(): PostMeta[] {
 }
 
 export function getPostBySlug(slug: string) {
-  const filePath = path.join(postsDirectory, `${slug}.mdx`);
+  const filePath = path.join(postsDirectory, `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
 
   const fileContent = fs.readFileSync(filePath, "utf-8");

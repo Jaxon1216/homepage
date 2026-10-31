@@ -155,7 +155,7 @@ Row 执行到 return，才产生 li、input、button 等 React 元素。React �
 
 从这份描述到 Fiber，再到稍后生成的 DOM，三者的关系如下。图中只展开 B 子树，省略外层 ul、其他行、静态文字和按钮。
 
-<ArticleImage src="/images/react-fiber/02-element-fiber-dom.png" alt="List 中的 JSX 如何提供 React 元素和 Fiber 的 type、key，以及宿主 DOM 的对应关系" width="2368" height="1744" loading="eager" decoding="async" />
+![List 中的 JSX 如何提供 React 元素和 Fiber 的 type、key，以及宿主 DOM 的对应关系](/images/react-fiber/02-element-fiber-dom.png)
 
 ## 三种结构放在一起看
 
@@ -191,7 +191,7 @@ root.render(<App />);
 
 页面已有 `<div id="root"></div>` 作为挂载容器。以 `root.render(<App />)` 为入口，三种结构对应如下。左侧汇总的是组件逐层执行后产生的元素，并不是 JSX 一次性生成了一棵完整的元素树。
 
-<ArticleImage src="/images/react-fiber/11-three-tree-overview.png" alt="App 和 Content 的 JSX 逐层产生 React 元素，经 Fiber 的 child、sibling、return 组织，最终对应宿主 DOM 结构" width="2511" height="2424" loading="lazy" decoding="async" />
+![App 和 Content 的 JSX 逐层产生 React 元素，经 Fiber 的 child、sibling、return 组织，最终对应宿主 DOM 结构](/images/react-fiber/11-three-tree-overview.png)
 
 这张图参考[《图解 React》中的三者关系图](https://7km.top/main/fibertree-prepare/)，重新绘制并按本文版本校正。
 
@@ -210,7 +210,7 @@ root.render(<App />);
 - **向下：beginWork。** 处理当前节点，执行组件、计算状态、协调子节点。例如调用 List 得到 Row 元素，再调用 Row 得到 li 等元素。
 - **回溯：completeWork。** 当前节点没有待处理的子节点后，完成它的工作。有兄弟节点就处理兄弟，否则回到父节点继续完成。
 
-<ArticleImage src="/images/react-fiber/04-fiber-traversal.png" alt="Fiber 从 beginWork 向下再经 completeWork 回溯的遍历路线" width="2364" height="1592" loading="lazy" decoding="async" />
+![Fiber 从 beginWork 向下再经 completeWork 回溯的遍历路线](/images/react-fiber/04-fiber-traversal.png)
 
 在对应的 Fiber 上，List 的 `child` 指向 Row A，Row A 的 `sibling` 指向 Row B，Row B 的 `return` 仍指向 List。
 
@@ -232,11 +232,11 @@ root.render(<App />);
 
 这次工作的目标很具体：把 B 输入框的 value 从“原备注”变成“已确认”。
 
-<ArticleImage src="/images/react-fiber/01-update-pipeline.png" alt="B 的状态更新经过触发、调度、render、commit 和浏览器绘制" width="2464" height="1336" loading="lazy" decoding="async" />
+![B 的状态更新经过触发、调度、render、commit 和浏览器绘制](/images/react-fiber/01-update-pipeline.png)
 
 之前建立的 Fiber 现在派上了用场：类型和 key 记录身份，Hook 链保存状态，父子兄弟指针说明工作的位置。
 
-<ArticleImage src="/images/react-fiber/03-fiber-node.png" alt="Fiber 的 type 和 key 来自元素，其他字段保存状态、输入与节点关系" width="2272" height="1840" loading="lazy" decoding="async" />
+![Fiber 的 type 和 key 来自元素，其他字段保存状态、输入与节点关系](/images/react-fiber/03-fiber-node.png)
 
 React 再次执行 B 的 Row。运行到 `useState` 时，读到本次更新后的 draft，随后返回 input 等子节点的新描述。input 的类型仍是 `'input'`，可以保留已有宿主节点，记录必要的属性变化。
 
@@ -248,7 +248,7 @@ React 通过两版 Fiber 准备更新：**current** 是上一次已经提交的�
 
 两版中的对应节点通过 `alternate` 关联。匹配成功后，React 可以取出或创建另一版 Fiber，接着已有身份和状态计算；新建一个元素对象，不等于必须新建一份组件状态。
 
-<ArticleImage src="/images/react-fiber/05-double-buffer.png" alt="更新前、构建中、提交后，current 与 workInProgress 的变化" width="2528" height="1504" loading="lazy" decoding="async" />
+![更新前、构建中、提交后，current 与 workInProgress 的变化](/images/react-fiber/05-double-buffer.png)
 
 在 B 的新备注准备完成前，current 仍代表上一次提交的状态。WIP 记录新状态和待提交的变化。**两版宿主 Fiber 可以指向同一个已有 DOM 节点**，双缓冲并不需要复制两套页面。[createWorkInProgress 源码](https://github.com/facebook/react/blob/v19.3.1/packages/react-reconciler/src/ReactFiber.js#L323)
 
@@ -272,7 +272,7 @@ React 结合它们的身份与类型，决定哪些节点可以接续，哪些�
 
 例如先用 `key="B"` 找到旧的 B，再比较类型。本例的普通函数组件，关键比较是旧 Fiber 的 `elementType` 与新元素的 `type` 是否仍指向同一个 Row 函数。匹配成功，就能接续 B 的身份与状态；换成另一个函数引用，即使函数名和 key 都相同，也需要替换。
 
-<ArticleImage src="/images/react-fiber/06-identity-diff.png" alt="新 React 元素通过 key 或位置寻找旧 Fiber，再检查 type 决定复用或替换" width="2336" height="1536" loading="lazy" decoding="async" />
+![新 React 元素通过 key 或位置寻找旧 Fiber，再检查 type 决定复用或替换](/images/react-fiber/06-identity-diff.png)
 
 **复用的含义是接续身份、状态，以及可复用的宿主节点。** Row 仍可能因为新 props 或自身状态更新而重新执行；执行组件也不意味着重建它的 DOM。
 
@@ -316,7 +316,7 @@ markDeletions(remaining);
 | A | 0 | 移动 | 3 |
 | E | 无 | 新增 | 3 |
 
-<ArticleImage src="/images/react-fiber/07-list-diff.png" alt="列表从 ABCD 变为 BDAE 时，匹配、位置判断和变更提交的分步过程" width="2476" height="1824" loading="lazy" decoding="async" />
+![列表从 ABCD 变为 BDAE 时，匹配、位置判断和变更提交的分步过程](/images/react-fiber/07-list-diff.png)
 
 这里的“保留”表示无需为该项标记移动，不代表它的最终数字索引不变。删除 C、把 A 移到 D 后面，再插入 E，就能得到目标顺序。移动已有节点也会改变周围节点的位置。
 
@@ -330,7 +330,7 @@ React 在这个过程中记录 Placement 等标记，并在父 Fiber 上记录�
 
 如果改成 `key={index}`，React 识别的就是位置。新列表第 0 项 B 会接续原来 A 的“原备注”，第 1 项 D 则会拿到原来 B 的“已确认”。数据换了，组件身份却留在原位置。
 
-<ArticleImage src="/images/react-fiber/08-key-state.png" alt="相同重排下，稳定 ID key 保留数据身份，index key 让状态留在位置上" width="2368" height="1673" loading="lazy" decoding="async" />
+![相同重排下，稳定 ID key 保留数据身份，index key 让状态留在位置上](/images/react-fiber/08-key-state.png)
 
 所以，**唯一是为了区分同一组兄弟，稳定是为了在前后两次渲染中认出同一项**。业务 ID 通常很适合；本地数据也可以在创建时生成一次 ID，后续一直使用。
 
@@ -353,7 +353,7 @@ while (nextWork !== null && !shouldYield()) {
 
 在工作单元之间，如果需要让出，React 保存进度并退出当前任务。浏览器获得处理输入和绘制的机会，React 后续再继续工作；如果来了更紧急的更新，过时的结果也可能被重做或放弃。
 
-<ArticleImage src="/images/react-fiber/09-time-slicing.png" alt="并发 render 让出主线程，处理紧急输入后继续或重做未提交工作" width="2496" height="1599" loading="lazy" decoding="async" />
+![并发 render 让出主线程，处理紧急输入后继续或重做未提交工作](/images/react-fiber/09-time-slicing.png)
 
 中断期间，尚未提交的计算不会逐块出现在当前页面上；用户仍看到上一次已提交的结果。等本次结果准备好，再进入提交。[React 官方：并发渲染](https://react.dev/blog/2022/03/29/react-v18#what-is-concurrent-react)
 
@@ -373,7 +373,7 @@ while (nextWork !== null && !shouldYield()) {
 
 **before mutation → mutation → current 切换 → layout**，之后处理相应的 passive Effects。
 
-<ArticleImage src="/images/react-fiber/10-commit-lifecycle.png" alt="commit 各阶段、current 切换、类生命周期与 layout/passive Effects 的对应时间轴" width="2400" height="1984" loading="lazy" decoding="async" />
+![commit 各阶段、current 切换、类生命周期与 layout/passive Effects 的对应时间轴](/images/react-fiber/10-commit-lifecycle.png)
 
 **before mutation** 可以在 DOM 变化前读取信息。类组件的 `getSnapshotBeforeUpdate` 就在这里获取滚动位置等快照。
 

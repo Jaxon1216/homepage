@@ -38,3 +38,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Analytics
 
 Umami 接入配置、事件口径、作者访问排除与验证方法见 [埋点使用说明](docs/analytics/README.md)。
+
+## 博客内容
+
+文章放在 `content/posts/*.md`，使用 YAML frontmatter 和 GFM Markdown。
+正文支持代码高亮、表格、标题目录、`mermaid` 围栏代码块、标准图片语法
+（`![描述](/images/example.png)`，点击放大），以及 `<details>` / `<summary>` 折叠内容。
+折叠标签与 Markdown 正文之间请保留空行。文章内不支持 JSX、import 或 JavaScript 表达式。
+
+渲染入口是 `components/markdown/Markdown.tsx`，元数据与 tag 校验在 `lib/posts.ts`。
+内嵌 HTML 按仓库内可信内容处理；不要直接接入未经审核的外部文章。

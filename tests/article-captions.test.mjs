@@ -4,10 +4,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Module from 'node:module';
 import ts from 'typescript';
-import { compile, run } from '@mdx-js/mdx';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeRaw from 'rehype-raw';
+import rehypeReact from 'rehype-react';
 import remarkGfm from 'remark-gfm';
 import rehypePrettyCode from 'rehype-pretty-code';
-import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import * as jsxRuntime from 'react/jsx-runtime';
 
@@ -20,21 +23,26 @@ function loadPlugin(relativePath, name) {
   return loaded.exports[name];
 }
 
+const rehypeCodeMeta = loadPlugin('lib/rehype-code-meta.ts', 'rehypeCodeMeta');
 const rehypeMermaid = loadPlugin('lib/rehype-mermaid.ts', 'rehypeMermaid');
 const rehypeArticleCaptions = loadPlugin('lib/rehype-article-captions.ts', 'rehypeArticleCaptions');
 
 async function article(source) {
   let tree;
-  const compiled = await compile(source, {
-    outputFormat: 'function-body',
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [
-      rehypeMermaid,
-      [rehypePrettyCode, { theme: { dark: 'one-dark-pro', light: 'github-light' }, keepBackground: false }],
-      rehypeArticleCaptions,
-      () => (value) => { tree = structuredClone(value); },
-    ],
-  });
+  const result = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeCodeMeta)
+    .use(rehypeRaw)
+    .use(() => rehypeCodeMeta({ restore: true }))
+    .use(rehypeMermaid)
+    .use(rehypePrettyCode, { theme: { dark: 'one-dark-pro', light: 'github-light' }, keepBackground: false })
+    .use(rehypeArticleCaptions)
+    .use(() => (value) => { tree = structuredClone(value); })
+    .use(rehypeReact, jsxRuntime)
+    .process(source);
+  const compiled = result.result;
   return { tree, compiled };
 }
 
@@ -59,7 +67,7 @@ function captions(tree) {
     name(node) === 'figcaption' ? text(node) : node.properties['data-caption']);
 }
 
-test('Markdown、Mermaid 与 ArticleImage 按源码顺序编号，title 优先于 alt', async () => {
+test('Markdown、Mermaid 与 HTML 图片 按源码顺序编号，title 优先于 alt', async () => {
   const source = [
     '![第一张备用说明](/first.png "第一张正式图题")',
     '',
@@ -68,7 +76,7 @@ test('Markdown、Mermaid 与 ArticleImage 按源码顺序编号，title 优先�
     'A-->B',
     '```',
     '',
-    '<ArticleImage src="/third.png" alt="第三张说明" width="1200" loading="lazy" />',
+    '<img src="/third.png" alt="第三张说明" width="1200" loading="lazy" />',
     '',
     '<img src="/fourth.png" title="第四张图题" alt="第四张备用说明" />',
   ].join('\n');
@@ -80,11 +88,7 @@ test('Markdown、Mermaid 与 ArticleImage 按源码顺序编号，title 优先�
   const mermaid = findAll(tree, (node) => name(node) === 'div' && node.properties?.['data-caption'])[0];
   assert.equal(text(mermaid), 'graph TD\nA-->B\n');
 
-  // Exercise MDX's JSX nodes and the emitted figure markup, not just hand-made HAST.
-  const { default: Content } = await run(compiled, { ...jsxRuntime, baseUrl: import.meta.url });
-  const html = renderToStaticMarkup(createElement(Content, {
-    components: { ArticleImage: (props) => createElement('img', props) },
-  }));
+  const html = renderToStaticMarkup(compiled);
   assert.match(html, /<figure class="article-figure">/);
   assert.match(html, /src="\/third.png"[^>]*width="1200"[^>]*loading="lazy"/);
   assert.match(html, /<figcaption>图 4　第四张图题<\/figcaption>/);
@@ -100,8 +104,7 @@ test('图片从混合段落提升为 figure，保留文字、图片链接并避�
   const figure = findAll(tree, (node) => name(node) === 'figure')[0];
   assert.equal(findAll(figure, (node) => name(node) === 'a')[0].properties.href, 'https://example.com');
   assert.deepEqual(captions(tree), ['图 1\u3000链接图片']);
-  const { default: Content } = await run(compiled, { ...jsxRuntime, baseUrl: import.meta.url });
-  const html = renderToStaticMarkup(createElement(Content));
+  const html = renderToStaticMarkup(compiled);
   assert.match(html, /<\/p><figure class="article-figure">/);
   assert.match(html, /<a href="https:\/\/example.com"><img/);
 });

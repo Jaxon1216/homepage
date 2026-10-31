@@ -67,7 +67,7 @@ body {
   display: none;
 }
 
-/* Prose for MDX */
+/* Prose for Markdown */
 .prose {
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--foreground);
