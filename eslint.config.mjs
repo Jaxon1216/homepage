@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     // Local editor plugins and scratch files are not application source.
     ".obsidian/**",
     ".temp/**",
+    ".artifacts/**",
   ]),
 ]);
 

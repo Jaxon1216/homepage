@@ -72,7 +72,7 @@ Let’s go through each one.
 # S — Single Responsibility
 > “A component should do one thing. And only one thing.”
 
-### The Problem
+## The Problem
 ```ts
 // ❌ This component does everything  
 // Fetches data, handles state,  
@@ -128,7 +128,7 @@ const UserProfile = () => {
 ```
 One component. Every responsibility. Every reason to change.
 【分析】一个组件承担了初始化页面的所有动作，俗称屎山代码。
-### A Better Split
+## A Better Split
 Split every responsibility into its own focused piece:
 > 拆分每一份职责为单独聚焦的片段
 
@@ -191,7 +191,7 @@ const UserProfile = () => {
   )  
 }
 ```
-### How I Read This Section
+## How I Read This Section
 
 - **分享**：单一职责在 React 里的价值，不只是“代码更整洁”，更重要的是把“变化原因”拆开。比如接口改动、交互改动、UI 改动，本来应该是三类不同变化；如果它们都堆在一个组件里，那么任何改动都会互相影响。
 - **实战信号**：如果一个组件里同时出现了 `fetch`、多个 `useState`、复杂条件渲染、事件处理函数和大段 JSX，基本就可以判断：这个组件开始越界了。
@@ -199,7 +199,7 @@ const UserProfile = () => {
 - **一句话记忆**：一个组件只负责一种变化原因。
 - **我自己的理解**：单一职责不是为了“拆得好看”，而是为了让未来修改某一块逻辑时，不会顺手把别的逻辑一起带崩。
 
-### A Quick Test
+## A Quick Test
 > _Describe your component. If you use the word_ **_AND_** _— split it._
 > 你尝试描述一下你的组件，如果你可以使用这个and单词来描述这个大组件能干的事---那你就拆分他。
 
@@ -218,7 +218,7 @@ const UserProfile = () => {
 
 Add new features without editing existing components.
 > 不改现有原组件来添加新特性（本质是抽离通用逻辑，提高可复用性）
-### The Problem
+## The Problem
 ```ts
 // ❌ Every new button type forces you 你为了让一个按钮有不同样式，新建了n个实例去编辑不同的样式 
 // to edit this component  
@@ -243,7 +243,7 @@ const Button = ({ type, label }) => {
   // Every edit risks breaking primary and danger.  
 }
 ```
-### The Fix
+## The Fix
 ```ts
 // ✅ Base component is closed for modification 
 // 基准组件（公用逻辑，按钮的架子）禁止修改，通过props来获得不同的实例 
@@ -291,7 +291,7 @@ const SuccessButton = ({ label, onClick }) => (
   />  
 )
 ```
-### What This Code Is Really Saying
+## What This Code Is Really Saying
 
 - **译文**：把“会变化的部分”通过 props 传进去，以此扩展组件。
 - **译文**：每个按钮变体都是一种独立扩展。
@@ -306,7 +306,7 @@ const SuccessButton = ({ label, onClick }) => (
 > 把一个组件替换成另一个组件时，不应该出问题
 【译文】里氏替换原则。
 【译文】把一个组件替换成另一个组件时，不应该导致系统出问题。
-### The Problem
+## The Problem
 ```ts
 // ❌ These two inputs behave differently 这两个输入会得到不同的效果 
 // Swapping one for the other breaks your form  【`/swæp/` 替换】
@@ -334,7 +334,7 @@ const CustomInput = ({ value, onValueChange }) => (
 【术语注】它接收的属性名变成了 `onValueChange`，而且回调拿到的是“字符串值”，不是原来的 event 事件对象。
 【译文】这样一替换，父组件就会因为调用方式不一致而出错。
 
-### The Fix
+## The Fix
 ```ts
 // ✅ Both components have identical contracts  
 // Same props. Same behavior. Freely swappable.  
@@ -375,15 +375,15 @@ const CommentForm = ({ useTextarea = false }) => {
   )  
 }
 ```
-### What This Code Is Really Saying
+## What This Code Is Really Saying
 
 - **译文**：两者拥有相同的 props 接口和相同的行为，因此可以自由替换。
 - **译文**：父组件不需要关心最终渲染的是哪一个输入组件，随时替换也不会出问题。
 
-### A Quick Test
+## A Quick Test
 > _Swap_ `_ComponentA_` _with_ `_ComponentB_`_. If the parent breaks — Liskov is violated._
 
-### How I Read This Section
+## How I Read This Section
 
 - **分享**：里氏替换在 React 场景下，最容易被忽略的地方不是“UI 长得像不像”，而是“对外契约是否一致”。看起来都叫 Input，但只要 props 名、返回值语义、事件模型不一样，父组件就不得不写特殊分支。
 - **重点**：所以这里真正要守住的不是“长得像”，而是：**同类组件应该拥有一致的 props 契约和行为预期。**
@@ -394,7 +394,7 @@ const CommentForm = ({ useTextarea = false }) => {
 # I — Interface Segregation
 > “Components should not receive props they don’t use.”
 > 组件不应该接收不用的props参数
-### The Problem
+## The Problem
 ```ts
 // ❌ One massive component that handles everything  
 // Callers pass null for things they don't need  
@@ -437,7 +437,7 @@ const NotificationBanner = ({
 />
 ```
 【译文】调用方被迫到处传 `null`，即使这些参数根本用不到。
-### The Fix
+## The Fix
 ```ts
 // ✅ Specific components for specific needs
 // 颗粒度吧反正就是，精细化组件  
@@ -481,10 +481,10 @@ const ActionNotification = ({ message, actionLabel, onAction }) => (
   onAction={handleDownload}  
 />
 ```
-### A Quick Test
+## A Quick Test
 > _Look at your component’s props. Is the caller ever passing_ `_null_` _for something? If yes — your component is too broad._
 > 看一下你组件的props，【`/ˈkɔːlər/` 调用方】是不是经常为了凑参数而传 `null`？如果是，就说明这个组件太宽泛了。
-### How I Read This Section
+## How I Read This Section
 
 - **译文**：调用方是不是经常为了凑参数而传 `null`？如果是，就说明这个组件职责范围太大了。
 - **分享**：接口隔离在 React 里非常实用，因为它直接关系到组件 API 是否“好用”。一个组件 props 越多、可选项越杂，调用方越容易迷惑，类型定义也会越来越臃肿。
@@ -502,7 +502,7 @@ const ActionNotification = ({ message, actionLabel, onAction }) => (
 This is where **dependency injection through props** comes in.
 
 【译文】这正是通过 props 实现【`/dɪˈpendənsi ɪnˈdʒekʃn/` 依赖注入】的典型场景。
-### The Problem
+## The Problem
 ```ts
 // ❌ Component is hardwired to fetch from one place  
 // Cannot reuse with different data sources  
@@ -528,7 +528,7 @@ const UserList = () => {
   )  
 }
 ```
-### The Fix
+## The Fix
 
 ### Inject the Dependency
 
@@ -625,7 +625,7 @@ const UserList = ({ useUsers }) => {
 <UserList useUsers={useAPIUsers} />
 <UserList useUsers={useMockUsers} />
 ```
-### How I Read This Section
+## How I Read This Section
 
 - **译文**：`fetch` 函数由外部传入，而不是在组件内部写死。
 - **术语注**：立即返回一个成功状态的 Promise，括号里的值会作为异步结果被拿到。
