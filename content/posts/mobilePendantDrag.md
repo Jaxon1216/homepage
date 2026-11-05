@@ -1,4 +1,5 @@
 ---
+status: published
 title: "从零实现移动端拖拽 Hook：兼顾点击与 iOS 滚动穿透"
 date: "2026-05-15"
 description: "从一个 useVerticalDrag Hook 出发，讲清 Touch Events、原生监听、passive、touch-action，以及 iOS WKWebView 滚动穿透的解决思路。"

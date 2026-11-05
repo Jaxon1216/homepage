@@ -1,4 +1,5 @@
 ---
+status: published
 title: "写 Go 后端前，先学会这些 Vim 和 Linux 命令"
 date: "2026-09-22"
 description: "从确认 Go 是否安装、理解 PATH 与 GOPATH，到用 Vim 改配置、用日志和端口定位问题：整理一套 Go 后端开发刚入门就能用上的终端基本功。"

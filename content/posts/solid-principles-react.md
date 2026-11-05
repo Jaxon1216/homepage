@@ -1,4 +1,5 @@
 ---
+status: published
 title: "SOLID Principles in React: What Every React Developer Should Know"
 date: "2026-5-20"
 description: "从组件拆分、props 契约、可替换性到依赖注入，理解如何在 React 项目中避免写出难维护的屎山代码。"

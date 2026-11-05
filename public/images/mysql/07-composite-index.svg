@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="700" viewBox="0 0 1080 700" role="img" aria-labelledby="title desc">
+<title id="title">联合索引：先按用户，再按状态，最后按时间排序</title>
+<desc id="desc">联合索引 user_id、status、created_at 的部分叶子项按用户、状态、时间依次排列；用户三的项目连续，其中已支付订单也构成更小的连续区间。索引项附带主键 id。</desc>
+<rect width="1080" height="700" fill="#ffffff"/>
+<rect x="36" y="29" width="7" height="56" rx="3" fill="#145DA8"/>
+<text x="57" y="53" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700">联合索引：先按用户，再按状态，最后按时间</text>
+<text x="57" y="85" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" >索引 (user_id, status, created_at) 的部分叶子项；每项还携带订单主键 id</text>
+<rect x="57" y="120" width="700" height="45" rx="7" fill="#F3F6FA"/>
+<text x="100" y="150" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="700">user_id</text>
+<text x="215" y="150" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="700">status</text>
+<text x="341" y="150" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="700">created_at</text>
+<text x="555" y="150" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="19" font-weight="700">id（主键）</text>
+<rect x="63" y="348" width="690" height="198" rx="14" fill="#E7F0FC" stroke="#145DA8" stroke-width="2"/>
+<rect x="76" y="356" width="664" height="122" rx="10" fill="#E9F5E5" stroke="#598743" stroke-width="2"/>
+<circle cx="83" cy="197" r="5" fill="#AABACA"/>
+<text x="120" y="203" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >1</text>
+<text x="215" y="203" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >paid</text>
+<text x="341" y="203" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-01 10:00</text>
+<text x="583" y="203" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >1</text>
+<line x1="95" y1="220" x2="718" y2="220" stroke="#CEDAE3" stroke-width="1"/>
+<circle cx="83" cy="259" r="5" fill="#AABACA"/>
+<text x="120" y="265" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >1</text>
+<text x="215" y="265" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >paid</text>
+<text x="341" y="265" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-02 10:00</text>
+<text x="583" y="265" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >2</text>
+<line x1="95" y1="282" x2="718" y2="282" stroke="#CEDAE3" stroke-width="1"/>
+<circle cx="83" cy="321" r="5" fill="#AABACA"/>
+<text x="120" y="327" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >2</text>
+<text x="215" y="327" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >paid</text>
+<text x="341" y="327" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-01 11:00</text>
+<text x="583" y="327" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >3</text>
+<line x1="95" y1="344" x2="718" y2="344" stroke="#CEDAE3" stroke-width="1"/>
+<circle cx="83" cy="383" r="5" fill="#145DA8"/>
+<text x="120" y="389" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >3</text>
+<text x="215" y="389" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >paid</text>
+<text x="341" y="389" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-01 12:00</text>
+<text x="583" y="389" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >5</text>
+<line x1="95" y1="406" x2="718" y2="406" stroke="#CEDAE3" stroke-width="1"/>
+<circle cx="83" cy="445" r="5" fill="#145DA8"/>
+<text x="120" y="451" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >3</text>
+<text x="215" y="451" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >paid</text>
+<text x="341" y="451" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-02 12:00</text>
+<text x="583" y="451" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >6</text>
+<line x1="95" y1="468" x2="718" y2="468" stroke="#CEDAE3" stroke-width="1"/>
+<circle cx="83" cy="507" r="5" fill="#145DA8"/>
+<text x="120" y="513" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="23" >3</text>
+<text x="215" y="513" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >unpaid</text>
+<text x="341" y="513" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" >2026-10-03 13:00</text>
+<text x="583" y="513" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="22" >8</text>
+<line x1="95" y1="530" x2="718" y2="530" stroke="#CEDAE3" stroke-width="1"/>
+<polyline points="758,445 790,445 790,378 803,378" fill="none" stroke="#145DA8" stroke-width="2.5"/>
+<circle cx="803" cy="378" r="4" fill="#145DA8"/>
+<text x="818" y="372" fill="#145DA8" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" font-weight="700">user_id = 3</text>
+<text x="818" y="402" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" >一个连续区间</text>
+<polyline points="748,415 779,415 779,479 803,479" fill="none" stroke="#598743" stroke-width="2.5"/>
+<circle cx="803" cy="479" r="4" fill="#598743"/>
+<text x="818" y="473" fill="#598743" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" font-weight="700">再加 status</text>
+<text x="818" y="502" fill="#598743" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="20" font-weight="700">= paid</text>
+<text x="818" y="531" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" >范围进一步缩小</text>
+<line x1="57" y1="584" x2="1020" y2="584" stroke="#CEDAE3" stroke-width="2"/>
+<text x="58" y="620" fill="#172B42" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="21" font-weight="600">同一用户中，先按状态排；同一状态内，再按时间排。</text>
+<text x="58" y="656" fill="#53677C" font-family="PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" >图中仅展示部分索引项，日期用于说明排列，不表示索引按时间全局有序。</text>
+</svg>

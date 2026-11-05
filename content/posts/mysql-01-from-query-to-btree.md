@@ -1,4 +1,5 @@
 ---
+status: published
 title: "MySQL 入门（一）：从一条 SQL 到数据页与 B+ 树"
 date: "2026-10-28"
 description: "从 Server 层与存储引擎的分工出发，用一道 SQL 题对应语句与输出，再沿数据页、页目录与 B+ 树，解释 MySQL 怎样找到记录。"

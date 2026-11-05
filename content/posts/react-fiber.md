@@ -1,4 +1,5 @@
 ---
+status: published
 title: "深入理解 React Fiber：一次更新如何变成页面变化"
 date: "2026-10-22"
 description: "跟着一个列表从首次渲染走到页面更新，讲清 type、key 的来源，以及 React 元素、Fiber、Diff、双缓冲、commit 和生命周期如何衔接。"

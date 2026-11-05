@@ -1,4 +1,5 @@
 ---
+status: published
 title: "WebView 里的 React H5 弹窗，到底该怎么写：从 visible 到 useImperativeHandle"
 date: "2026-07-06"
 description: "从声明式 visible、服务式弹窗到 useImperativeHandle，梳理 WebView 里的 React H5 弹窗组件选型。"

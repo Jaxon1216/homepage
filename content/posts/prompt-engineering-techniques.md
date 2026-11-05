@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Prompt 优化的七条主线：会写、会推、会持续改"
 date: "2026-5-22"
 description: "从一个写 skill / 用 Cursor / Claude Code 的前端开发者视角，系统梳理七种常用 Prompt 技巧、它们为什么有效，以及在 vibe coding / agent / AGENTS.md 里的落地方式。"

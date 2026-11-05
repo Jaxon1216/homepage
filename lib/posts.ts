@@ -16,6 +16,13 @@ export type PostTag = (typeof POST_TAG_ALLOWLIST)[number];
 
 const POST_TAG_SET = new Set<string>(POST_TAG_ALLOWLIST);
 
+type PostStatus = "draft" | "published";
+
+function parsePostStatus(slug: string, status: unknown = "draft"): PostStatus {
+  if (status === "draft" || status === "published") return status;
+  throw new Error(`[${slug}] 非法 status: ${String(status)}。请使用 draft 或 published。`);
+}
+
 function assertAllowedTags(slug: string, tags: string[]): string[] {
   const invalid = tags.filter((tag) => !POST_TAG_SET.has(tag));
   if (invalid.length > 0) {
@@ -50,26 +57,12 @@ function resolveCover(data: Record<string, unknown>, content: string): string | 
 export function getAllPosts(): PostMeta[] {
   if (!fs.existsSync(postsDirectory)) return [];
 
-  const files = fs.readdirSync(postsDirectory).filter((f) => f.endsWith(".md"));
-
-  const posts = files.map((filename) => {
-    const slug = filename.replace(/\.md$/, "");
-    const filePath = path.join(postsDirectory, filename);
-    const fileContent = fs.readFileSync(filePath, "utf-8");
-    const { data, content } = matter(fileContent);
-    const stats = readingTime(content);
-
-    return {
-      slug,
-      title: data.title || slug,
-      date: data.date || "",
-      description: data.description || "",
-      tags: assertAllowedTags(slug, data.tags || []),
-      cover: resolveCover(data, content),
-      readingTime: stats.text,
-      readingSeconds: stats.time / 1000,
-    };
-  });
+  const posts: PostMeta[] = [];
+  for (const filename of fs.readdirSync(postsDirectory)) {
+    if (!filename.endsWith(".md")) continue;
+    const post = getPostBySlug(path.basename(filename, ".md"));
+    if (post) posts.push(post.meta);
+  }
 
   return posts.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -82,6 +75,10 @@ export function getPostBySlug(slug: string) {
 
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
+  const status = parsePostStatus(slug, data.status);
+  const tags = assertAllowedTags(slug, data.tags || []);
+  if (status === "draft") return null;
+
   const stats = readingTime(content);
 
   return {
@@ -90,7 +87,7 @@ export function getPostBySlug(slug: string) {
       title: data.title || slug,
       date: data.date || "",
       description: data.description || "",
-      tags: assertAllowedTags(slug, data.tags || []),
+      tags,
       cover: resolveCover(data, content),
       readingTime: stats.text,
       readingSeconds: stats.time / 1000,

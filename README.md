@@ -42,6 +42,9 @@ Umami 接入配置、事件口径、作者访问排除与验证方法见 [埋点
 ## 博客内容
 
 文章放在 `content/posts/*.md`，使用 YAML frontmatter 和 GFM Markdown。
+新文章使用 `status: draft`，省略状态也按草稿处理。改为 `status: published` 并重新部署即可发布。
+已发布文章改回 `draft` 并重新部署后，会从博客列表移除，原文章链接返回 404。
+
 正文支持代码高亮、表格、标题目录、`mermaid` 围栏代码块、标准图片语法
 （`![描述](/images/example.png)`，点击放大），以及 `<details>` / `<summary>` 折叠内容。
 折叠标签与 Markdown 正文之间请保留空行。文章内不支持 JSX、import 或 JavaScript 表达式。

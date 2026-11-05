@@ -1,4 +1,5 @@
 ---
+status: published
 title: "给博客接入 GitHub 评论：Giscus 从配置到落地"
 date: "2026-09-17"
 description: "用 GitHub Discussions 承载评论，讲清 Giscus 的授权、参数获取、URL 映射，以及让 AI 自适应接入任意项目的提示词。"

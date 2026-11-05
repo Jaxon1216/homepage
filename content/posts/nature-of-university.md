@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Nature of University"
 date: "2025-10-03"
 description: "站岗四年：大学其实是一家公司（我们只是门口的礼仪小姐）"

@@ -1,4 +1,5 @@
 ---
+status: published
 title: "编译构建：从 webpack 到 Vite 的原理与进化"
 date: "2026-08-31"
 description: "从模块化到一次真实构建，讲清 webpack 的依赖图、loader、chunk 与运行时，再对照 Vite 的按需开发机制与生产构建；结合实验理解分包、Tree Shaking 和 source map。"

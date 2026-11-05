@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1060" role="img" aria-labelledby="title desc">
+  <title id="title">一次 Node.js 页面请求：网络等待和 JavaScript 执行如何衔接</title>
+  <desc id="desc">页面请求进入同一个 JavaScript 主线程，处理函数发起三次异步查询。网络就绪由操作系统通知，事件循环处理相应 I/O 回调；Promise 全部完成后，微任务安排后续 JavaScript 汇总并返回。图中同时区分 timers、poll、check、nextTick、Promise 微任务与 libuv 线程池。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#6b8590"/></marker>
+    <marker id="blue-arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#477fa7"/></marker>
+    <marker id="purple-arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#8f6aa9"/></marker>
+  </defs>
+  <rect width="1500" height="1060" rx="28" fill="#f5f8f7"/>
+  <g font-family="PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif">
+    <text x="52" y="68" font-size="35" font-weight="700" fill="#173843">一次页面请求：Node.js 怎样同时等待三个查询？</text>
+    <text x="54" y="106" font-size="20" fill="#647e88">例子：查询用户、历史记录和推荐内容，再汇总响应</text>
+
+    <rect x="50" y="165" width="205" height="142" rx="17" fill="#fff" stroke="#d0dfdb" stroke-width="2"/>
+    <text x="72" y="206" font-size="25" font-weight="700" fill="#285b52">① 页面请求</text>
+    <text x="72" y="244" font-size="19" fill="#58736f">客户端请求</text>
+    <text x="72" y="272" font-size="19" fill="#58736f">GET /page/123</text>
+    <path d="M255 235 H294" fill="none" stroke="#6b8590" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <rect x="302" y="143" width="667" height="195" rx="20" fill="#173d48"/>
+    <text x="327" y="179" font-size="25" font-weight="700" fill="#fff">同一条 JavaScript 主线程</text>
+    <text x="327" y="207" font-size="18" fill="#cce1dd">请求处理、I/O 回调和 Promise 后续代码分别获得执行机会</text>
+    <g fill="#fff" stroke="#c9e4dd" stroke-width="1.4">
+      <rect x="326" y="224" width="191" height="85" rx="12"/>
+      <rect x="532" y="224" width="191" height="85" rx="12"/>
+      <rect x="738" y="224" width="207" height="85" rx="12"/>
+    </g>
+    <g font-size="19" font-weight="700" fill="#285b52"><text x="341" y="253">② 发起查询</text><text x="547" y="253">④ 执行 I/O 回调</text><text x="753" y="253">⑤ 汇总并返回</text></g>
+    <g font-size="16" fill="#5b7670"><text x="341" y="282">await 暂停后续</text><text x="547" y="282">处理就绪的响应</text><text x="753" y="282">结果到齐后 res.json</text></g>
+
+    <rect x="1025" y="143" width="425" height="195" rx="20" fill="#eaf2fa" stroke="#b7d1e3" stroke-width="2"/>
+    <text x="1050" y="182" font-size="24" font-weight="700" fill="#315f81">③ 网络 I/O：等待下游</text>
+    <text x="1050" y="215" font-size="18" fill="#506e80">异步请求发出后，操作系统监听网络状态</text>
+    <g fill="#fff" stroke="#c3d8e8"><rect x="1050" y="238" width="106" height="49" rx="10"/><rect x="1168" y="238" width="106" height="49" rx="10"/><rect x="1286" y="238" width="106" height="49" rx="10"/></g>
+    <g font-size="19" fill="#356782" text-anchor="middle"><text x="1103" y="269">用户</text><text x="1221" y="269">历史</text><text x="1339" y="269">推荐</text></g>
+    <path d="M969 263 H1014" fill="none" stroke="#477fa7" stroke-width="3" marker-end="url(#blue-arrow)"/>
+
+    <rect x="50" y="410" width="919" height="400" rx="20" fill="#fff" stroke="#cbdeda" stroke-width="2"/>
+    <text x="78" y="451" font-size="25" font-weight="700" fill="#194e47">Node.js 事件循环：安排就绪的回调</text>
+    <text x="78" y="483" font-size="18" fill="#627e7b">libuv 常见阶段示意；具体时机受执行上下文和 Node.js 版本影响</text>
+    <rect x="78" y="511" width="245" height="83" rx="13" fill="#e7f4ef"/><text x="101" y="544" font-size="22" font-weight="700" fill="#206b5c">timers</text><text x="101" y="574" font-size="17" fill="#476e66">到期的定时器回调</text>
+    <rect x="350" y="511" width="245" height="83" rx="13" fill="#e7f0f8"/><text x="373" y="544" font-size="22" font-weight="700" fill="#346783">poll</text><text x="373" y="574" font-size="17" fill="#516f80">处理网络 I/O 就绪等事件</text>
+    <rect x="622" y="511" width="245" height="83" rx="13" fill="#eeeaf8"/><text x="645" y="544" font-size="22" font-weight="700" fill="#67518a">check</text><text x="645" y="574" font-size="17" fill="#756a89">执行 setImmediate 回调</text>
+    <text x="78" y="638" font-size="18" fill="#7c694e">独立于上面的 libuv 阶段，在相应时机处理：</text>
+    <rect x="78" y="658" width="352" height="67" rx="11" fill="#fcf2df"/><text x="99" y="699" font-size="19" fill="#805f38">Node.js 的 nextTick 队列</text>
+    <rect x="450" y="658" width="417" height="67" rx="11" fill="#f1eafa"/><text x="471" y="699" font-size="19" fill="#695080">V8 的 Promise 微任务队列</text>
+    <text x="78" y="769" font-size="18" fill="#617c77">回调和微任务里的 JS 都由上方主线程执行。</text>
+
+    <path d="M1238 338 V557 H985" fill="none" stroke="#477fa7" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#blue-arrow)"/>
+    <text x="1034" y="529" font-size="18" fill="#477fa7">网络就绪 → 通知事件循环</text>
+    <path d="M472 511 V389 H622 V346" fill="none" stroke="#477fa7" stroke-width="3" marker-end="url(#blue-arrow)"/>
+    <text x="486" y="386" font-size="17" fill="#477fa7">安排 I/O 回调</text>
+    <path d="M856 658 V354" fill="none" stroke="#8f6aa9" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#purple-arrow)"/>
+    <text x="744" y="390" font-size="17" fill="#806191">安排后续 JS</text>
+
+    <rect x="1025" y="641" width="425" height="169" rx="20" fill="#fff6e7" stroke="#efd1a0" stroke-width="2"/>
+    <text x="1050" y="682" font-size="23" font-weight="700" fill="#8a632c">libuv 工作线程池</text>
+    <text x="1050" y="717" font-size="18" fill="#7b6a50">处理部分文件、DNS、加密等工作</text>
+    <text x="1050" y="748" font-size="18" fill="#7b6a50">完成后安排相应的后续处理</text>
+    <text x="1050" y="779" font-size="17" fill="#8e7b5f">与上方网络 I/O 是不同的底层路径</text>
+
+    <rect x="50" y="850" width="1400" height="139" rx="18" fill="#e4f2eb"/>
+    <text x="79" y="891" font-size="22" font-weight="700" fill="#245a50">沿着这次请求看：</text>
+    <text x="79" y="927" font-size="19" fill="#4d7167">handler 发起三个查询 → 各自等待网络 → 后续 JS 获得执行机会 → Promise.all 汇总结果</text>
+    <text x="79" y="960" font-size="18" fill="#607f76">图中省略了一些阶段和客户端内部步骤；线程池示意的是另一类工作。</text>
+  </g>
+</svg>

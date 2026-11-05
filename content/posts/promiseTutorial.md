@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Promise手撕教程"
 date: "2026-05-14"
 description: "从状态机与回调队列出发，系统理解 Promise 的实现思路与链式调用。"

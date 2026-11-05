@@ -8,6 +8,7 @@
 
 ```bash
 node diagrams/mysql/generate.mjs
+node diagrams/mysql/generate-composite.mjs
 ```
 
 | 输出文件 | 用途 |
@@ -22,8 +23,12 @@ node diagrams/mysql/generate.mjs
 | `public/images/mysql/04-secondary-lookup.svg` | user_id 二级索引和回表 |
 | `public/images/mysql/05-join-venn.svg` | 从 `join-venn.svg` 复制的 JOIN 图 |
 | `public/images/mysql/06-buffer-pool.svg` | MySQL 进程内的 Buffer Pool、磁盘页、缓存命中与未命中读页 |
+| `public/images/mysql/07-composite-index.svg` | 联合索引的排序及用户、状态条件对应的连续范围 |
+| `public/images/mysql/08-composite-icp.svg` | 范围扫描后使用索引条件下推减少回表的示例 |
 
 生成器从自身位置解析路径。修改 JSON、生成脚本或 JOIN 图源后重新生成，不直接修改输出 SVG。没有新增绘图依赖。
+
+第二篇的联合索引图使用 `generate-composite.mjs` 中的订单数据，图中只展示部分索引项、时间省略秒数；范围与 ICP 图源 `composite-range-index-condition-pushdown.svg` 复用自个人 MySQL 笔记，图中的 `(a, b, c)` 是独立教学示例。图中蓝色大框与绿色小框有意嵌套，表示条件递进时的范围收窄。
 
 ## 统一数据与页编号
 

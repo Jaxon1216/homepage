@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Claude Code 使用技巧"
 date: "2026-08-18"
 description: "从上下文管理、MCP 扩展到 Subagent 并行，整理 Claude Code 日常开发中最值得掌握的进阶用法。"

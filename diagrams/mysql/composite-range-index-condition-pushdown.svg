@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="680" viewBox="0 0 1080 680" role="img" aria-labelledby="title desc">
+<title id="title">范围扫描与索引条件下推</title>
+<desc id="desc">二级索引 a、b、c 中，a 等于 1 且 b 大于 10 的范围包含四个索引项。索引条件下推先按 c 等于 3 过滤，示例中减少两次回表；扫描范围不变。</desc>
+<rect width="1080" height="680" fill="#ffffff"/>
+<rect x="32" y="30" width="7" height="54" rx="3" fill="#2563eb"/>
+<text x="54" y="52" fill="#172b4d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="27" text-anchor="start" font-weight="700">范围扫描和 ICP：减少的成本不同</text>
+<text x="54" y="82" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="16" text-anchor="start">二级索引 (a, b, c) · WHERE a = 1 AND b &gt; 10 AND c = 3 · 查询还需要非索引列</text>
+<circle cx="65" cy="137" r="15" fill="#2563eb"/>
+<text x="65" y="143" fill="white" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="17" text-anchor="middle" font-weight="700">1</text>
+<text x="90" y="144" fill="#2563eb" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="23" text-anchor="start" font-weight="700">a = 1、b &gt; 10 定位范围；c = 3 在范围内筛选</text>
+<rect x="56" y="179" width="221" height="77" rx="10" fill="#fff0ed" stroke="#c2413a" stroke-width="1.5"/>
+<text x="166" y="211" fill="#172b4d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">(1, 11, 2)  id=7</text>
+<text x="166" y="241" fill="#c2413a" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">c ≠ 3，丢弃</text>
+<rect x="306" y="179" width="221" height="77" rx="10" fill="#e7f6f2" stroke="#087f8c" stroke-width="1.5"/>
+<text x="416" y="211" fill="#172b4d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">(1, 11, 3)  id=8</text>
+<text x="416" y="241" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">c = 3，保留</text>
+<rect x="556" y="179" width="221" height="77" rx="10" fill="#fff0ed" stroke="#c2413a" stroke-width="1.5"/>
+<text x="666" y="211" fill="#172b4d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">(1, 12, 1)  id=9</text>
+<text x="666" y="241" fill="#c2413a" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">c ≠ 3，丢弃</text>
+<rect x="806" y="179" width="221" height="77" rx="10" fill="#e7f6f2" stroke="#087f8c" stroke-width="1.5"/>
+<text x="916" y="211" fill="#172b4d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">(1, 12, 3)  id=10</text>
+<text x="916" y="241" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">c = 3，保留</text>
+<line x1="59" y1="278" x2="1028" y2="278" stroke="#2563eb" stroke-width="3"/>
+<text x="541" y="308" fill="#2563eb" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="21" text-anchor="middle" font-weight="700">以上四个二级索引项仍然需要扫描</text>
+<text x="278" y="365" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="24" text-anchor="middle" font-weight="700">不使用 ICP</text>
+<text x="808" y="365" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="24" text-anchor="middle" font-weight="700">使用 ICP</text>
+<circle cx="151" cy="412" r="21" fill="#edf1f7" stroke="#53657d" stroke-width="2"/>
+<text x="151" y="419" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle">7</text>
+<circle cx="231" cy="412" r="21" fill="#edf1f7" stroke="#53657d" stroke-width="2"/>
+<text x="231" y="419" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle">8</text>
+<circle cx="311" cy="412" r="21" fill="#edf1f7" stroke="#53657d" stroke-width="2"/>
+<text x="311" y="419" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle">9</text>
+<circle cx="391" cy="412" r="21" fill="#edf1f7" stroke="#53657d" stroke-width="2"/>
+<text x="391" y="419" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle">10</text>
+<circle cx="762" cy="412" r="21" fill="#e7f6f2" stroke="#087f8c" stroke-width="2"/>
+<text x="762" y="419" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">8</text>
+<circle cx="852" cy="412" r="21" fill="#e7f6f2" stroke="#087f8c" stroke-width="2"/>
+<text x="852" y="419" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="18" text-anchor="middle" font-weight="700">10</text>
+<polyline points="278,437 278,468" fill="none" stroke="#53657d" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="278,468 273,459 283,459" fill="#53657d"/>
+<polyline points="807,437 807,468" fill="none" stroke="#087f8c" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="807,468 802,459 812,459" fill="#087f8c"/>
+<rect x="64" y="471" width="427" height="91" rx="10" fill="#f3f6fa" stroke="#cbd7e6" stroke-width="1.5"/>
+<text x="278" y="507" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="22" text-anchor="middle" font-weight="700">回表 4 次，再判断 c</text>
+<text x="278" y="541" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">最终返回 2 行</text>
+<rect x="594" y="471" width="427" height="91" rx="10" fill="#e7f6f2" stroke="#087f8c" stroke-width="1.5"/>
+<text x="807" y="507" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="21" text-anchor="middle" font-weight="700">索引中先判断 c，回表 2 次</text>
+<text x="807" y="541" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="19" text-anchor="middle">最终同样返回 2 行</text>
+<text x="541" y="603" fill="#087f8c" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="22" text-anchor="middle" font-weight="700">ICP 减少回表次数；没有把 c 变成新的连续范围边界。</text>
+<line x1="42" y1="623" x2="1038" y2="623" stroke="#cbd7e6" stroke-width="2"/>
+<text x="44" y="652" fill="#53657d" font-family="Noto Sans SC, PingFang SC, sans-serif" font-size="16" text-anchor="start">图中次数用于说明访问步骤；实际是否启用 ICP、是否回表，以执行计划和查询列为准。</text>
+</svg>

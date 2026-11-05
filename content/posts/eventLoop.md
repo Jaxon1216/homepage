@@ -1,4 +1,5 @@
 ---
+status: published
 title: "深入理解事件循环"
 date: "2026-3-30"
 description: "为什么宏任务vs微任务其实是个过时甚至错误的说法"
