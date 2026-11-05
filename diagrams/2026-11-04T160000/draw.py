@@ -1,0 +1,75 @@
+from html import escape
+p=[]
+def add(s): p.append(s)
+def rect(x,y,w,h,fill,stroke='none',rx=18,sw=2): add(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>')
+def text(x,y,s,size=24,fill='#263b46',weight='400',family='Noto Sans SC'): add(f'<text x="{x}" y="{y}" font-family="{family}" font-size="{size}" font-weight="{weight}" fill="{fill}">{escape(s)}</text>')
+def line(x1,y1,x2,y2,color='#94a6aa',width=3): add(f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{color}" stroke-width="{width}"/>')
+def circle(x,y,r,fill): add(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{fill}"/>')
+def path(d,color='#94a6aa',width=3): add(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width}"/>')
+add('<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2170" viewBox="0 0 1800 2170">')
+rect(0,0,1800,2170,'#f5f7f5',rx=0)
+
+text(85,80,'GO RUNTIME  /  一次工具调用的调度',22,'#167d65','700')
+text(85,145,'G、M、P 到底怎样一起工作？',48,'#162f38','700')
+text(85,194,'同一个例子：一个 Agent 请求，同时启动搜索、数据库、天气三个任务。',25,'#546d76')
+rect(85,235,1630,205,'#122c33',rx=22)
+text(122,282,'你写的代码',22,'#a8ded0','700')
+text(122,330,'go search();   go database();   go weather()',27,'#fff','600','monospace')
+text(122,382,'代码创建的是 3 个 goroutine；不要求创建 3 条操作系统线程。',24,'#c9dfdb')
+text(90,500,'01',28,'#19866c','700')
+text(145,500,'先认识角色：谁安排谁？',31,'#16313a','700')
+rect(85,530,1630,275,'#fff','#dce7e2',24)
+# Four wide columns, with no arrow ambiguity
+rect(115,575,330,160,'#e3f2ed','#a7d3c0',18)
+text(145,619,'G  goroutine',30,'#087e61','700')
+text(145,660,'要执行的 Go 任务',23)
+text(145,697,'G1、G2、G3',22,'#52756c')
+rect(500,575,450,160,'#fff3db','#ebd398',18)
+text(530,619,'P + M',30,'#9d6b15','700')
+text(530,660,'M 是操作系统线程',23)
+text(530,697,'P 是执行 Go 所需的调度资源',22,'#806c4c')
+rect(1010,575,320,160,'#e9f1fb','#c3d8ef',18)
+text(1040,619,'操作系统',30,'#3f6a9e','700')
+text(1040,660,'把线程安排到 CPU',23)
+text(1040,697,'由 OS 负责',22,'#617a95')
+rect(1385,575,290,160,'#f3eafd','#d7c7eb',18)
+text(1415,619,'CPU 核心',30,'#745098','700')
+text(1415,660,'实际执行指令',23)
+text(1415,697,'P 不是 CPU 核心',22,'#786e86')
+for x in (457,960,1340):
+ line(x,655,x+28,655,'#9aa9a4',4); add(f'<polygon points="{x+28},647 {x+43},655 {x+28},663" fill="#9aa9a4"/>')
+text(125,772,'G 到 M 的安排由 Go runtime 负责；操作系统再调度 M。',23,'#55706f')
+text(90,875,'02',28,'#19866c','700')
+text(145,875,'看三个时刻：等待网络时，线程去做什么？',31,'#16313a','700')
+text(90,917,'假设 GOMAXPROCS = 2，且有足够 CPU；以下只是一种可能的调度顺序。',23,'#536d75')
+# 3 state cards
+states=[
+ (950,'① 开始调用','G1  搜索','G2  数据库','G3  天气：可运行，等待调度',''),
+ (1250,'② G1 等待网络','G3  天气','G2  数据库','G1  搜索：等待网络响应',''),
+ (1550,'③ G1 就绪后再次运行','G3  天气','G1  搜索','G2 已完成；G1 就绪后调度',''),
+]
+for y,title,left,right,note,_ in states:
+ rect(85,y,1630,260,'#fff','#dce7e2',22)
+ text(120,y+53,title,28,'#16313a','700')
+ text(120,y+90,'同时运行 Go 代码的两个示例位置',21,'#70868a')
+ # P and M grouped instead of P as CPU
+ rect(120,y+110,525,74,'#e7f4ef','#add8c5',14)
+ text(145,y+156,'P1 + M1',25,'#167d65','700')
+ text(345,y+156,left,24,'#204b42','600')
+ rect(675,y+110,525,74,'#edf3fb','#c1d5ef',14)
+ text(700,y+156,'P2 + M2',25,'#3b6b9f','700')
+ text(900,y+156,right,24,'#294b6d','600')
+ rect(1230,y+92,440,110,'#fff5e4','#ead6ad',14)
+ text(1250,y+133,'其他状态 / 说明',20,'#866d46','600')
+ text(1250,y+173,note,21,'#6d5c40')
+ text(120,y+231,'G 由 runtime 调度；P1 + M1、P2 + M2 只是这一时刻的示意。',20,'#69807d')
+# lower conclusion
+text(90,1880,'03',28,'#19866c','700')
+text(145,1880,'这里的“2”限制什么？',31,'#16313a','700')
+rect(85,1910,1630,150,'#e4f2ed','#b4d9c9',20)
+text(120,1960,'GOMAXPROCS = 2',28,'#087e61','700')
+text(470,1960,'限制同时执行用户 Go 代码的线程数量。',25,'#244d43','600')
+text(120,2011,'不限制 goroutine 总数、进程线程总数，也不限制网络连接总数。',23,'#476c60')
+text(90,2110,'边界：这里画的是 runtime 管理的常见网络等待；某些阻塞系统调用可能阻塞 M，P 可转交。',20,'#627a7d')
+add('</svg>')
+open('diagrams/2026-11-04T160000/diagram.svg','w',encoding='utf8').write('\n'.join(p))

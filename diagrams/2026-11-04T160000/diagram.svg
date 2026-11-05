@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2170" viewBox="0 0 1800 2170">
+<rect x="0" y="0" width="1800" height="2170" rx="0" fill="#f5f7f5" stroke="none" stroke-width="2"/>
+<text x="85" y="80" font-family="Noto Sans SC" font-size="22" font-weight="700" fill="#167d65">GO RUNTIME  /  一次工具调用的调度</text>
+<text x="85" y="145" font-family="Noto Sans SC" font-size="48" font-weight="700" fill="#162f38">G、M、P 到底怎样一起工作？</text>
+<text x="85" y="194" font-family="Noto Sans SC" font-size="25" font-weight="400" fill="#546d76">同一个例子：一个 Agent 请求，同时启动搜索、数据库、天气三个任务。</text>
+<rect x="85" y="235" width="1630" height="205" rx="22" fill="#122c33" stroke="none" stroke-width="2"/>
+<text x="122" y="282" font-family="Noto Sans SC" font-size="22" font-weight="700" fill="#a8ded0">你写的代码</text>
+<text x="122" y="330" font-family="monospace" font-size="27" font-weight="600" fill="#fff">go search();   go database();   go weather()</text>
+<text x="122" y="382" font-family="Noto Sans SC" font-size="24" font-weight="400" fill="#c9dfdb">代码创建的是 3 个 goroutine；不要求创建 3 条操作系统线程。</text>
+<text x="90" y="500" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#19866c">01</text>
+<text x="145" y="500" font-family="Noto Sans SC" font-size="31" font-weight="700" fill="#16313a">先认识角色：谁安排谁？</text>
+<rect x="85" y="530" width="1630" height="275" rx="24" fill="#fff" stroke="#dce7e2" stroke-width="2"/>
+<rect x="115" y="575" width="330" height="160" rx="18" fill="#e3f2ed" stroke="#a7d3c0" stroke-width="2"/>
+<text x="145" y="619" font-family="Noto Sans SC" font-size="30" font-weight="700" fill="#087e61">G  goroutine</text>
+<text x="145" y="660" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#263b46">要执行的 Go 任务</text>
+<text x="145" y="697" font-family="Noto Sans SC" font-size="22" font-weight="400" fill="#52756c">G1、G2、G3</text>
+<rect x="500" y="575" width="450" height="160" rx="18" fill="#fff3db" stroke="#ebd398" stroke-width="2"/>
+<text x="530" y="619" font-family="Noto Sans SC" font-size="30" font-weight="700" fill="#9d6b15">P + M</text>
+<text x="530" y="660" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#263b46">M 是操作系统线程</text>
+<text x="530" y="697" font-family="Noto Sans SC" font-size="22" font-weight="400" fill="#806c4c">P 是执行 Go 所需的调度资源</text>
+<rect x="1010" y="575" width="320" height="160" rx="18" fill="#e9f1fb" stroke="#c3d8ef" stroke-width="2"/>
+<text x="1040" y="619" font-family="Noto Sans SC" font-size="30" font-weight="700" fill="#3f6a9e">操作系统</text>
+<text x="1040" y="660" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#263b46">把线程安排到 CPU</text>
+<text x="1040" y="697" font-family="Noto Sans SC" font-size="22" font-weight="400" fill="#617a95">由 OS 负责</text>
+<rect x="1385" y="575" width="290" height="160" rx="18" fill="#f3eafd" stroke="#d7c7eb" stroke-width="2"/>
+<text x="1415" y="619" font-family="Noto Sans SC" font-size="30" font-weight="700" fill="#745098">CPU 核心</text>
+<text x="1415" y="660" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#263b46">实际执行指令</text>
+<text x="1415" y="697" font-family="Noto Sans SC" font-size="22" font-weight="400" fill="#786e86">P 不是 CPU 核心</text>
+<line x1="457" y1="655" x2="485" y2="655" stroke="#9aa9a4" stroke-width="4"/>
+<polygon points="485,647 500,655 485,663" fill="#9aa9a4"/>
+<line x1="960" y1="655" x2="988" y2="655" stroke="#9aa9a4" stroke-width="4"/>
+<polygon points="988,647 1003,655 988,663" fill="#9aa9a4"/>
+<line x1="1340" y1="655" x2="1368" y2="655" stroke="#9aa9a4" stroke-width="4"/>
+<polygon points="1368,647 1383,655 1368,663" fill="#9aa9a4"/>
+<text x="125" y="772" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#55706f">G 到 M 的安排由 Go runtime 负责；操作系统再调度 M。</text>
+<text x="90" y="875" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#19866c">02</text>
+<text x="145" y="875" font-family="Noto Sans SC" font-size="31" font-weight="700" fill="#16313a">看三个时刻：等待网络时，线程去做什么？</text>
+<text x="90" y="917" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#536d75">假设 GOMAXPROCS = 2，且有足够 CPU；以下只是一种可能的调度顺序。</text>
+<rect x="85" y="950" width="1630" height="260" rx="22" fill="#fff" stroke="#dce7e2" stroke-width="2"/>
+<text x="120" y="1003" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#16313a">① 开始调用</text>
+<text x="120" y="1040" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#70868a">同时运行 Go 代码的两个示例位置</text>
+<rect x="120" y="1060" width="525" height="74" rx="14" fill="#e7f4ef" stroke="#add8c5" stroke-width="2"/>
+<text x="145" y="1106" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#167d65">P1 + M1</text>
+<text x="345" y="1106" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#204b42">G1  搜索</text>
+<rect x="675" y="1060" width="525" height="74" rx="14" fill="#edf3fb" stroke="#c1d5ef" stroke-width="2"/>
+<text x="700" y="1106" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#3b6b9f">P2 + M2</text>
+<text x="900" y="1106" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#294b6d">G2  数据库</text>
+<rect x="1230" y="1042" width="440" height="110" rx="14" fill="#fff5e4" stroke="#ead6ad" stroke-width="2"/>
+<text x="1250" y="1083" font-family="Noto Sans SC" font-size="20" font-weight="600" fill="#866d46">其他状态 / 说明</text>
+<text x="1250" y="1123" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#6d5c40">G3  天气：可运行，等待调度</text>
+<text x="120" y="1181" font-family="Noto Sans SC" font-size="20" font-weight="400" fill="#69807d">G 由 runtime 调度；P1 + M1、P2 + M2 只是这一时刻的示意。</text>
+<rect x="85" y="1250" width="1630" height="260" rx="22" fill="#fff" stroke="#dce7e2" stroke-width="2"/>
+<text x="120" y="1303" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#16313a">② G1 等待网络</text>
+<text x="120" y="1340" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#70868a">同时运行 Go 代码的两个示例位置</text>
+<rect x="120" y="1360" width="525" height="74" rx="14" fill="#e7f4ef" stroke="#add8c5" stroke-width="2"/>
+<text x="145" y="1406" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#167d65">P1 + M1</text>
+<text x="345" y="1406" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#204b42">G3  天气</text>
+<rect x="675" y="1360" width="525" height="74" rx="14" fill="#edf3fb" stroke="#c1d5ef" stroke-width="2"/>
+<text x="700" y="1406" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#3b6b9f">P2 + M2</text>
+<text x="900" y="1406" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#294b6d">G2  数据库</text>
+<rect x="1230" y="1342" width="440" height="110" rx="14" fill="#fff5e4" stroke="#ead6ad" stroke-width="2"/>
+<text x="1250" y="1383" font-family="Noto Sans SC" font-size="20" font-weight="600" fill="#866d46">其他状态 / 说明</text>
+<text x="1250" y="1423" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#6d5c40">G1  搜索：等待网络响应</text>
+<text x="120" y="1481" font-family="Noto Sans SC" font-size="20" font-weight="400" fill="#69807d">G 由 runtime 调度；P1 + M1、P2 + M2 只是这一时刻的示意。</text>
+<rect x="85" y="1550" width="1630" height="260" rx="22" fill="#fff" stroke="#dce7e2" stroke-width="2"/>
+<text x="120" y="1603" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#16313a">③ G1 就绪后再次运行</text>
+<text x="120" y="1640" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#70868a">同时运行 Go 代码的两个示例位置</text>
+<rect x="120" y="1660" width="525" height="74" rx="14" fill="#e7f4ef" stroke="#add8c5" stroke-width="2"/>
+<text x="145" y="1706" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#167d65">P1 + M1</text>
+<text x="345" y="1706" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#204b42">G3  天气</text>
+<rect x="675" y="1660" width="525" height="74" rx="14" fill="#edf3fb" stroke="#c1d5ef" stroke-width="2"/>
+<text x="700" y="1706" font-family="Noto Sans SC" font-size="25" font-weight="700" fill="#3b6b9f">P2 + M2</text>
+<text x="900" y="1706" font-family="Noto Sans SC" font-size="24" font-weight="600" fill="#294b6d">G1  搜索</text>
+<rect x="1230" y="1642" width="440" height="110" rx="14" fill="#fff5e4" stroke="#ead6ad" stroke-width="2"/>
+<text x="1250" y="1683" font-family="Noto Sans SC" font-size="20" font-weight="600" fill="#866d46">其他状态 / 说明</text>
+<text x="1250" y="1723" font-family="Noto Sans SC" font-size="21" font-weight="400" fill="#6d5c40">G2 已完成；G1 就绪后调度</text>
+<text x="120" y="1781" font-family="Noto Sans SC" font-size="20" font-weight="400" fill="#69807d">G 由 runtime 调度；P1 + M1、P2 + M2 只是这一时刻的示意。</text>
+<text x="90" y="1880" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#19866c">03</text>
+<text x="145" y="1880" font-family="Noto Sans SC" font-size="31" font-weight="700" fill="#16313a">这里的“2”限制什么？</text>
+<rect x="85" y="1910" width="1630" height="150" rx="20" fill="#e4f2ed" stroke="#b4d9c9" stroke-width="2"/>
+<text x="120" y="1960" font-family="Noto Sans SC" font-size="28" font-weight="700" fill="#087e61">GOMAXPROCS = 2</text>
+<text x="470" y="1960" font-family="Noto Sans SC" font-size="25" font-weight="600" fill="#244d43">限制同时执行用户 Go 代码的线程数量。</text>
+<text x="120" y="2011" font-family="Noto Sans SC" font-size="23" font-weight="400" fill="#476c60">不限制 goroutine 总数、进程线程总数，也不限制网络连接总数。</text>
+<text x="90" y="2110" font-family="Noto Sans SC" font-size="20" font-weight="400" fill="#627a7d">边界：这里画的是 runtime 管理的常见网络等待；某些阻塞系统调用可能阻塞 M，P 可转交。</text>
+</svg>
