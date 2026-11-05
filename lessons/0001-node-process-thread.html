@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第一课：Node 里的进程、线程与请求</title><link rel="stylesheet" href="../assets/lesson.css"><script src="../assets/quiz.js" defer></script></head>
+<body><main><header><div class="eyebrow">后端运行模型 · 01 / 建议 5 分钟</div><h1>一个 Node 进程，<br>如何同时处理多个请求？</h1><p class="muted">本课目标：能沿着一段代码指出线程在什么时候执行、什么时候等待。</p></header>
+<h2>1. 先划清边界</h2><p>运行一次 <code>node app.js</code>，通常启动一个 Node 进程。进程内主线程执行启动代码，以及普通 JavaScript 回调；它一次执行一段 JS，并按执行流程调用不同的函数。线程不需要先“跑完整个文件”，也不会因每个请求复制一套代码。<a href="https://nodejs.org/learn/asynchronous-work/dont-block-the-event-loop">[Node 官方指南]</a></p>
+<pre>Node 进程
+├── 主线程：启动代码、路由回调、await 后续 JS
+└── 其他运行时线程：按需执行运行时分配的工作
+
+一份程序定义多个函数 ──→ 按实际调用顺序逐段执行</pre>
+<p class="callout">“Node 单线程”通常是指默认主线程执行这段应用 JavaScript。整个进程可能有多个线程，实际线程数量由运行时、版本和使用的功能决定。</p>
+<h2>2. 看两次请求怎么穿插</h2><p>示意代码：假设 <code>query</code> 是真正异步的数据库驱动操作，<code>await</code> 后面的代码仍由同一个 JS 主线程恢复执行。</p>
+<pre>app.get('/user', async (req, res) =&gt; {
+  console.log('开始', req.query.id) // 主线程
+  const user = await query(req.query.id)
+  console.log('结束', req.query.id) // 主线程
+  res.json(user)                   // 主线程
+})</pre>
+<pre>时间   主线程                         数据库
+ 1     A：打印开始，发出查询 ───────→ A 执行中
+ 2     A 在 await 处暂停
+ 3     B：打印开始，发出查询 ───────→ B 执行中
+ 4     B 在 await 处暂停              A 返回
+ 5     A：恢复、打印结束、返回响应    B 返回
+ 6     B：恢复、打印结束、返回响应</pre>
+<p>这是<strong>一种可能的时序</strong>；具体先后取决于请求到达、数据库完成和调度时间。等待期间记录了后续如何继续；不是一个线程蹲在那里等待 A。网络 I/O 可通过操作系统的非阻塞机制处理，不应说所有等待都交给了工作线程池。<a href="https://nodejs.org/learn/asynchronous-work/event-loop-timers-and-nexttick">[事件循环]</a></p>
+<p>如果 <code>query</code> 返回之前在主线程做了大量同步计算，或者 <code>await</code> 后面有耗时同步循环，主线程仍会被占住，其他 JS 回调就必须等。</p>
+<h2>3. 试着判断</h2><div class="quiz"><p>请求 A 等待异步数据库响应时，主线程能否执行请求 B 的短小 JS 回调？</p><button data-feedback="对。A 暂停后，主线程可以执行 B；A 完成后再恢复它的后续代码。">能的</button><button data-feedback="再想想：A 是等待 I/O，并没有让主线程同步堵在原地。">不能</button><p class="feedback" role="status" aria-live="polite"></p></div>
+<div class="quiz"><p>一个请求到来时，会自动获得一条只运行它自己代码的新线程吗？</p><button data-feedback="再看第 2 节：两个请求的 JS 回调都可能由同一主线程依次执行。">会的</button><button data-feedback="对。在这个默认 Node 示例里，并没有为每个请求新建 JS 线程。">不会</button><p class="feedback" role="status" aria-live="polite"></p></div>
+<h2>继续学习</h2><p>推荐原始资料：<a href="https://nodejs.org/learn/asynchronous-work/dont-block-the-event-loop">Node.js 官方：不要阻塞事件循环</a>。复习时可查 <a href="../reference/runtime-glossary.html">运行模型速查</a>。如果任何一处仍不清楚，请直接向老师追问，也可以让老师逐行演示执行顺序。</p><footer><small>本例介绍默认 Node 主线程模型；Worker threads、多进程及连接池是独立的下一步。</small></footer></main></body></html>

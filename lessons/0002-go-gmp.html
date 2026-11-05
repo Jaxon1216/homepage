@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>第二课：Go 的 goroutine 与 GMP</title><link rel="stylesheet" href="../assets/lesson.css"><script src="../assets/quiz.js" defer></script></head>
+<body><main><header><div class="eyebrow">后端运行模型 · 02 / 建议 5 分钟</div><h1>Go 的 goroutine<br>由谁放到线程上执行？</h1><p class="muted">本课目标：解释一次网络等待时 G、M、P 的关系，并判断 GOMAXPROCS 限制的是什么。</p></header>
+<h2>1. 从熟悉的 Node.js 出发</h2><p>Node.js 常让一个 JS 主线程在异步网络等待期间处理其他回调。Go 也能在等待网络时推进其他任务，但开发者通常通过 <code>go</code> 创建 goroutine；Go runtime 把可运行的 goroutine 安排到操作系统线程上。</p>
+<pre>go callTool("A")   // 发起任务 A
+go callTool("B")   // 发起任务 B
+
+G1 ─┐
+    ├── Go runtime 调度 ──→ M（操作系统线程）
+G2 ─┘                        ↑
+                    执行 Go 代码需要 P</pre>
+<p>这是简化示意：<strong>G</strong> 是 goroutine，<strong>M</strong> 是操作系统线程，<strong>P</strong> 是执行用户 Go 代码所需的调度资源。P 不是 CPU 物理核心，也不是线程池。它们的安排由 Go runtime 动态管理。<a href="https://go.dev/src/runtime/HACKING">[Go runtime 官方说明]</a></p>
+<h2>2. 一个任务等网络，另一个能做什么？</h2><p>假设 G1 和 G2 都向外部服务发送请求，网络 I/O 由 Go runtime 的网络轮询机制管理。一种可能的时序：</p>
+<pre>① G1 在 M1 + P1 上运行，发起网络请求
+② G1 等待网络，暂时不可运行
+③ M1 + P1 可以运行 G2
+④ G1 的网络事件就绪，G1 再次进入可运行状态
+⑤ runtime 之后安排 G1 继续，未必还是 M1</pre>
+<p>等待期间，G1 保留后续执行需要的状态，但不必让一条线程一直等待这次网络响应。<strong>这不适用于所有阻塞：</strong>例如线程进入某些阻塞系统调用时，M 可能被阻塞，runtime 可以把 P 交给其他 M。<a href="https://go.dev/src/runtime/HACKING">[调度与系统调用]</a></p>
+<h2>3. GOMAXPROCS 管什么？</h2><p><code>GOMAXPROCS</code> 决定 P 的数量，限制<strong>同时执行用户 Go 代码</strong>的操作系统线程数量；它不是 goroutine 数量上限，也不是进程中线程总数上限。默认值受 Go 版本和环境影响。<a href="https://pkg.go.dev/runtime#GOMAXPROCS">[官方 API]</a></p>
+<p class="callout">写业务通常不手动为每个任务创建线程。你仍需要控制业务并发数：例如给下游工具调用设置上限、超时与取消，并检查共享数据的并发访问。</p>
+<h2>4. 试着判断</h2><div class="quiz"><p>GOMAXPROCS 为 2，能否创建 100 个 goroutine？</p><button data-feedback="可以。GOMAXPROCS 限制同时执行用户 Go 代码的线程数，不限制 goroutine 总量。">可以创建</button><button data-feedback="再看第 3 节：它限制的是同时执行用户 Go 代码的线程数量。">无法创建</button><p class="feedback" role="status" aria-live="polite"></p></div>
+<div class="quiz"><p>受 runtime 管理的网络请求使 G1 等待时，其他可运行的 G 能否获得执行机会？</p><button data-feedback="可以。G1 暂停等待网络时，runtime 可以安排其他可运行的 goroutine。">可以运行</button><button data-feedback="再看第 2 节：等待的是 G1，runtime 可以调度其他可运行的 G。">不能运行</button><p class="feedback" role="status" aria-live="polite"></p></div>
+<h2>继续学习</h2><p>推荐阅读 <a href="https://go.dev/src/runtime/HACKING">Go 官方 runtime 调度说明</a>。可以回看<a href="0001-node-process-thread.html">第一课：Node.js 进程、线程与请求</a>或查阅<a href="../reference/runtime-glossary.html">运行模型速查</a>。任何一步不清楚，都可以继续让老师结合代码画出执行过程。</p><footer><small>本课描述常见 Go runtime 的简化模型；具体调度顺序不由这张示意图保证。</small></footer></main></body></html>
