@@ -426,7 +426,7 @@ body:has(.blog-reading-shell) {
 .blog-reading-prose {
   color: var(--article-ink);
   font-family: var(--article-serif);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.9;
   line-break: strict;
   font-kerning: normal;
@@ -482,6 +482,11 @@ body:has(.blog-reading-shell) {
   text-align: justify;
 }
 
+/* Long links should wrap without stretching the surrounding Chinese text. */
+.blog-reading-prose > p:has(a) {
+  text-align: start;
+}
+
 .blog-reading-prose > p:has(:is(img, button, svg)) {
   text-indent: 0;
   text-align: center;
@@ -501,6 +506,11 @@ body:has(.blog-reading-shell) {
   color: var(--article-muted);
 }
 
+.blog-reading-prose ol > li::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .blog-reading-prose strong {
   color: inherit;
   font-weight: 700;
@@ -508,6 +518,7 @@ body:has(.blog-reading-shell) {
 
 .blog-reading-prose a {
   color: inherit;
+  overflow-wrap: anywhere;
   text-decoration-color: var(--article-rule);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -636,10 +647,19 @@ body:has(.blog-reading-shell) {
 }
 
 .blog-reading-prose :is(th, td) {
-  padding: 0.65em 0.9em;
+  padding: 0.5em 0.75em;
   border: 0;
   color: inherit;
   line-height: 1.7;
+}
+
+/* Imported cells contain paragraphs; keep their spacing inside the cell. */
+.blog-reading-prose :is(th, td) p {
+  margin-block: 0;
+}
+
+.blog-reading-prose :is(th, td) p + p {
+  margin-block-start: 0.4em;
 }
 
 .blog-reading-prose th {
@@ -740,12 +760,12 @@ body:has(.blog-reading-shell) {
   }
 
   .blog-reading-prose {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .blog-reading-prose pre,
   .blog-reading-prose figure[data-rehype-pretty-code-figure] pre {
-    font-size: 1rem;
+    font-size: 0.9375rem;
   }
 }
 

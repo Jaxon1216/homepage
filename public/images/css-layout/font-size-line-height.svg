@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200"
+     height="660"
+     viewBox="-20 -20 1200 660">
+<g id="o6:1" transform="translate(0, 0)"><rect x="0" y="0" width="1160" height="620" fill="#f8fafe" stroke="none" stroke-width="0" rx="20" ry="20"/></g>
+<g id="a6:1" transform="translate(54, 21.999)"><text font-size="34" font-family="Noto Sans SC" font-weight="bold" fill="#183b63" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="40.001"><tspan x="0" text-anchor="start">字号不变，行高改变</tspan></tspan></text></g>
+<g id="a6:2" transform="translate(54, 80.2935)"><text font-size="21" font-family="Noto Sans SC" font-weight="normal" fill="#59728d" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="24.707"><tspan x="0" text-anchor="start">两边均为 font-size: 24px，同样两行文字；图形按比例放大示意。</tspan></tspan></text></g>
+<g id="c6:1" transform="translate(54, 132)"><path fill="none" stroke="#d9e4f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 1052 0"/></g>
+<g id="a6:3" transform="translate(80, 153.411)"><text font-size="26" font-family="Noto Sans SC" font-weight="bold" fill="#245b91" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="30.589"><tspan x="0" text-anchor="start">line-height: 1</tspan></tspan></text></g>
+<g id="a6:4" transform="translate(650, 153.411)"><text font-size="26" font-family="Noto Sans SC" font-weight="bold" fill="#245b91" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="30.589"><tspan x="0" text-anchor="start">line-height: 1.5</tspan></tspan></text></g>
+<g id="c6:2" transform="translate(580, 160)"><path fill="none" stroke="#dfe8f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 0 360"/></g>
+<g id="o6:2" transform="translate(80, 230)"><rect x="0" y="0" width="380" height="72" fill="#dfeeff" stroke="none" stroke-width="0" rx="0" ry="0"/></g>
+<g id="o6:3" transform="translate(80, 302)"><rect x="0" y="0" width="380" height="72" fill="#edf5ff" stroke="none" stroke-width="0" rx="0" ry="0"/></g>
+<g id="c6:3" transform="translate(80, 230)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="c6:4" transform="translate(80, 302)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="c6:5" transform="translate(80, 374)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="a6:5" transform="translate(94, 205.292)"><text font-size="72" font-family="Noto Sans SC" font-weight="normal" fill="#183b63" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="84.708"><tspan x="0" text-anchor="start">文字 Agjp</tspan></tspan></text></g>
+<g id="a6:6" transform="translate(94, 277.292)"><text font-size="72" font-family="Noto Sans SC" font-weight="normal" fill="#183b63" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="84.708"><tspan x="0" text-anchor="start">文字 Agjp</tspan></tspan></text></g>
+<g id="c6:6" transform="translate(484, 230)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 0 72"/></g>
+<g id="c6:7" transform="translate(477, 230)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 14 0"/></g>
+<g id="c6:8" transform="translate(477, 302)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 14 0"/></g>
+<g id="a6:7" transform="translate(499, 248.117)"><text font-size="22" font-family="Noto Sans SC" font-weight="normal" fill="#507a9f" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="25.883"><tspan x="0" text-anchor="start">24px</tspan></tspan></text></g>
+<g id="o6:4" transform="translate(650, 230)"><rect x="0" y="0" width="380" height="108" fill="#dfeeff" stroke="none" stroke-width="0" rx="0" ry="0"/></g>
+<g id="o6:5" transform="translate(650, 338)"><rect x="0" y="0" width="380" height="108" fill="#edf5ff" stroke="none" stroke-width="0" rx="0" ry="0"/></g>
+<g id="c6:9" transform="translate(650, 230)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="c6:10" transform="translate(650, 338)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="c6:11" transform="translate(650, 446)"><path fill="none" stroke="#7d9fbe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 380 0"/></g>
+<g id="a6:8" transform="translate(664, 223.292)"><text font-size="72" font-family="Noto Sans SC" font-weight="normal" fill="#183b63" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="84.708"><tspan x="0" text-anchor="start">文字 Agjp</tspan></tspan></text></g>
+<g id="a6:9" transform="translate(664, 331.292)"><text font-size="72" font-family="Noto Sans SC" font-weight="normal" fill="#183b63" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="84.708"><tspan x="0" text-anchor="start">文字 Agjp</tspan></tspan></text></g>
+<g id="c6:12" transform="translate(1054, 230)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 0 108"/></g>
+<g id="c6:13" transform="translate(1047, 230)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 14 0"/></g>
+<g id="c6:14" transform="translate(1047, 338)"><path fill="none" stroke="#507a9f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 14 0"/></g>
+<g id="a6:10" transform="translate(1069, 266.117)"><text font-size="22" font-family="Noto Sans SC" font-weight="normal" fill="#507a9f" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="25.883"><tspan x="0" text-anchor="start">36px</tspan></tspan></text></g>
+<g id="a6:11" transform="translate(80, 471.9405)"><text font-size="23" font-family="Noto Sans SC" font-weight="normal" fill="#4b6e90" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="27.06"><tspan x="0" text-anchor="start">两行共 48px</tspan></tspan></text></g>
+<g id="a6:12" transform="translate(650, 471.9405)"><text font-size="23" font-family="Noto Sans SC" font-weight="normal" fill="#4b6e90" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="27.06"><tspan x="0" text-anchor="start">两行共 72px</tspan></tspan></text></g>
+<g id="c6:15" transform="translate(54, 540)"><path fill="none" stroke="#d9e4f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 0 0 L 1052 0"/></g>
+<g id="a6:13" transform="translate(54, 558.47)"><text font-size="20" font-family="Noto Sans SC" font-weight="normal" fill="#59728d" text-anchor="start" dominant-baseline="alphabetic" x="0"><tspan x="0" y="23.53"><tspan x="0" text-anchor="start">本例为同一字体、字号的纯文字；字号控制字的大小，行高影响每行占用的高度。</tspan></tspan></text></g>
+</svg>
